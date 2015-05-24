@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>tornado WebSocket example</title>
+    <script type="text/javascript" src="tornadoProtocol.js"></script>
+</head>
+<body>
+<div class="container">
+    <h1>tornado WebSocket example</h1>
+    <hr>
+    WebSocket status : <span id="message"></span>
+    <hr>
+    <hr>
+    <ul>
+        <li>value 201 - 500 : change to yellow</li>
+        <li>value 501 - : change to red</li>
+    </ul>
+</div>
+
+
+    <script>
+    $tornadoInit(12345)
+    //$tornado.TestClass.client.test = 6
+    $tornado.client.TestClass.onTest = function(a,b){
+        alert("OnTest")
+    }
+    //alert($tornado.client["TestClass"]["test"])
+    $tornado.onopen = function(){
+      $tornado.server.TestClass.tast(1,2,3).done(function(data){
+        console.log(data)
+      }, function(error){
+        console.log("Error on - " + error)
+      });
+      /*
+      $tornado.server.TestClass.tast(1,2,3).done(function(data){
+        console.log(data)
+      }, function(error){
+      console.log("Error on - " + error)
+      });
+      $tornado.server.TestClass.tast(1,2,3).done(function(data){
+        console.log(data)
+      }, function(error){
+      console.log("Error on - " + error)
+      });*/
+    };
+
+    $tornado.onclose = function(ev){
+     console.log("OnClose")
+    };
+    $tornado.onerror = function(ev){
+      alert(ev)
+    };
+
+
+</script>
+</body>
+</html>

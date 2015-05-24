@@ -13,7 +13,8 @@ function $tornadoInit(args){{
     $tornado = new WebSocket('ws://localhost:8888/ws/'+args);
     $tornado.__messageID = 0
     $tornado.__returnFunctions = {{}};
-    $tornado.__respondTimeout = 3000
+    $tornado.__respondTimeout = 3000;
+    $tornado.client = {{}};
     $tornado.__getReturnFunction = function(ID){{
         return function(onSuccess, onError){{
             f=$tornado.__returnFunctions[ID];

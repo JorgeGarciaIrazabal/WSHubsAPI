@@ -4,7 +4,8 @@ function $tornadoInit(args){
     $tornado = new WebSocket('ws://localhost:8888/ws/'+args);
     $tornado.__messageID = 0
     $tornado.__returnFunctions = {};
-    $tornado.__respondTimeout = 3000
+    $tornado.__respondTimeout = 3000;
+    $tornado.client = {};
     $tornado.__getReturnFunction = function(ID){
         return function(onSuccess, onError){
             f=$tornado.__returnFunctions[ID];
@@ -30,7 +31,7 @@ function $tornadoInit(args){
                 else if(f.onError != undefined)
                     f.onError(msgObj.replay)
             }else{
-                f = $tornado[msgObj.hub].client[msgObj.function]
+                f = $tornado.client[msgObj.hub][msgObj.function]
                 f.apply(f, msgObj.args)
             }
         }catch(err){
@@ -38,8 +39,9 @@ function $tornadoInit(args){
         }
     }
     $tornado.onMessageError = function(error){ }
+    $tornado.server = {}
     
-    $tornado.TestClass2 = {
+    $tornado.server.TestClass2 = {
         __HUB_NAME : "TestClass2",
         
         tast : function (a, b, c){
@@ -65,8 +67,8 @@ function $tornadoInit(args){
             return {done: $tornado.__getReturnFunction(id)}
         }
     }
-    $tornado.TestClass2.client = {}
-    $tornado.TestClass = {
+    $tornado.client.TestClass2 = {}
+    $tornado.server.TestClass = {
         __HUB_NAME : "TestClass",
         
         tast : function (a, b, c){
@@ -92,7 +94,7 @@ function $tornadoInit(args){
             return {done: $tornado.__getReturnFunction(id)}
         }
     }
-    $tornado.TestClass.client = {}
+    $tornado.client.TestClass = {}
 
 }
     

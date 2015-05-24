@@ -8,7 +8,7 @@ import logging.config
 import json
 from HubDecorator import HubDecorator
 logging.config.dictConfig(json.load(open('logging.json')))
-from TornadoCommProtocol import MessageHandler
+from CommProtocol import ClientHandler,CommHandler
 
 cl = []
 log = logging.getLogger(__name__)
@@ -30,7 +30,7 @@ class UploadHandler(web.RequestHandler):
 
 app = web.Application([
     (r'/', IndexHandler),
-    (r'/ws/(.*)', MessageHandler),
+    (r'/ws/(.*)', ClientHandler),
     (r'/upload', UploadHandler),
 ])
 class tes:
@@ -43,7 +43,7 @@ if __name__ == '__main__':
     class TestClass2:
 
         def test(self, _client, a=1, b=2):
-            print b
+            print(b)
             time.sleep(b)
             return a, b
 
@@ -58,12 +58,16 @@ if __name__ == '__main__':
 
         def tast(self, _client, a=5, b=1, c=3):
             """
-            @type _client: MessageHandler
+            @type _client: CommHandler
             """
+            clients = _client.OtherClients()
             _client.onTest(5,6)
+            """for c in clients:
+                print(c.ID)
+                c.onTest(5,6)"""
             return tes()
-    #HubDecorator.constructJSFile()
-    HubDecorator.constructJAVAFile("C:/Users/jgarc/workspace/tornado/src/tornado", "tornado")
+    HubDecorator.constructJSFile("Test/JSClient/")
+    #HubDecorator.constructJAVAFile("C:/Users/jgarc/workspace/tornado/src/tornado", "tornado")
     log.debug("starting...")
     app.listen(8888)
     ioloop.IOLoop.instance().start()

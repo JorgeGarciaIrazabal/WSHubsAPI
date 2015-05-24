@@ -1,13 +1,12 @@
 from inspect import getargspec
 import inspect
-import json
 import string
 import sys
 import logging
 import logging.config
 import os
-from HubDecoratorConfig import HubDecoratorConfig as config
 import logging.config
+from HubDecoratorConfig import HubDecoratorConfig as config
 
 log = logging.getLogger(__name__)
 
@@ -19,6 +18,18 @@ class HubDecorator:
     HUBsJS_Strings = []
     HUBsJAVA_Strings = []
 
+    IS_HUB_PROPERTY_STR = "is_a_hub_class"
+
+    JS_FILE_NAME = "tornadoProtocol.js"
+    JAVA_FILE_NAME = "TornadoServer.java"
+
+    @classmethod
+    def isHub(cls, obj):
+        try:
+            return obj.__dict__.get(cls.IS_HUB_PROPERTY_STR,False)
+        except:
+            return False
+
     @staticmethod
     def getPublicFunctions(m):
         isFunction = inspect.ismethod if sys.version_info[0] == 2 else inspect.isfunction
@@ -26,12 +37,12 @@ class HubDecorator:
 
     @classmethod
     def constructJSFile(cls, path=""):
-        with open(path + "tornadoProtocol.js", "w") as f:
+        with open(path + cls.JS_FILE_NAME, "w") as f:
             f.write(config.JS_WRAPPER.format(main="".join(cls.HUBsJS_Strings)))
 
     @classmethod
     def constructJAVAFile(cls, path, package):
-        with open(path + os.sep + "TornadoServer.java", "w") as f:
+        with open(path + os.sep + cls.JAVA_FILE_NAME, "w") as f:
             wrapper = config.JAVA_WRAPPER % package
             f.write(wrapper.format(main="".join(cls.HUBsJAVA_Strings)))
 
@@ -89,7 +100,7 @@ class HubDecorator:
                 funcStrings = "\n".join(getJAVAFunctionsStr(cls, templates))
 
             return templates.class_.format(name=cls.__name__, functions=funcStrings)
-
+        setattr(cls,HubDecorator.IS_HUB_PROPERTY_STR,True)
         hd.HUBsJS_Strings.append(getHubClass(config.getJSTemplates(), JS))
         hd.HUBsJAVA_Strings.append(getHubClass(config.getJAVATemplates(), JAVA))
 
