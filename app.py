@@ -8,7 +8,7 @@ import logging.config
 import json
 from HubDecorator import HubDecorator
 logging.config.dictConfig(json.load(open('logging.json')))
-from CommProtocol import ClientHandler,CommHandler
+from ClientHandlers.Tornado import ClientHandler
 
 cl = []
 log = logging.getLogger(__name__)
@@ -60,8 +60,9 @@ if __name__ == '__main__':
             """
             @type _client: CommHandler
             """
-            clients = _client.OtherClients()
-            _client.onTest(5,6)
+            clients = _client.OtherClients
+            clients.onTest(5,6)
+            """_client.onTest(5,6)"""
             """for c in clients:
                 print(c.ID)
                 c.onTest(5,6)"""

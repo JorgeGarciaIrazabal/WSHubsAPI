@@ -6,7 +6,7 @@ import unittest
 import os
 import time
 
-from tornado import web, ioloop
+from ClientHandlers import web, ioloop
 
 from CommProtocol import ClientHandler
 from HubDecorator import HubDecorator

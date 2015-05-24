@@ -126,6 +126,6 @@ if __name__ == '__main__':
             print(a, b)
 
     HubDecorator.constructJAVAFile(
-        "C:/Users/Jorge/SoftwareProjects/WhereAppU/app/src/main/java/com/application/jorge/whereappu/Tornado",
-        "com.application.jorge.whereappu.Tornado")
+        "C:/Users/Jorge/SoftwareProjects/WhereAppU/app/src/main/java/com/application/jorge/whereappu/ClientHandlers",
+        "com.application.jorge.whereappu.ClientHandlers")
     HubDecorator.constructJSFile()

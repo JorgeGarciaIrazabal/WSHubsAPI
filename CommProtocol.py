@@ -1,16 +1,13 @@
 import json
-import logging
 import sys
 import inspect
 
-import tornado
-import tornado.websocket
-
 from HubDecorator import HubDecorator
+from utils import classproperty
 
 __author__ = 'jgarc'
 
-log = logging.getLogger(__name__)
+
 
 class FunctionMessage:
     def __init__(self, messageStr, client):
@@ -29,7 +26,6 @@ class FunctionMessage:
         try:
             return True, self.method(*self.args)
         except Exception as e:
-            log.exception(e)
             return False, str(e)
 
     def callFunction(self):
@@ -75,20 +71,23 @@ class CommHandler:
                 replayStr = json.dumps(replay.__dict__)
             self.writeMessage(replayStr)
         except Exception as e:
-            log.exception(e)
+            self.onError(e)
 
     def onClose(self):
         if self.ID in self._connections.keys():
             self._connections.pop(self.ID)
 
+    def onError(self, exception):
+        raise NotImplementedError
+
     def __getattr__(self, item):
-        def clientFunction(*args):
+        def connectionFunction(*args):
             hubName = self.__getHubName()
             message = {"function": item, "args": list(args), "hub": hubName}
             msgStr = json.dumps(message)
             self.writeMessage(msgStr)
 
-        return clientFunction
+        return connectionFunction
 
     def writeMessage(self, *args, **kwargs):
         raise NotImplementedError
@@ -110,43 +109,28 @@ class CommHandler:
                     pass
                 else:  # obj is the class that defines our method
                     return hubName
-    @classmethod
+    @classproperty
     def allClients(cls):
-        return cls._connections.values()
+        return ConnectionGroup(cls._connections.values())
 
+    @property
     def OtherClients(self):
-        return filter(lambda x: x.ID != self.ID, self._connections.values())
+        return ConnectionGroup(filter(lambda x: x.ID != self.ID, self._connections.values()))
 
-class ConnectionGroups:
+class ConnectionGroup:
     def __init__(self, connections):
-        self.connections = connections
+        """
+        :type connections: list of CommHandler
+        """
+        self.__connections = connections
 
     def __getattr__(self, item):
-        for c in self.connections:
-            c
+        functions = []
+        for c in self.__connections:
+            functions.append(c.__getattr__(item))
 
-class ClientHandler(tornado.websocket.WebSocketHandler):
-    def __init__(self, application, request, **kwargs):
-        super().__init__(application, request, **kwargs)
-        self._commHandler = CommHandler(self)
-        self._commHandler.writeMessage = self.writeMessage
-        self.ID = None
+        def connectionFunctions(*args):
+            for f in functions:
+                f(*args)
+        return connectionFunctions
 
-    def writeMessage(self, message):
-        log.debug("message to %s:\n%s" % (self._commHandler.ID, message))
-        self.write_message(message)
-
-    def open(self, *args):
-        log.debug("open new connection with ID: %d " % int(args[0]))
-        self.ID = self._commHandler.onOpen(int(args[0]))
-
-    def on_message(self, message):
-        log.debug("Message received from ID: %s\n%s " % (str(self.ID), str(message)))
-        self._commHandler.onMessage(message)
-
-    def on_close(self):
-        log.debug("client closed %s" % self._commHandler.__dict__.get("ID", "None"))
-        self._commHandler.onClose()
-
-    def check_origin(self, origin):
-        return True
