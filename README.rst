@@ -1,4 +1,4 @@
-A sample Python project
+Web socket protocol
 =======================
 
 This file is not implemented.
