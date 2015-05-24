@@ -6,7 +6,7 @@ log = logging.getLogger(__name__)
 
 class ClientHandler(tornado.websocket.WebSocketHandler):
     def __init__(self, application, request, **kwargs):
-        super().__init__(application, request, **kwargs)
+        super(ClientHandler, self).__init__(application, request, **kwargs)
         self._commHandler = CommHandler(self)
         self._commHandler.writeMessage = self.writeMessage
         self.ID = None

@@ -26,7 +26,7 @@ class HubDecorator:
     @classmethod
     def isHub(cls, obj):
         try:
-            return obj.__dict__.get(cls.IS_HUB_PROPERTY_STR,False)
+            return obj.__dict__.get(cls.IS_HUB_PROPERTY_STR, False)
         except:
             return False
 
@@ -37,12 +37,12 @@ class HubDecorator:
 
     @classmethod
     def constructJSFile(cls, path=""):
-        with open(path + cls.JS_FILE_NAME, "w") as f:
+        with open(os.path.join(path, cls.JS_FILE_NAME), "w") as f:
             f.write(config.JS_WRAPPER.format(main="".join(cls.HUBsJS_Strings)))
 
     @classmethod
     def constructJAVAFile(cls, path, package):
-        with open(path + os.sep + cls.JAVA_FILE_NAME, "w") as f:
+        with open(os.path.join(path, cls.JAVA_FILE_NAME), "w") as f:
             wrapper = config.JAVA_WRAPPER % package
             f.write(wrapper.format(main="".join(cls.HUBsJAVA_Strings)))
 
@@ -100,13 +100,13 @@ class HubDecorator:
                 funcStrings = "\n".join(getJAVAFunctionsStr(cls, templates))
 
             return templates.class_.format(name=cls.__name__, functions=funcStrings)
-        setattr(cls,HubDecorator.IS_HUB_PROPERTY_STR,True)
+
+        setattr(cls, HubDecorator.IS_HUB_PROPERTY_STR, True)
         hd.HUBsJS_Strings.append(getHubClass(config.getJSTemplates(), JS))
         hd.HUBsJAVA_Strings.append(getHubClass(config.getJAVATemplates(), JAVA))
 
         hd.HUBs_DICT[cls.__name__] = cls()
         return cls
-
 
 if __name__ == '__main__':
     @HubDecorator

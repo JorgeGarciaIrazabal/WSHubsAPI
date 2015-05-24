@@ -14,6 +14,12 @@ from CommProtocol import CommHandler
 cl = []
 log = logging.getLogger(__name__)
 
+settings = {
+    "static_path": os.path.join(os.path.dirname(__file__), "static"),
+    "login_url": "/login",
+}
+
+
 class IndexHandler(web.RequestHandler):
     def get(self):
         self.render("index.html")
@@ -33,7 +39,7 @@ app = web.Application([
     (r'/', IndexHandler),
     (r'/ws/(.*)', ClientHandler),
     (r'/upload', UploadHandler),
-])
+],**settings)
 class tes:
     def __init__(self):
         self.a = 10
@@ -61,16 +67,10 @@ if __name__ == '__main__':
             """
             @type _client: CommHandler
             """
-            clients = _client.otherClients
-            _client.allClients
-            clients.onTest(5,6)
-            """_client.onTest(5,6)"""
-            """for c in clients:
-                print(c.ID)
-                c.onTest(5,6)"""
+            _client.otherClients.onTest(5,6)
+            #_client.allClients.onTest(6,7)
             return tes()
-    HubDecorator.constructJSFile("Test/JSClient/")
-    #HubDecorator.constructJAVAFile("C:/Users/jgarc/workspace/tornado/src/tornado", "tornado")
+    HubDecorator.constructJSFile(settings["static_path"])
     log.debug("starting...")
     app.listen(8888)
     ioloop.IOLoop.instance().start()
