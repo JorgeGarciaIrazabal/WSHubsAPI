@@ -24,7 +24,7 @@ setup(
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
-    version='0.1.0',
+    version='0.1.1',
 
     description='function protocol to communicate backend and frontend in a intuitive way like signalR in C#',
     long_description=long_description,
@@ -33,7 +33,7 @@ setup(
     url='https://github.com/JorgeGarciaIrazabal/WSFunctionProtocol.git',
 
     # Author details
-    author='Jorge García Irazábal',
+    author='Jorge Garcia Irazabal',
     author_email='jorge.girazabal@gmail.com',
 
     # Choose your license
