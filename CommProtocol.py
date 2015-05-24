@@ -44,7 +44,7 @@ class CommHandler:
     __UNPROVIDED_TEMPLATE = "__%d"
     _connections = {}
 
-    def __init__(self, client):
+    def __init__(self, client = None):
         self.ID = None
         self.client = client
 
@@ -114,8 +114,11 @@ class CommHandler:
         return ConnectionGroup(cls._connections.values())
 
     @property
-    def OtherClients(self):
+    def otherClients(self):
         return ConnectionGroup(filter(lambda x: x.ID != self.ID, self._connections.values()))
+
+    def getClients(self, function):
+        return ConnectionGroup(filter(function, self._connections.values()))
 
 class ConnectionGroup:
     def __init__(self, connections):
