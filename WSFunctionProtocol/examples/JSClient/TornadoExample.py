@@ -63,7 +63,7 @@ if __name__ == '__main__':
 
         def getNumOfClientsConnected(self):
             self.numberOfFunctionsCalled+=1
-            print self.numberOfFunctionsCalled
+            print(self.numberOfFunctionsCalled)
             client = HubDecorator.getConnection()
             return len(client.allClients)
             # _client.otherClients.onTest(5,6) #todo: not implemented respond on client

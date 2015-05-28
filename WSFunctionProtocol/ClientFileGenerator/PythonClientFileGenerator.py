@@ -22,7 +22,7 @@ class PythonClientFileGenerator():
             defaults = getDefaults(method)
             formattedArgs = []
             for i, arg in enumerate(reversed(args)):
-                if i > len(defaults):
+                if i >= len(defaults):
                     formattedArgs.insert(0, arg)
                 else:
                     formattedArgs.insert(0, arg + "=" + str(defaults[-i - 1]))
@@ -54,7 +54,6 @@ import json
 import logging
 import threading
 from ws4py.client.threadedclient import WebSocketClient
-import time
 from threading import Timer
 
 log = logging.getLogger(__name__)
@@ -121,7 +120,7 @@ class WSConnection(WebSocketClient):
 
     def received_message(self, m):
         try:
-            msgObj = json.loads(m.data)
+            msgObj = json.loads(m.data.decode('utf-8'))
             if "replay" in msgObj:
                 f = self.__returnFunctions.get(msgObj["ID"], None)
                 if f and msgObj["success"]:
@@ -129,7 +128,7 @@ class WSConnection(WebSocketClient):
                 elif f and f.onError:
                     f.onError(msgObj["replay"])
             else:
-                self.client.__dict__[msgObj["hub"]].__dict__[msgObj["function"]](*msgObj["args"])
+                self.client.__getattribute__(msgObj["hub"]).__dict__[msgObj["function"]](*msgObj["args"])
         except Exception as e:
             self.onError(e)
 
@@ -186,7 +185,7 @@ class WSConnection(WebSocketClient):
             args = list()
             {cook}
             id = WSServer.getNextMessageID()
-            body = {{"hub": cls.__name__, "function": "tast", "args": args, "ID": id}}
+            body = {{"hub": cls.__name__, "function": "{name}", "args": args, "ID": id}}
             WSConnection._instance.send(json.dumps(body))
             return WSConnection._instance._getReturnFunction(id)'''
     ARGS_COOK_TEMPLATE = "args.append({name})"

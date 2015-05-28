@@ -3,7 +3,6 @@ import json
 import logging
 import threading
 from ws4py.client.threadedclient import WebSocketClient
-import time
 from threading import Timer
 
 log = logging.getLogger(__name__)
@@ -26,8 +25,8 @@ class WSReturnObject:
 
 
 class WSClient(object):
-    MyHubTest = WSSimpleObject()
     TestClass2 = WSSimpleObject()
+    ChatHub = WSSimpleObject()
 
 class WSServer(object):
     _messageID = 0
@@ -39,35 +38,6 @@ class WSServer(object):
             cls._messageID += 1
             return cls._messageID
     
-    class MyHubTest(object):
-        
-        @classmethod
-        def tast(cls, a=5, b=1, c=3):
-            """
-            :rtype : WSReturnObject
-            """
-            args = list()
-            args.append(a)
-            args.append(b)
-            args.append(c)
-            id = WSServer.getNextMessageID()
-            body = {"hub": cls.__name__, "function": "tast", "args": args, "ID": id}
-            WSConnection._instance.send(json.dumps(body))
-            return WSConnection._instance._getReturnFunction(id)
-        
-        @classmethod
-        def test(cls, a=1, b=2):
-            """
-            :rtype : WSReturnObject
-            """
-            args = list()
-            args.append(a)
-            args.append(b)
-            id = WSServer.getNextMessageID()
-            body = {"hub": cls.__name__, "function": "tast", "args": args, "ID": id}
-            WSConnection._instance.send(json.dumps(body))
-            return WSConnection._instance._getReturnFunction(id)
-        
     class TestClass2(object):
         
         @classmethod
@@ -93,7 +63,33 @@ class WSServer(object):
             args.append(a)
             args.append(b)
             id = WSServer.getNextMessageID()
-            body = {"hub": cls.__name__, "function": "tast", "args": args, "ID": id}
+            body = {"hub": cls.__name__, "function": "test", "args": args, "ID": id}
+            WSConnection._instance.send(json.dumps(body))
+            return WSConnection._instance._getReturnFunction(id)
+        
+    class ChatHub(object):
+        
+        @classmethod
+        def getNumOfClientsConnected(cls, ):
+            """
+            :rtype : WSReturnObject
+            """
+            args = list()
+            
+            id = WSServer.getNextMessageID()
+            body = {"hub": cls.__name__, "function": "getNumOfClientsConnected", "args": args, "ID": id}
+            WSConnection._instance.send(json.dumps(body))
+            return WSConnection._instance._getReturnFunction(id)
+        
+        @classmethod
+        def sendToAll(cls, message):
+            """
+            :rtype : WSReturnObject
+            """
+            args = list()
+            args.append(message)
+            id = WSServer.getNextMessageID()
+            body = {"hub": cls.__name__, "function": "sendToAll", "args": args, "ID": id}
             WSConnection._instance.send(json.dumps(body))
             return WSConnection._instance._getReturnFunction(id)
         
@@ -129,7 +125,7 @@ class WSConnection(WebSocketClient):
 
     def received_message(self, m):
         try:
-            msgObj = json.loads(m.data)
+            msgObj = json.loads(m.data.decode('utf-8'))
             if "replay" in msgObj:
                 f = self.__returnFunctions.get(msgObj["ID"], None)
                 if f and msgObj["success"]:

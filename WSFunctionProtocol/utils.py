@@ -1,4 +1,7 @@
-from Queue import Queue
+try:
+    from Queue import Queue
+except:
+    from queue import Queue
 from collections import OrderedDict
 import inspect
 import json
@@ -8,16 +11,20 @@ import string
 import sys
 from inspect import getargspec
 import threading
-import thread
+
+try:
+    textTypes = [str, unicode]
+except:
+    textTypes = [str]
+ASCII_UpperCase = string.uppercase if sys.version_info[0] == 2 else string.ascii_uppercase
+
 
 class classproperty(object):
-
     def __init__(self, fget):
         self.fget = fget
 
     def __get__(self, owner_self, owner_cls):
         return self.fget(owner_cls)
-
 
 def getArgs(method):
     args = getargspec(method).args
@@ -31,11 +38,11 @@ def getArgs(method):
 
 def getDefaults(method):
     d = getargspec(method).defaults
-    if d is None: return[]
+    if d is None: return []
     d = list(d)
     for i in range(len(d)):
-        if isinstance(d[i],(str,unicode)):#todo: check with python 3
-            d[i] = '"%s"'%d[i]
+        if isinstance(d[i], tuple(textTypes)):  # todo: check with python 3
+            d[i] = '"%s"' % d[i]
     return d
 
 def isPublicFunction(method):
@@ -43,20 +50,18 @@ def isPublicFunction(method):
     return isFunction(method) and not method.__name__.startswith("_")
 
 def getModulePath():
-    encoding = sys.getfilesystemencoding()
     frame = inspect.currentframe().f_back
     info = inspect.getframeinfo(frame)
     file = info.filename
-    return os.path.dirname(os.path.abspath(unicode(file, encoding)))
+    return os.path.dirname(os.path.abspath(file))
 
-ASCII_UpperCase = string.uppercase if sys.version_info[0] == 2 else string.ascii_uppercase
 
 
 FUNCTION_MESSAGE = """Function "%s" called.
     Parameters used: %s
     Result: %s
 """
-strBasicObjects =  [str,unicode] if sys.version_info[0] == 2 else [str]
+strBasicObjects = textTypes if sys.version_info[0] == 2 else [str]
 basicObjectList = [list, dict, str, int, float, bool, type(None)]
 basicObjectList.extend(strBasicObjects)
 MAX_STRING_LENGTH = 400
@@ -64,7 +69,6 @@ MAX_STRING_LENGTH = 400
 log = logging.getLogger(__name__)
 
 class LogFunction:
-
     @staticmethod
     def debug(func):
         return LogFunction.__log(func, log.debug)
@@ -122,9 +126,6 @@ class LogFunction:
 
         return wrapper
 
-
-
-
 class ThreadsList(list):
     def __init__(self, threadNum=0, setDaemon=True, *args, **kwargs):
         super(ThreadsList, self).__init__()
@@ -136,16 +137,19 @@ class ThreadsList(list):
             self[-1].setDaemon(setDaemon)
 
     def joinAll(self, **kwargs):
-        auxThreads=[]
+        auxThreads = []
+
         def joinThread(thread, **kwargs):
             thread.join(**kwargs)
+
         def joinThreads(**kwargs):
-            for t in self:
-                auxThreads.append(thread.start_new_thread(joinThread, thread=thread, **kwargs))
+            for thread in self:
+                auxThreads.append(threading.Thread(joinThread, (thread,)))
                 auxThreads[-1].start()
-            for t in auxThreads:
-                t.join()
-        t=thread.start_new_thread(joinThreads,**kwargs)
+            for thread in auxThreads:
+                thread.join()
+
+        t = threading.Thread(target=joinThreads, **kwargs)
         t.start()
         t.join()
 
@@ -155,9 +159,9 @@ class ThreadsList(list):
 
     def isAnyAlive(self):
         for t in self:
-            if t.isAlive():return True
+            if t.isAlive(): return True
 
-    def addAndStartThread(self, n = 1):
+    def addAndStartThread(self, n=1):
         for i in range(n):
             self.append(threading.Thread(*self.args, **self.kwargs))
             self[-1].setDaemon(self.setDaemon)
@@ -174,5 +178,5 @@ class WSThreadsQueue(Queue):
             try:
                 msg, connection = self.get()
                 connection.onMessage(msg)
-            except Exception as e:
-                pass#todo: create a call back for this exception
+            except:
+                pass  # todo: create a call back for this exception
