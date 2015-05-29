@@ -6,6 +6,7 @@ The ``WSHubsAPI`` package/module alows an intuitive communication between back-e
 Examples of usage
 -----------------
 Below is an example of how easy is to create a chat room with this API.
+
 Server side
 ~~~~~~~~~~~~~~~~~~~~~
 In this example we will use the tornado framework and the tornado clientHandler for the ws connections.
