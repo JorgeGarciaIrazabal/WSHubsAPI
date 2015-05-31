@@ -1,6 +1,6 @@
 import inspect
 import os
-from utils import isPublicFunction, getDefaults, getArgs
+from WSHubsAPI.utils import isPublicFunction, getDefaults, getArgs
 
 __author__ = 'jgarc'
 

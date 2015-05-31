@@ -84,4 +84,4 @@ License
 
 This software is licensed under the `MIT license`_.
 
-Â© 2015 Jorge Garcia Irazabal.
+© 2015 Jorge Garcia Irazabal.

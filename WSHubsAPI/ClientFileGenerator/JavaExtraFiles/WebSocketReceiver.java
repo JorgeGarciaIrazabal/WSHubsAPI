@@ -14,7 +14,6 @@
  *  limitations under the License. 
  */
 
-package tornado;
 
 import java.io.DataInputStream;
 import java.io.IOException;

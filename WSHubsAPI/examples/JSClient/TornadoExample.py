@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+import inspect
 import os
 import random
 import string
@@ -10,14 +10,10 @@ from tornado import web, ioloop
 from HubDecorator import HubDecorator
 from ConnectionHandlers.Tornado import ClientHandler
 
-
 logging.config.dictConfig(json.load(open('logging.json')))
 log = logging.getLogger(__name__)
 
-settings = {
-    "static_path": os.path.join(os.path.dirname(__file__), "static"),
-    "login_url": "/login",
-}
+settings = {"static_path": os.path.join(os.path.dirname(__file__), "static"), }
 
 
 class IndexHandler(web.RequestHandler):
@@ -30,20 +26,21 @@ class UploadHandler(web.RequestHandler):
         original_fname = file1['filename']
         extension = os.path.splitext(original_fname)[1]
         fname = ''.join(random.choice(string.ascii_lowercase + string.digits) for x in range(6))
-        final_filename= fname+extension
+        final_filename = fname + extension
         output_file = open(final_filename, 'w')
         output_file.write(file1['body'])
         self.finish("file" + final_filename + " is uploaded")
 
 app = web.Application([
-    (r'/', IndexHandler),
-    (r'/ws/(.*)', ClientHandler),
+    (r'/in', IndexHandler),
+    (r'/(.*)', ClientHandler),
     (r'/upload', UploadHandler),
-],**settings)
+], **settings)
+
 class tes:
     def __init__(self):
         self.a = 10
-        self.b =20
+        self.b = 20
 
 if __name__ == '__main__':
     @HubDecorator.hub
@@ -68,10 +65,13 @@ if __name__ == '__main__':
             self.numberOfFunctionsCalled+=1
             print(self.numberOfFunctionsCalled)
             client = HubDecorator.getConnection()
-            return len(client.allClients), 'this is a test ñññaá'
+            return len(client.allClients)
             # _client.otherClients.onTest(5,6) #todo: not implemented respond on client
             # _client.allClients.onTest(6,7)
+
+
+    # HubDecorator.constructJSFile(settings["static_path"])
+    HubDecorator.constructJAVAFile("C:/Software Projects/WhereAppU/app/src/main/java/com/application/jorge/whereappu/Tornado/","com.application.jorge.whereappu.Tornado", True)
     log.debug("starting...")
-    HubDecorator.constructPythonFile()
     app.listen(8888)
     ioloop.IOLoop.instance().start()

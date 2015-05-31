@@ -14,8 +14,6 @@
  *  limitations under the License. 
  */
 
-package tornado;
-
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -47,7 +45,7 @@ public class WebSocket
 	private URI url = null;
 	private WebSocketEventHandler eventHandler = null;
 	
-	private volatile boolean connected = false;
+	protected volatile boolean connected = false;
 	
 	private Socket socket = null;
 	private DataInputStream input = null;

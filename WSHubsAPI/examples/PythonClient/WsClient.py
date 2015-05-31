@@ -1,8 +1,7 @@
 from __future__ import print_function
 import json
 import logging
-import time
-from WSProtocol import WSConnection
+from WSHubsAPI.WSProtocol import WSConnection
 
 log = logging.getLogger(__name__)
 
@@ -16,8 +15,8 @@ if __name__ == '__main__':
         ws.connect()
         ws.client.ChatHub.alert = lambda x: print(str(x))
         ws.server.ChatHub.getNumOfClientsConnected().done(lambda x: print(x[1]), lambda x: print(x))
-        for i in range(190):
-            ws.server.ChatHub.sendToAll("test")
-            time.sleep(2)
+        while True:
+            message = input("")
+            ws.server.ChatHub.sendToAll(message)
     except KeyboardInterrupt:
         ws.close()

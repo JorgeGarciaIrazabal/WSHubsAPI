@@ -1,4 +1,4 @@
-import inspect
+# -*- coding: utf-8 -*-
 import os
 import random
 import string
@@ -7,13 +7,17 @@ import logging
 import logging.config
 import json
 from tornado import web, ioloop
-from HubDecorator import HubDecorator
-from ConnectionHandlers.Tornado import ClientHandler
+from WSHubsAPI.HubDecorator import HubDecorator
+from WSHubsAPI.ConnectionHandlers.Tornado import ClientHandler
+
 
 logging.config.dictConfig(json.load(open('logging.json')))
 log = logging.getLogger(__name__)
 
-settings = {"static_path": os.path.join(os.path.dirname(__file__), "static"), }
+settings = {
+    "static_path": os.path.join(os.path.dirname(__file__), "static"),
+    "login_url": "/login",
+}
 
 
 class IndexHandler(web.RequestHandler):
@@ -26,21 +30,20 @@ class UploadHandler(web.RequestHandler):
         original_fname = file1['filename']
         extension = os.path.splitext(original_fname)[1]
         fname = ''.join(random.choice(string.ascii_lowercase + string.digits) for x in range(6))
-        final_filename = fname + extension
+        final_filename= fname+extension
         output_file = open(final_filename, 'w')
         output_file.write(file1['body'])
         self.finish("file" + final_filename + " is uploaded")
 
 app = web.Application([
-    (r'/in', IndexHandler),
-    (r'/(.*)', ClientHandler),
+    (r'/', IndexHandler),
+    (r'/ws/(.*)', ClientHandler),
     (r'/upload', UploadHandler),
-], **settings)
-
+],**settings)
 class tes:
     def __init__(self):
         self.a = 10
-        self.b = 20
+        self.b =20
 
 if __name__ == '__main__':
     @HubDecorator.hub
@@ -59,19 +62,18 @@ if __name__ == '__main__':
 
         def sendToAll(self, message):
             self.numberOfFunctionsCalled+=1
-            HubDecorator.getConnection().otherClients.alert(message)
+            conn = HubDecorator.getConnection()
+            message = "From %s: %s"%(str(conn.ID), message)
+            conn.otherClients.alert(message)
 
         def getNumOfClientsConnected(self):
             self.numberOfFunctionsCalled+=1
             print(self.numberOfFunctionsCalled)
             client = HubDecorator.getConnection()
-            return len(client.allClients)
+            return len(client.allClients), 'this is a test ñññaá'
             # _client.otherClients.onTest(5,6) #todo: not implemented respond on client
             # _client.allClients.onTest(6,7)
-
-
-    # HubDecorator.constructJSFile(settings["static_path"])
-    HubDecorator.constructJAVAFile("C:/Users/jgarc/workspace/tornado/src/tornado","tornado", True)
     log.debug("starting...")
+    HubDecorator.constructPythonFile()
     app.listen(8888)
     ioloop.IOLoop.instance().start()

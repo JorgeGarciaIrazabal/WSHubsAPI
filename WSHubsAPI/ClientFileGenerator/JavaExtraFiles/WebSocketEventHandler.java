@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2011 Roderick Baier
+ *  Copyright (C) 2012 Roderick Baier
  *  
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -14,32 +14,26 @@
  *  limitations under the License. 
  */
 
-package tornado;
-import java.io.UnsupportedEncodingException;
+
+import java.io.IOException;
 
 
-public class WebSocketMessage
+public interface WebSocketEventHandler
 {
-	private Byte[] message;
-
-
-	public WebSocketMessage(final Byte[] message)
-	{
-		this.message = message;
-	}
-
-
-	public String getText()
-	{
-		byte[] message = new byte[this.message.length];
-		for (int i = 0; i < this.message.length; i++) {
-			message[i] = this.message[i];
-		}
-		try {
-			return new String(message, "UTF-8");
-		}
-		catch (UnsupportedEncodingException uee) {
-			return null;
-		}
-	}
+	public void onOpen();
+	
+	
+	public void onMessage(WebSocketMessage message);
+	
+	
+	public void onError(IOException exception);
+	
+	
+	public void onClose();
+	
+	
+	public void onPing();
+	
+	
+	public void onPong();
 }

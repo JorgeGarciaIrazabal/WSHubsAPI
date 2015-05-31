@@ -1,7 +1,7 @@
 import inspect
 import logging
 import os
-from utils import isPublicFunction, getArgs, ASCII_UpperCase, getModulePath
+from WSHubsAPI.utils import isPublicFunction, getArgs, ASCII_UpperCase, getModulePath
 import shutil
 from os import listdir
 from os.path import isfile
@@ -10,7 +10,7 @@ __author__ = 'jgarc'
 log = logging.getLogger(__name__)
 
 class JAVAFileGenerator:
-    SERVER_FILE_NAME = "WSProtocolServer.java"
+    SERVER_FILE_NAME = "WSServer.java"
     CLIENT_FILE_NAME = "WSClient.java"
     EXTRA_FILES_FOLDER = "JavaExtraFiles"
 
@@ -39,7 +39,7 @@ class JAVAFileGenerator:
         with open(os.path.join(path, cls.SERVER_FILE_NAME), "w") as f:
             classStrings = "".join(cls.__getClassStrings(hubs))
             f.write((cls.WRAPPER % package).format(main=classStrings))
-        cls.__copyExtraFiles(path)
+        cls.__copyExtraFiles(path, package)
 
     @classmethod
     def createClientTemplate(cls, path, package, hubs): #todo: dynamically get client function names
@@ -57,13 +57,19 @@ class JAVAFileGenerator:
         return classStrings
 
     @classmethod
-    def __copyExtraFiles(cls, dstPath):
+    def __copyExtraFiles(cls, dstPath, package):
         filesPath = os.path.join(getModulePath(), cls.EXTRA_FILES_FOLDER)
         files = [f for f in listdir(filesPath) if isfile(os.path.join(filesPath, f)) and f.endswith(".java")]
         for f in files:
             if not isfile(os.path.join(dstPath, f)):
-                log.info("Created file: %s", os.path.join(dstPath, f))
-                shutil.copyfile(os.path.join(filesPath, f), os.path.join(dstPath, f))
+                absDstPath =  os.path.join(dstPath, f)
+                absOriPath = os.path.join(filesPath, f)
+                with open(absOriPath) as oriFile:
+                    with open(absDstPath, 'w') as dstFile:
+                        oriStr = oriFile.read()
+                        dstStr = "package %s;\n"%package + oriStr
+                        dstFile.write(dstStr)
+                log.info("Created file: %s", absDstPath)
 
     CLASS_TEMPLATE = """
     public static class {name} {{
@@ -80,19 +86,23 @@ class JAVAFileGenerator:
 
     WRAPPER = """package %s;
 import com.google.gson.Gson;
-import org.json.JSONArray;
+import org.json.simple.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 import java.net.URISyntaxException;
+import org.json.simple.JSONObject;
 
-public class WSProtocolServer {{
+public class %s {{//TODO: do not use static functions, we might want different connections
     private static Gson gson = new Gson();
-    private static WSConnection connection;
+    public static WSConnection connection;
 
-    public static void init(String uriStr) throws URISyntaxException {{
+    public static void init(String uriStr, WebSocketEventHandler webSocketEventHandler) throws URISyntaxException {{
         connection = new WSConnection(uriStr);
+        connection.setEventHandler(webSocketEventHandler);
         connection.connect();
     }}
+
+    public static boolean isConnected(){{return connection.isConnected();}}
+
     private static FunctionResult constructMessage (String hubName, String functionName, JSONArray argsArray) throws JSONException{{
         int messageId= connection.getNewMessageId();
         JSONObject msgObj = new JSONObject();
@@ -100,20 +110,22 @@ public class WSProtocolServer {{
         msgObj.put("function",functionName);
         msgObj.put("args", argsArray);
         msgObj.put("ID", messageId);
-        connection.send(msgObj.toString());
+        connection.send(msgObj.toJSONString());
         return new FunctionResult(connection,messageId);
     }}
 
     private static <TYPE_ARG> void addArg(JSONArray argsArray, TYPE_ARG arg) throws JSONException {{
         try {{
-            argsArray.put(arg);
+            argsArray.add(arg);
         }} catch (Exception e) {{
-            argsArray.put(new JSONObject(gson.toJson(arg)));
+            JSONArray aux = new JSONArray();
+            aux.add(gson.toJson(arg));
+            argsArray.add(aux);
         }}
     }}
     {main}
 }}
-    """
+    """%('%s',SERVER_FILE_NAME[:-5])
 
     CLIENT_CLASS_TEMPLATE = """package {package};
 public class WSClient {{

@@ -1,5 +1,5 @@
 import logging
-from CommProtocol import CommHandler
+from WSHubsAPI.CommProtocol import CommHandler
 import tornado.websocket
 __author__ = 'Jorge'
 log = logging.getLogger(__name__)

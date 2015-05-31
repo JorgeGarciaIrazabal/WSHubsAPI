@@ -11,7 +11,7 @@ import string
 import sys
 from inspect import getargspec
 import threading
-
+from datetime import datetime
 try:
     textTypes = [str, unicode]
 except:
@@ -55,76 +55,34 @@ def getModulePath():
     file = info.filename
     return os.path.dirname(os.path.abspath(file))
 
-
-
-FUNCTION_MESSAGE = """Function "%s" called.
-    Parameters used: %s
-    Result: %s
-"""
-strBasicObjects = textTypes if sys.version_info[0] == 2 else [str]
-basicObjectList = [list, dict, str, int, float, bool, type(None)]
-basicObjectList.extend(strBasicObjects)
-MAX_STRING_LENGTH = 400
-
-log = logging.getLogger(__name__)
-
-class LogFunction:
-    @staticmethod
-    def debug(func):
-        return LogFunction.__log(func, log.debug)
-
-    @staticmethod
-    def info(func):
-        return LogFunction.__log(func, log.info)
-
-    @staticmethod
-    def warning(func):
-        return LogFunction.__log(func, log.warning)
-
-    @staticmethod
-    def error(func):
-        return LogFunction.__log(func, log.error)
-
-    @staticmethod
-    def critical(func):
-        return LogFunction.__log(func, log.critical)
-
-    @staticmethod
-    def __log(func, logFunc):
-        def wrapper(*args, **kwargs):
-            result = func(*args, **kwargs)
-            parameters = OrderedDict()
-            specs = getargspec(func)
-            argsName = specs[0]
-            for i, arg in enumerate(args):
-                if i >= len(argsName):
-                    parameters["args"] = str(args[i:])
-                else:
-                    if isinstance(args[i], basicObjectList):
-                        parameters[argsName[i]] = args[i]
-                    else:
-                        parameters[argsName[i]] = str(args[i])
-            for key, value in kwargs.items():
-                if isinstance(value, basicObjectList):
-                    parameters[key] = value
-                else:
-                    parameters[key] = str(value)
-
-            if not isinstance(result, basicObjectList):
-                result = str(result)
-
+def serializeObject(obj2ser):
+    obj = obj2ser if not hasattr(obj2ser, "__dict__") else obj2ser.__dict__
+    if isinstance(obj,dict):
+        sObj = {}
+        for key, value in obj.items():
+            if isinstance(value,datetime):
+                sObj[key] = str(value)
+            else:
+                try:
+                    if not key.startswith("_") and id(value) != id(obj2ser):
+                        sValue = serializeObject(value)
+                        json.dumps(serializeObject(sValue))
+                        sObj[key] = sValue
+                except TypeError:
+                    pass
+    elif isinstance(obj,(list,tuple,set)):
+        sObj = []
+        for value in obj:
             try:
-                parameters.pop("self")
-            except:
+                sValue = serializeObject(value)
+                json.dumps(sValue)
+                sObj.append(sValue)
+            except TypeError:
                 pass
-            parameters = json.dumps(parameters, separators=(',', ' = '))
-            if len(parameters) >= MAX_STRING_LENGTH: parameters = parameters[:MAX_STRING_LENGTH - 3] + "..."
-            if isinstance(result, strBasicObjects) and len(result) >= MAX_STRING_LENGTH:
-                result = result[:MAX_STRING_LENGTH - 3] + "..."
-            logFunc(FUNCTION_MESSAGE % (func.__name__, parameters, result))
-            return result
+    else:
+        sObj = obj
+    return sObj
 
-        return wrapper
 
 class ThreadsList(list):
     def __init__(self, threadNum=0, setDaemon=True, *args, **kwargs):

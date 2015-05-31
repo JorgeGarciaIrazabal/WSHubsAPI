@@ -2,9 +2,10 @@ import json
 import logging
 import sys
 import inspect
+import threading
 
 from HubDecorator import HubDecorator
-from utils import classproperty, WSThreadsQueue
+from utils import classproperty, WSThreadsQueue, serializeObject
 
 log = logging.getLogger(__name__)
 __author__ = 'Jorge Garcia Irazabal'
@@ -15,7 +16,7 @@ class CommHandler(object):
     _connections = {}
     __AVAILABLE_UNPROVIDED_IDS = []
     threadsPool = WSThreadsQueue(50) #todo: make dynamic queue size
-
+    __lock = threading.Lock()
     def __init__(self, client=None):
         self.ID = None
         self.client = client
@@ -29,12 +30,13 @@ class CommHandler(object):
         return cls.__UNPROVIDED_TEMPLATE % cls.__LAST_UNPROVIDED_ID
 
     def onOpen(self, ID=None):
-        if ID is None or ID in self._connections:
-            self.ID = self.getUnprovidedID()
-        else:
-            self.ID = ID
-        self._connections[self.ID] = self
-        return self.ID
+        with self.__lock:
+            if ID is None or ID in self._connections:
+                self.ID = self.getUnprovidedID()
+            else:
+                self.ID = ID
+            self._connections[self.ID] = self
+            return self.ID
 
     def onMessage(self, message):
         try:
@@ -148,7 +150,7 @@ class FunctionMessage:
 
     def callFunction(self):
         success, replay = self.__executeFunction()
-        replay = replay if not hasattr(replay, "__dict__") else replay.__dict__
+        replay = serializeObject(replay)
         return {
             "success": success,
             "replay": replay,

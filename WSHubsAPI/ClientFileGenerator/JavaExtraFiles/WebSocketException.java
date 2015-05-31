@@ -14,8 +14,6 @@
  *  limitations under the License. 
  */
 
-package tornado;
-
 
 
 public class WebSocketException extends RuntimeException
