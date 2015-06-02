@@ -27,7 +27,6 @@ class JSClientFileGenerator():
 
     @classmethod
     def createFile(cls, path, hubs):
-        if not os.path.exists(path): os.makedirs(path)
         with open(os.path.join(path, cls.FILE_NAME), "w") as f:
             classStrings = "".join(cls.__getClassStrings(hubs))
             f.write(cls.WRAPPER.format(main=classStrings))
@@ -39,70 +38,69 @@ class JSClientFileGenerator():
             classStrings.append(cls.__getHubClassStr(h))
         return classStrings
 
-    WRAPPER = """var $wsConnection
-function $wsConnectionInit(args, serverTimeout){{
+    WRAPPER = """var $tornado
+function $tornadoInit(args){{
     args = args || "";
-    $wsConnection = new WebSocket(args);
-    $wsConnection.__messageID = 0
-    $wsConnection.__returnFunctions = {{}};
-    $wsConnection.__respondTimeout = serverTimeout || 5000;
-    $wsConnection.client = {{}};
-    $wsConnection.__constructMessage = function (hubName, functionName, args){{
+    $tornado = new WebSocket(args);
+    $tornado.__messageID = 0
+    $tornado.__returnFunctions = {{}};
+    $tornado.__respondTimeout = 3000;
+    $tornado.client = {{}};
+    $tornado.__constructMessage = function (hubName, functionName, args){{
         args = Array.prototype.slice.call(args);
-        id = $wsConnection.__messageID++
+        id = $tornado.__messageID++
         body = {{"hub":hubName, "function":functionName,"args": args, "ID": id}};
-        $wsConnection.send(JSON.stringify(body));
-        return {{done: $wsConnection.__getReturnFunction(id)}}
+        $tornado.send(JSON.stringify(body));
+        return {{done: $tornado.__getReturnFunction(id)}}
     }}
-    $wsConnection.__getReturnFunction = function(ID){{
+    $tornado.__getReturnFunction = function(ID){{
         return function(onSuccess, onError){{
-            f=$wsConnection.__returnFunctions[ID];
-            if($wsConnection.__returnFunctions[ID] == undefined)
-                $wsConnection.__returnFunctions[ID] = {{}}
-            f=$wsConnection.__returnFunctions[ID]
-            f.onSuccess = function(){{onSuccess.apply(onSuccess,arguments);delete $wsConnection.__returnFunctions[ID]}};
-            f.onError = function(){{onError.apply(onError,arguments);delete $wsConnection.__returnFunctions[ID]}};
+            f=$tornado.__returnFunctions[ID];
+            if($tornado.__returnFunctions[ID] == undefined)
+                $tornado.__returnFunctions[ID] = {{}}
+            f=$tornado.__returnFunctions[ID]
+            f.onSuccess = function(){{onSuccess.apply(onSuccess,arguments);delete $tornado.__returnFunctions[ID]}};
+            f.onError = function(){{onError.apply(onError,arguments);delete $tornado.__returnFunctions[ID]}};
             //check __returnFunctions, memory leak
             setTimeout(function(){{
-                if($wsConnection.__returnFunctions[ID] && $wsConnection.__returnFunctions[ID].onError)
-                    $wsConnection.__returnFunctions[ID].onError("timeOut Error");
-            }}, $wsConnection.__respondTimeout)
+                if($tornado.__returnFunctions[ID] && $tornado.__returnFunctions[ID].onError)
+                    $tornado.__returnFunctions[ID].onError("timeOut Error");
+            }}, $tornado.__respondTimeout)
         }}
     }}
-    $wsConnection.onmessage = function(ev) {{
+    $tornado.onmessage = function(ev) {{
         try{{
             msgObj = JSON.parse(ev.data);
             if(msgObj.hasOwnProperty("replay")){{
-                f = $wsConnection.__returnFunctions[msgObj.ID]
-                if(msgObj.success && f != undefined && f.onSuccess != undefined)
+                f = $tornado.__returnFunctions[msgObj.ID]
+                if(msgObj.success && f.onSuccess != undefined)
                     f.onSuccess(msgObj.replay)
-                else if(f != undefined && f.onError != undefined)
+                else if(f.onError != undefined)
                     f.onError(msgObj.replay)
             }}else{{
-                f = $wsConnection.client[msgObj.hub][msgObj.function]
+                f = $tornado.client[msgObj.hub][msgObj.function]
                 f.apply(f, msgObj.args)
             }}
         }}catch(err){{
             this.onMessageError(err)
         }}
     }}
-    $wsConnection.onMessageError = function(error){{ }}
-    $wsConnection.server = {{}}
+    $tornado.onMessageError = function(error){{ }}
+    $tornado.server = {{}}
     {main}
 
-    return $wsConnection;
 }}
     """
     CLASS_TEMPLATE = """
-    $wsConnection.server.{name} = {{
+    $tornado.server.{name} = {{
         __HUB_NAME : "{name}",
         {functions}
     }}
-    $wsConnection.client.{name} = {{}}"""
+    $tornado.client.{name} = {{}}"""
     #todo:last part of this function can be extracted
     FUNCTION_TEMPLATE = """
         {name} : function ({args}){{
             {cook}
-            return $wsConnection.__constructMessage(this.__HUB_NAME, "{name}",arguments)
+            return $tornado.__constructMessage(this.__HUB_NAME, "{name}",arguments)
         }}"""
-    ARGS_COOK_TEMPLATE = "arguments[{iter}] = {name} == undefined ? {default} : {name};"
+    ARGS_COOK_TEMPLATE = "arguments[{iter}] = {name} || {default};"

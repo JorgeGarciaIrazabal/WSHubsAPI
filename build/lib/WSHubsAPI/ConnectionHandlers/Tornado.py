@@ -1,8 +1,6 @@
 import logging
 from WSHubsAPI.CommProtocol import CommHandler
 import tornado.websocket
-from WSHubsAPI.ValidateStrings import getUnicode
-
 __author__ = 'Jorge'
 log = logging.getLogger(__name__)
 
@@ -23,10 +21,10 @@ class ClientHandler(tornado.websocket.WebSocketHandler):
         except:
             id = None
         self.ID = self._commHandler.onOpen(id)
-        log.debug("open new connection with ID: %s " % getUnicode(self.ID))
+        log.debug("open new connection with ID: %s " % str(self.ID))
 
     def on_message(self, message):
-        log.debug("Message received from ID: %s\n%s " % (getUnicode(self.ID), getUnicode(message)))
+        log.debug("Message received from ID: %s\n%s " % (str(self.ID), str(message)))
         self._commHandler.onAsyncMessage(message)
 
     def on_close(self):

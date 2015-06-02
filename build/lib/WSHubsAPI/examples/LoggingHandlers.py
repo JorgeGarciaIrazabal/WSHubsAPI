@@ -1,5 +1,3 @@
-from WSHubsAPI.ValidateStrings import getUnicode
-
 __author__ = 'jgarc'
 import copy
 
@@ -22,5 +20,5 @@ class ColoredConsoleHandler(logging.StreamHandler):
             color = '\x1b[35m'  # pink
         else:  # NOTSET and anything else
             color = '\x1b[0m'  # normal
-        myrecord.msg = color + getUnicode(myrecord.msg) + '\x1b[0m'  # normal
+        myrecord.msg = color + str(myrecord.msg) + '\x1b[0m'  # normal
         logging.StreamHandler.emit(self, myrecord)

@@ -1,0 +1,25 @@
+Metadata-Version: 1.1
+Name: WSHubsAPI
+Version: 0.3.0a0
+Summary: function protocol to communicate backend and frontend in a intuitive way like signalR in C#
+Home-page: https://github.com/JorgeGarciaIrazabal/WSFunctionProtocol.git
+Author: Jorge Garcia Irazabal
+Author-email: jorge.girazabal@gmail.com
+License: MIT
+Description: This application inspect the code in the server side and creates the necessary files in the client side to easily communicate both sides.
+        
+        This protocol allows to call server-side functions (only hub classes) from the client and vice versa
+        
+Keywords: communication protocol tornado sockets signalR
+Platform: UNKNOWN
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: Topic :: Software Development :: Build Tools
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 2
+Classifier: Programming Language :: Python :: 2.6
+Classifier: Programming Language :: Python :: 2.7
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.2
+Classifier: Programming Language :: Python :: 3.3
+Classifier: Programming Language :: Python :: 3.4

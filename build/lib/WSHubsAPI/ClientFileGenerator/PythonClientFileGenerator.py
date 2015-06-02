@@ -37,9 +37,6 @@ class PythonClientFileGenerator():
 
     @classmethod
     def createFile(cls, path, hubs):
-        if not os.path.exists(path): os.makedirs(path)
-        with open(os.path.join(path,"__init__.py"),'w'): #creating __init__.py if not exist
-            pass
         with open(os.path.join(path, cls.FILE_NAME), "w") as f:
             classStrings = "".join(cls.__getClassStrings(hubs))
             clientHubs = "\n".join(cls.__getClientHubsStrings(hubs))

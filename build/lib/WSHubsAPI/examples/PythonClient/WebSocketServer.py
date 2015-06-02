@@ -62,14 +62,14 @@ if __name__ == '__main__':
 
         def sendToAll(self, message):
             self.numberOfFunctionsCalled+=1
-            conn = HubDecorator.getConnection()
+            conn = HubDecorator.sender()
             message = "From %s: %s"%(str(conn.ID), message)
             conn.otherClients.alert(message)
 
         def getNumOfClientsConnected(self):
             self.numberOfFunctionsCalled+=1
             print(self.numberOfFunctionsCalled)
-            client = HubDecorator.getConnection()
+            client = HubDecorator.sender()
             return len(client.allClients), 'this is a test ñññaá'
             # _client.otherClients.onTest(5,6) #todo: not implemented respond on client
             # _client.allClients.onTest(6,7)

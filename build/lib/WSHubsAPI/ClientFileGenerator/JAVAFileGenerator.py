@@ -1,10 +1,10 @@
 import inspect
 import logging
 import os
+from WSHubsAPI.utils import isNewFunction, getArgs, ASCII_UpperCase, getModulePath
+import shutil
 from os import listdir
 from os.path import isfile
-
-from WSHubsAPI.utils import isNewFunction, getArgs, ASCII_UpperCase, getModulePath
 
 __author__ = 'jgarc'
 log = logging.getLogger(__name__)
@@ -36,7 +36,6 @@ class JAVAFileGenerator:
 
     @classmethod
     def createFile(cls, path, package, hubs):
-        if not os.path.exists(path): os.makedirs(path)
         with open(os.path.join(path, cls.SERVER_FILE_NAME), "w") as f:
             classStrings = "".join(cls.__getClassStrings(hubs))
             f.write((cls.WRAPPER % package).format(main=classStrings))
