@@ -123,4 +123,4 @@ License
 
 This software is licensed under the `MIT license`_.
 
-© 2015 Jorge Garcia Irazabal.
+Â© 2015 Jorge Garcia Irazabal.
