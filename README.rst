@@ -23,7 +23,7 @@ In this example we will use the WS4Py library and the ws4py clientHandler for th
                 self.allClients.onMessage(name,message)
                 return "Sent to %d clients"%len(self.allClients)
 
-        #Hub.constructPythonFile("_static") #only if you will use a python client
+>>>     #Hub.constructPythonFile("_static") #only if you will use a python client
         Hub.constructJSFile("_static") #only if you will use a js client
         server = make_server('127.0.0.1', 8888, server_class=WSGIServer,
                          handler_class=WebSocketWSGIRequestHandler,
