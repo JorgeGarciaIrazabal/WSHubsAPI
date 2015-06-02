@@ -1,3 +1,4 @@
+
 try:
     from Queue import Queue
 except:
@@ -45,9 +46,13 @@ def getDefaults(method):
             d[i] = '"%s"' % d[i]
     return d
 
-def isPublicFunction(method):
+def isNewFunction(method):
+    from WSHubsAPI.Hub import Hub
     isFunction = lambda x: inspect.ismethod(x) or inspect.isfunction(x)
-    return isFunction(method) and not method.__name__.startswith("_")
+    functions = inspect.getmembers(Hub, predicate=isFunction)
+    functionNames = [f[0] for f in functions ]
+
+    return isFunction(method) and not method.__name__.startswith("_") and method.__name__ not in functionNames
 
 def getModulePath():
     frame = inspect.currentframe().f_back

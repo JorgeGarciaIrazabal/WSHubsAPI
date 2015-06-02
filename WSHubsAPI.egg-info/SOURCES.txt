@@ -2,7 +2,6 @@ README.rst
 setup.cfg
 setup.py
 WSHubsAPI/CommProtocol.py
-WSHubsAPI/DESCRIPTION.rst
 WSHubsAPI/Hub.py
 WSHubsAPI/ValidateStrings.py
 WSHubsAPI/__init__.py
@@ -24,8 +23,6 @@ WSHubsAPI/examples/__init__.py
 WSHubsAPI/examples/Clients/__init__.py
 WSHubsAPI/examples/Clients/logging.json
 WSHubsAPI/examples/Clients/pythonClient.py
-WSHubsAPI/examples/Clients/_static/WSProtocol.py
-WSHubsAPI/examples/Clients/_static/__init__.py
 WSHubsAPI/examples/Servers/ChatHub.py
 WSHubsAPI/examples/Servers/TornadoWSServer.py
 WSHubsAPI/examples/Servers/__init__.py
