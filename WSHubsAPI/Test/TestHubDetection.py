@@ -4,6 +4,7 @@ import unittest
 
 class TestHubDetection(unittest.TestCase):
     def setUp(self):
+        #Constucting hubs for testing
         class TestHub(Hub):
             def getData(self):
                 pass
