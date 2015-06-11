@@ -12,30 +12,34 @@ class HubException(Exception):
 class Hub(object):
     HUBs_DICT = {}
     __hubsConstructed = False
+
     @classmethod
-    def initHubsInspection(cls):
-        if not cls.__hubsConstructed:
-            for c in Hub.__subclasses__():
+    def initHubsInspection(cls, forceReconstruction=False):
+        if not cls.__hubsConstructed or forceReconstruction:
+            cls.HUBs_DICT.clear()
+            for hub in Hub.__subclasses__():
                 try:
-                    c()
+                    hub()
                 except TypeError as e:
-                    if "__init__() takes" in str(e):
-                        raise HubException("Hubs can not have a constructor with parameters. Check Hub: %s" % c.__name__)
+                    if "__init__()" in str(e):
+                        raise HubException(
+                            "Hubs can not have a constructor with parameters. Check Hub: %s" % hub.__name__)
                     else:
                         raise e
             cls.__hubsConstructed = True
+
     @classmethod
-    def constructJSFile(cls, path=""):
+    def constructJSFile(cls, path="."):
         cls.initHubsInspection()
         JSClientFileGenerator.createFile(path, cls.HUBs_DICT.values())
 
     @classmethod
-    def constructJAVAFile(cls, path, package, createClientTemplate = False):
+    def constructJAVAFile(cls, package, path=".", createClientTemplate=False):
         cls.initHubsInspection()
-        hubs=cls.HUBs_DICT.values()
+        hubs = cls.HUBs_DICT.values()
         JAVAFileGenerator.createFile(path, package, hubs)
         if createClientTemplate:
-            JAVAFileGenerator.createClientTemplate(path,package,hubs)
+            JAVAFileGenerator.createClientTemplate(path, package, hubs)
 
     @classmethod
     def constructPythonFile(cls, path="."):
@@ -50,7 +54,7 @@ class Hub(object):
         frame = inspect.currentframe()
         while frame.f_back is not None:
             frame = frame.f_back
-            if isinstance(frame.f_locals.get("self",None), CommHandler):
+            if isinstance(frame.f_locals.get("self", None), CommHandler):
                 return frame.f_locals["self"]
         return None
 
@@ -64,7 +68,6 @@ class Hub(object):
         connection = self.sender
         return ConnectionGroup(filter(lambda x: x.ID != connection.ID, connection.connections.values()))
 
-
     def getClients(self, function):
         connection = self.sender
         return ConnectionGroup(filter(function, connection.connections.values()))
@@ -74,14 +77,6 @@ class Hub(object):
         if hubName in self.HUBs_DICT:
             raise HubException("Hub's name must be unique")
         setattr(self.__class__, "__HubName__", hubName)
-        try:
-            self.HUBs_DICT[hubName] = self
-        except TypeError as e:
-            if "__init__() takes" in str(e):
-                raise HubException("Hubs can not have a constructor with parameters. Check Hub: %s" % self.__class__.__name__)
-            else:
-                raise e
-
-
+        self.HUBs_DICT[hubName] = self
 
 from WSHubsAPI.CommProtocol import ConnectionGroup, CommHandler
