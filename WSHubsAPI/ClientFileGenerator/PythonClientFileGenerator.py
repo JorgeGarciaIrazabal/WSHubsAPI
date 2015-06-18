@@ -5,7 +5,7 @@ from WSHubsAPI.utils import isNewFunction, getDefaults, getArgs
 __author__ = 'jgarc'
 
 class PythonClientFileGenerator():
-    FILE_NAME = "WSProtocol.py"
+    FILE_NAME = "WSHubsApi.py"
     TAB = "    "
 
     @classmethod
@@ -26,14 +26,14 @@ class PythonClientFileGenerator():
                     formattedArgs.insert(0, arg)
                 else:
                     formattedArgs.insert(0, arg + "=" + str(defaults[-i - 1]))
-            appendInArgs = ("\n" + cls.TAB * 3).join([cls.ARGS_COOK_TEMPLATE.format(name=arg) for arg in args])
+            appendInArgs = ("\n" + cls.TAB * 4).join([cls.ARGS_COOK_TEMPLATE.format(name=arg) for arg in args])
             funcStrings.append(
                 cls.FUNCTION_TEMPLATE.format(name=name, args=", ".join(formattedArgs), cook=appendInArgs))
         return funcStrings
 
     @classmethod
-    def __getClientHubsStrings(cls, hubs):
-        return [cls.CLIENT_HUB_TEMPLATE.format(name=h.__HubName__) for h in hubs]
+    def __getAttributesHub(cls, hubs):
+        return [cls.ATTRIBUTE_HUB_TEMPLATE.format(name=h.__HubName__) for h in hubs]
 
     @classmethod
     def createFile(cls, path, hubs):
@@ -42,8 +42,8 @@ class PythonClientFileGenerator():
             pass
         with open(os.path.join(path, cls.FILE_NAME), "w") as f:
             classStrings = "".join(cls.__getClassStrings(hubs))
-            clientHubs = "\n".join(cls.__getClientHubsStrings(hubs))
-            f.write(cls.WRAPPER.format(main=classStrings, clientHubs=clientHubs))
+            attributesHubs = "\n".join(cls.__getAttributesHub(hubs))
+            f.write(cls.WRAPPER.format(Hubs=classStrings, attributesHubs=attributesHubs))
 
     @classmethod
     def __getClassStrings(cls, hubs):
@@ -52,17 +52,13 @@ class PythonClientFileGenerator():
             classStrings.append(cls.__getHubClassStr(h))
         return classStrings
 
-    WRAPPER = '''from __future__ import print_function
-import json
+    WRAPPER = '''import json
 import logging
 import threading
 from ws4py.client.threadedclient import WebSocketClient
 from threading import Timer
 
 log = logging.getLogger(__name__)
-
-__wsConnection = None
-""":type WSConnection"""
 
 class WSSimpleObject(object):
     def __setattr__(self, key, value):
@@ -78,48 +74,21 @@ class WSReturnObject:
         pass
 
 
-class WSClient(object):
-{clientHubs}
-
-class WSServer(object):
-    _messageID = 0
-    _messageLock = threading.RLock()
-
-    @classmethod
-    def getNextMessageID(cls):
-        with cls._messageLock:
-            cls._messageID += 1
-            return cls._messageID
-    {main}
-
-class WSConnection(WebSocketClient):
-    SERVER_TIMEOUT = 5.0
-    _instance = None
-    """:type WSConnection"""
-
-    def __init__(self, url):
-        super(WSConnection, self).__init__(url)
-        self.client = WSClient()
-        self.server = WSServer()
+class WSHubsAPIClient(WebSocketClient):
+    def __init__(self, api, url, serverTimeout):
+        super(WSHubsAPIClient, self).__init__(url)
         self.__returnFunctions = dict()
         self.isOpened = False
+        self.serverTimeout = serverTimeout
+        self.api = api
         """:type dict of WSReturnObject.WSCallbacks"""
-
-    @staticmethod
-    def init(url, serverTimeout=5.0):
-        """
-        :rtype : WSConnection
-        """
-        WSConnection._instance = WSConnection(url)
-        WSConnection.SERVER_TIMEOUT = serverTimeout
-        return WSConnection._instance
 
     def opened(self):
         self.isOpened = True
         log.debug("Connection opened")
 
     def closed(self, code, reason=None):
-        log.debug("Connection closed with code:\\n%s\\nAnd reason:\\n%s"%(code,reason))
+        log.debug("Connection closed with code:\\n%s\\nAnd reason:\\n%s" % (code, reason))
 
     def received_message(self, m):
         try:
@@ -131,11 +100,11 @@ class WSConnection(WebSocketClient):
                 elif f and f.onError:
                     f.onError(msgObj["replay"])
             else:
-                self.client.__getattribute__(msgObj["hub"]).__dict__[msgObj["function"]](*msgObj["args"])
+                self.api.__getattribute__(msgObj["hub"]).client.__dict__[msgObj["function"]](*msgObj["args"])
         except Exception as e:
             self.onError(e)
 
-    def _getReturnFunction(self, ID):
+    def getReturnFunction(self, ID):
         """
         :rtype : WSReturnObject
         """
@@ -157,7 +126,7 @@ class WSConnection(WebSocketClient):
             else:
                 callBacks.onError = None
             self.__returnFunctions[ID] = callBacks
-            r = Timer(self.SERVER_TIMEOUT, self.onTimeOut, (ID,))
+            r = Timer(self.serverTimeout, self.onTimeOut, (ID,))
             r.start()
 
         retObject = WSReturnObject()
@@ -173,23 +142,55 @@ class WSConnection(WebSocketClient):
         f = self.__returnFunctions.pop(messageId, None)
         if f and f.onError:
             f.onError("timeOut Error")
+
+class HubsAPI(object):
+    def __init__(self, url, serverTimeout=5.0):
+        self.wsClient = WSHubsAPIClient(self, url, serverTimeout)
+{attributesHubs}
+
+    def connect(self):
+        self.wsClient.connect()
+
+{Hubs}
+
 '''
 
     CLASS_TEMPLATE = '''
-    class {name}(object):
-        {functions}
+    class __{name}(object):
+        def __init__(self, wsClient):
+            hubName = self.__class__.__name__[2:]
+            self.server = self.__server(wsClient, hubName)
+            self.client = WSSimpleObject()
+
+        class __server(object):
+            __messageID = 0
+            __messageLock = threading.RLock()
+
+            def __init__(self, wsClient, hubName):
+                """
+                :type wsClient: WSHubsAPIClient
+                """
+                self.wsClient = wsClient
+                self.hubName = hubName
+
+            @classmethod
+            def __getNextMessageID(cls):
+                with cls.__messageLock:
+                    cls.__messageID += 1
+                    return cls.__messageID
+
+            {functions}
         '''
     FUNCTION_TEMPLATE = '''
-        @classmethod
-        def {name}(cls, {args}):
-            """
-            :rtype : WSReturnObject
-            """
-            args = list()
-            {cook}
-            id = WSServer.getNextMessageID()
-            body = {{"hub": cls.__name__, "function": "{name}", "args": args, "ID": id}}
-            WSConnection._instance.send(json.dumps(body))
-            return WSConnection._instance._getReturnFunction(id)'''
+            def {name}(self, {args}):
+                """
+                :rtype : WSReturnObject
+                """
+                args = list()
+                {cook}
+                id = self.__getNextMessageID()
+                body = {{"hub": self.hubName, "function": "{name}", "args": args, "ID": id}}
+                self.wsClient.send(json.dumps(body))
+                return self.wsClient.getReturnFunction(id)'''
     ARGS_COOK_TEMPLATE = "args.append({name})"
-    CLIENT_HUB_TEMPLATE = "    {name} = WSSimpleObject()"
+    ATTRIBUTE_HUB_TEMPLATE = "        self.{name} = self.__{name}(self.wsClient)"

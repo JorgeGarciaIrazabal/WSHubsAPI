@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/WSFunctionProtocol.iml" filepath="$PROJECT_DIR$/.idea/WSFunctionProtocol.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/WSHubsAPI.iml" filepath="$PROJECT_DIR$/.idea/WSHubsAPI.iml" />
     </modules>
   </component>
 </project>

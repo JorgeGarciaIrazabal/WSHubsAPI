@@ -5,7 +5,7 @@ from WSHubsAPI.utils import getDefaults, getArgs, isNewFunction
 __author__ = 'jgarc'
 
 class JSClientFileGenerator():
-    FILE_NAME = "WSProtocol.js"
+    FILE_NAME = "WSHubsApi.js"
     @classmethod
     def __getHubClassStr(cls, class_):
         funcStrings = ",\n".join(cls.__getJSFunctionsStr(class_))
@@ -39,70 +39,78 @@ class JSClientFileGenerator():
             classStrings.append(cls.__getHubClassStr(h))
         return classStrings
 
-    WRAPPER = """var $wsConnection
-function $wsConnectionInit(args, serverTimeout){{
-    args = args || "";
-    $wsConnection = new WebSocket(args);
-    $wsConnection.__messageID = 0
-    $wsConnection.__returnFunctions = {{}};
-    $wsConnection.__respondTimeout = serverTimeout || 5000;
-    $wsConnection.client = {{}};
-    $wsConnection.__constructMessage = function (hubName, functionName, args){{
+    WRAPPER = """function HubsAPI(url, serverTimeout) {{
+    var messageID = 0;
+    var returnFunctions = {{}};
+    var respondTimeout = (serverTimeout || 5) * 1000;
+    var thisApi = this;
+    url = url || "";
+
+    this.wsClient = new WebSocket(url);
+
+    var constructMessage = function (hubName, functionName, args) {{
         args = Array.prototype.slice.call(args);
-        id = $wsConnection.__messageID++
-        body = {{"hub":hubName, "function":functionName,"args": args, "ID": id}};
-        $wsConnection.send(JSON.stringify(body));
-        return {{done: $wsConnection.__getReturnFunction(id)}}
-    }}
-    $wsConnection.__getReturnFunction = function(ID){{
-        return function(onSuccess, onError){{
-            f=$wsConnection.__returnFunctions[ID];
-            if($wsConnection.__returnFunctions[ID] == undefined)
-                $wsConnection.__returnFunctions[ID] = {{}}
-            f=$wsConnection.__returnFunctions[ID]
-            f.onSuccess = function(){{onSuccess.apply(onSuccess,arguments);delete $wsConnection.__returnFunctions[ID]}};
-            f.onError = function(){{onError.apply(onError,arguments);delete $wsConnection.__returnFunctions[ID]}};
-            //check __returnFunctions, memory leak
-            setTimeout(function(){{
-                if($wsConnection.__returnFunctions[ID] && $wsConnection.__returnFunctions[ID].onError)
-                    $wsConnection.__returnFunctions[ID].onError("timeOut Error");
-            }}, $wsConnection.__respondTimeout)
+        var id = messageID++;
+        var body = {{"hub": hubName, "function": functionName, "args": args, "ID": id}};
+        thisApi.wsClient.send(JSON.stringify(body));
+        return {{done: getReturnFunction(id)}}
+    }};
+    var getReturnFunction = function (ID) {{
+        return function (onSuccess, onError) {{
+            if (returnFunctions[ID] == undefined)
+                returnFunctions[ID] = {{}};
+            var f = returnFunctions[ID];
+            f.onSuccess = function () {{
+                onSuccess.apply(onSuccess, arguments);
+                delete returnFunctions[ID]
+            }};
+            f.onError = function () {{
+                onError.apply(onError, arguments);
+                delete returnFunctions[ID]
+            }};
+            //check returnFunctions, memory leak
+            setTimeout(function () {{
+                if (returnFunctions[ID] && returnFunctions[ID].onError)
+                    returnFunctions[ID].onError("timeOut Error");
+            }}, respondTimeout)
         }}
-    }}
-    $wsConnection.onmessage = function(ev) {{
-        try{{
+    }};
+    this.wsClient.onmessage = function (ev) {{
+        var f,
+            msgObj;
+        try {{
             msgObj = JSON.parse(ev.data);
-            if(msgObj.hasOwnProperty("replay")){{
-                f = $wsConnection.__returnFunctions[msgObj.ID]
-                if(msgObj.success && f != undefined && f.onSuccess != undefined)
-                    f.onSuccess(msgObj.replay)
-                else if(f != undefined && f.onError != undefined)
+            if (msgObj.hasOwnProperty("replay")) {{
+                f = returnFunctions[msgObj.ID];
+                if (msgObj.success && f != undefined && f.onSuccess != undefined)
+                    f.onSuccess(msgObj.replay);
+                else if (f != undefined && f.onError != undefined)
                     f.onError(msgObj.replay)
-            }}else{{
-                f = $wsConnection.client[msgObj.hub][msgObj.function]
+            }} else {{
+                f = thisApi[msgObj.hub].client[msgObj.function];
                 f.apply(f, msgObj.args)
             }}
-        }}catch(err){{
+        }} catch (err) {{
             this.onMessageError(err)
         }}
-    }}
-    $wsConnection.onMessageError = function(error){{ }}
-    $wsConnection.server = {{}}
+    }};
+    this.wsClient.onMessageError = function (error) {{
+    }};
     {main}
-
-    return $wsConnection;
 }}
     """
     CLASS_TEMPLATE = """
-    $wsConnection.server.{name} = {{
+    this.{name} = {{}};
+    this.{name}.server = {{
         __HUB_NAME : "{name}",
         {functions}
     }}
-    $wsConnection.client.{name} = {{}}"""
-    #todo:last part of this function can be extracted
+    this.{name}.client = {{}}"""
+
     FUNCTION_TEMPLATE = """
         {name} : function ({args}){{
             {cook}
-            return $wsConnection.__constructMessage(this.__HUB_NAME, "{name}",arguments)
+            return constructMessage(this.__HUB_NAME, "{name}",arguments);
         }}"""
+
     ARGS_COOK_TEMPLATE = "arguments[{iter}] = {name} == undefined ? {default} : {name};"

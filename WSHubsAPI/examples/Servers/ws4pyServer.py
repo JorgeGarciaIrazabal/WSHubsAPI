@@ -1,8 +1,7 @@
+import importlib
 import json
 import logging
 import logging.config
-from threading import Thread
-import time
 from WSHubsAPI.ConnectionHandlers.WS4Py import ClientHandler
 from wsgiref.simple_server import make_server
 from ws4py.server.wsgirefserver import WSGIServer, WebSocketWSGIRequestHandler
@@ -13,7 +12,8 @@ logging.config.dictConfig(json.load(open('logging.json')))
 log = logging.getLogger(__name__)
 
 if __name__ == '__main__':
-    import ChatHub #necessaty to add this imput for code inspection
+    importlib.import_module("ChatHub")#necessaty to add this import for code inspection
+    #construct the necessary clients files in the specified path
     Hub.constructPythonFile("../Clients/_static")
     Hub.constructJSFile("../Clients/_static")
 
