@@ -34,6 +34,20 @@ class TestHubDetection(unittest.TestCase):
             def __init__(self, aux):
                 super(TestHubLimitation3, self).__init__()
 
+
+        self.assertRaises(HubException, Hub.initHubsInspection, forceReconstruction=True)
+        TestHubLimitation3.__init__ = lambda : 1+1
+
+    def test_hubsLimitations_startWithUnderscores(self):
+        class __TestHubLimitation(Hub):
+            pass
+
+        self.assertRaises(HubException, Hub.initHubsInspection, forceReconstruction=True)
+
+    def test_hubsLimitations_wsClient(self):
+        class wsClient(Hub):
+            pass
+
         self.assertRaises(HubException, Hub.initHubsInspection, forceReconstruction=True)
 
 if __name__ == '__main__':

@@ -6,8 +6,10 @@ from WSHubsAPI.utils import classproperty
 
 __author__ = 'Jorge'
 
+
 class HubException(Exception):
     pass
+
 
 class Hub(object):
     HUBs_DICT = {}
@@ -34,12 +36,11 @@ class Hub(object):
         JSClientFileGenerator.createFile(path, cls.HUBs_DICT.values())
 
     @classmethod
-    def constructJAVAFile(cls, package, path=".", createClientTemplate=False):
+    def constructJAVAFile(cls, package, path="."):
         cls.initHubsInspection()
         hubs = cls.HUBs_DICT.values()
         JAVAFileGenerator.createFile(path, package, hubs)
-        if createClientTemplate:
-            JAVAFileGenerator.createClientTemplate(path, package, hubs)
+        JAVAFileGenerator.createClientTemplate(path, package, hubs)
 
     @classmethod
     def constructPythonFile(cls, path="."):
@@ -76,7 +77,12 @@ class Hub(object):
         hubName = self.__class__.__dict__.get("__HubName__", self.__class__.__name__)
         if hubName in self.HUBs_DICT:
             raise HubException("Hub's name must be unique")
+        if hubName.startswith("__"):
+            raise HubException("Hub's name can not start with '__'")
+        if hubName == "wsClient":
+            raise HubException("Hub's name can not be 'wsClient', it is a  reserved name")
         setattr(self.__class__, "__HubName__", hubName)
         self.HUBs_DICT[hubName] = self
+
 
 from WSHubsAPI.CommProtocol import ConnectionGroup, CommHandler

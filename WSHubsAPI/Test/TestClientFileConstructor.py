@@ -1,5 +1,6 @@
 import os
 from os.path import isfile
+import shutil
 from WSHubsAPI.ClientFileGenerator.JAVAFileGenerator import JAVAFileGenerator
 from WSHubsAPI.ClientFileGenerator.JSClientFileGenerator import JSClientFileGenerator
 from WSHubsAPI.ClientFileGenerator.PythonClientFileGenerator import PythonClientFileGenerator
@@ -33,12 +34,13 @@ class TestHubDetection(unittest.TestCase):
 
     def test_JAVACreation(self):
         path = "onTest"
-        Hub.constructJAVAFile("test", path, createClientTemplate=True)
+        Hub.constructJAVAFile("test", path)
         self.assertTrue(os.path.exists(os.path.join(path, JAVAFileGenerator.SERVER_FILE_NAME)))
-        self.assertTrue(os.path.exists(os.path.join(path, JAVAFileGenerator.CLIENT_FILE_NAME)))
+        self.assertTrue(os.path.exists(os.path.join(path, JAVAFileGenerator.CLIENT_PACKAGE_NAME)))
         for f in listdir(path):
             fullPath = os.path.join(path, f)
-            os.remove(fullPath)
+            os.remove(fullPath) if os.path.isfile(fullPath) else shutil.rmtree(fullPath)
+
         os.removedirs(path)
 
     def test_PythonCreation(self):

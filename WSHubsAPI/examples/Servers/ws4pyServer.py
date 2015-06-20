@@ -12,16 +12,15 @@ logging.config.dictConfig(json.load(open('logging.json')))
 log = logging.getLogger(__name__)
 
 if __name__ == '__main__':
-    importlib.import_module("ChatHub")#necessaty to add this import for code inspection
-    #construct the necessary clients files in the specified path
-    Hub.constructPythonFile("../Clients/_static")
-    Hub.constructJSFile("../Clients/_static")
+    importlib.import_module("ChatHub")  # necessaty to add this import for code inspection
+    # construct the necessary clients files in the specified path
+    # Hub.constructPythonFile("../Clients/_static")
+    # Hub.constructJSFile("../Clients/_static")
+    Hub.constructJAVAFile("tornado.WSHubsApi", "C:/Users/Jorge/Desktop/tornado/src/tornado/WSHubsApi")
 
     server = make_server('127.0.0.1', 8888, server_class=WSGIServer,
-                     handler_class=WebSocketWSGIRequestHandler,
-                     app=WebSocketWSGIApplication(handler_cls=ClientHandler))
+                         handler_class=WebSocketWSGIRequestHandler,
+                         app=WebSocketWSGIApplication(handler_cls=ClientHandler))
     server.initialize_websockets_manager()
     log.debug("starting...")
-    target=server.serve_forever()
-
-
+    target = server.serve_forever()

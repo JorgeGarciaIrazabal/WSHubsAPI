@@ -30,12 +30,11 @@ class Hub(object):
         JSClientFileGenerator.createFile(path, cls.HUBs_DICT.values())
 
     @classmethod
-    def constructJAVAFile(cls, path, package, createClientTemplate = False):
+    def constructJAVAFile(cls, path, package):
         cls.initHubsInspection()
         hubs=cls.HUBs_DICT.values()
         JAVAFileGenerator.createFile(path, package, hubs)
-        if createClientTemplate:
-            JAVAFileGenerator.createClientTemplate(path,package,hubs)
+        JAVAFileGenerator.createClientTemplate(path,package,hubs)
 
     @classmethod
     def constructPythonFile(cls, path="."):
