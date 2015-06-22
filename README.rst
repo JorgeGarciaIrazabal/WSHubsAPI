@@ -72,16 +72,13 @@ works like:
         });
         $('#message').val('').focus();
     }
-
     hubsApi.wsClient.onopen = function(){
         $('#status').text("Connected")
-
         //function to be called from server
         hubsApi.ChatHub.client.onMessage = function(from, message){
             $('#discussion').append('<li><strong>' + from
                     + '</strong>: ' + message + '</li>');
         }
-
         //sending message
         $('#sendmessage').click(sendToAll);
         $('#message').keypress(function(e){
@@ -89,7 +86,6 @@ works like:
                 sendToAll()
         });
     };
-
     hubsApi.wsClient.onclose = function(ev){
         $('#status').text("Closed")
     };
@@ -121,6 +117,7 @@ if __name__ == '__main__':
         message = raw_input("")
         ws.ChatHub.server.sendToAll(name, message).done(lambda m: sys.stdout.write("message sent to %d client(s)\n"%m),
                                                         lambda m: sys.stdout.write("!!!!!message not sent!!!!!\n"))
+
 Client side JAVA/Android client
 ~~~~~~~~~~~~~~~
 
