@@ -2,7 +2,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class WSConnection extends WebSocket {
+public class WSHubsAPIClient extends WebSocket {
     public static final String TAG = "Websocket";
     private AtomicInteger messageId = new AtomicInteger();
 
@@ -19,7 +19,7 @@ public class WSConnection extends WebSocket {
         return connected;
     }
 
-    public WSConnection(String uri) throws URISyntaxException {
+    public WSHubsAPIClient(String uri) throws URISyntaxException {
         super(new URI(uri));
     }
 }

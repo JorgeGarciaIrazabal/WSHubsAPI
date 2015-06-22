@@ -1,13 +1,12 @@
-
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import java.util.Timer;
 import java.util.TimerTask;
 
 public class FunctionResult {
-	private WSConnection connection;
+	private WSHubsAPIClient connection;
 	private int messageID;
-	public FunctionResult(WSConnection connection, int messageID){
+	public FunctionResult(WSHubsAPIClient connection, int messageID){
 		this.connection = connection;
 		this.messageID = messageID;
 	}

@@ -66,7 +66,7 @@ def serializeObject(obj2ser):
         sObj = {}
         for key, value in obj.items():
             if isinstance(value,datetime):
-                sObj[key] = str(value)
+                sObj[key] = value.strftime('%Y/%m/%d %H:%M:%S %f')
             else:
                 try:
                     if not key.startswith("_") and id(value) != id(obj2ser):

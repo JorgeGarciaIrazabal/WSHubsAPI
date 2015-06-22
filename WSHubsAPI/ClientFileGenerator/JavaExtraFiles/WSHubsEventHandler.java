@@ -1,11 +1,10 @@
-
 import org.json.JSONObject;
-
 import java.lang.reflect.Method;
 import java.util.HashMap;
 
 public abstract class WSHubsEventHandler implements WebSocketEventHandler {
     public HashMap<Integer, FunctionResult.Handler> returnFunctions = new HashMap<>();
+    public String clientHubPrefix = this.getClass().getPackage() + "." + "ClientHubs.Client_";
 
     @Override
     public void onMessage(WebSocketMessage message) {
@@ -22,7 +21,7 @@ public abstract class WSHubsEventHandler implements WebSocketEventHandler {
                     }
                 }
             } else {
-                Class<?> c = Class.forName(WSClient.class.getCanonicalName() + "$" + msgObj.getString("hub"));
+                Class<?> c = Class.forName(clientHubPrefix + msgObj.getString("hub"));
                 Method[] methods = c.getDeclaredMethods();
                 String functionName = msgObj.getString("function").toUpperCase();
                 for (Method m : methods) {

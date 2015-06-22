@@ -38,9 +38,13 @@ class JAVAFileGenerator:
     @classmethod
     def createFile(cls, path, package, hubs):
         if not os.path.exists(path): os.makedirs(path)
+        attributesHubs = cls.__getAttributesHubs(hubs)
         with open(os.path.join(path, cls.SERVER_FILE_NAME), "w") as f:
             classStrings = "".join(cls.__getClassStrings(hubs))
-            f.write((cls.WRAPPER).format(main=classStrings, package=package, clientPackage=cls.CLIENT_PACKAGE_NAME))
+            f.write(cls.WRAPPER.format(main=classStrings,
+                                         package=package,
+                                         clientPackage=cls.CLIENT_PACKAGE_NAME,
+                                         attributesHubs=attributesHubs))
         cls.__copyExtraFiles(path, package)
 
     @classmethod
@@ -48,7 +52,7 @@ class JAVAFileGenerator:
         clientFolder = os.path.join(path, cls.CLIENT_PACKAGE_NAME)
         if not os.path.exists(clientFolder): os.makedirs(clientFolder)
         for hub in hubs:
-            clientHubFile = os.path.join(clientFolder, cls.CLIENT_HUB_PREFIX+hub.__HubName__) + '.java'
+            clientHubFile = os.path.join(clientFolder, cls.CLIENT_HUB_PREFIX + hub.__HubName__) + '.java'
             if not os.path.exists(clientHubFile):
                 with open(clientHubFile, "w") as f:
                     classString = cls.CLIENT_CLASS_TEMPLATE.format(package=package + "." + cls.CLIENT_PACKAGE_NAME,
@@ -62,6 +66,10 @@ class JAVAFileGenerator:
         for h in hubs:
             classStrings.append(cls.__getHubClassStr(h))
         return classStrings
+
+    @classmethod
+    def __getAttributesHubs(cls, hubs):
+        return "\n".join([cls.ATTRIBUTE_HUB_TEMPLATE.format(name=hub.__HubName__) for hub in hubs])
 
     @classmethod
     def __copyExtraFiles(cls, dstPath, package):
@@ -80,7 +88,7 @@ class JAVAFileGenerator:
 
     CLASS_TEMPLATE = """
     public class {name} {{
-        private class Server {{
+        public class Server {{
             public static final String HUB_NAME = "{name}";
             {functions}
         }}
@@ -97,19 +105,25 @@ class JAVAFileGenerator:
 
     WRAPPER = """package {package};
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.json.simple.JSONArray;
 import org.json.JSONException;
 import org.json.simple.JSONObject;
 import java.net.URISyntaxException;
+import java.lang.reflect.Modifier;
 import {package}.{clientPackage}.*;
 public class %s {{//TODO: do not use static functions, we might want different connections
-    private static Gson gson = new Gson();
-    public static WSConnection wsClient;
+    private static Gson gson = new GsonBuilder()
+            .excludeFieldsWithModifiers(Modifier.FINAL, Modifier.TRANSIENT, Modifier.STATIC)
+            .serializeNulls()
+            .setDateFormat("dd/MMM/yyyy HH:mm:ss")
+            .create();
+    public WSHubsAPIClient wsClient;
+{attributesHubs}
 
     public %s (String uriStr, WebSocketEventHandler webSocketEventHandler) throws URISyntaxException {{
-        wsClient = new WSConnection(uriStr);
+        wsClient = new WSHubsAPIClient(uriStr);
         wsClient.setEventHandler(webSocketEventHandler);
-        wsClient.connect();
     }}
 
     public boolean isConnected(){{return wsClient.isConnected();}}
@@ -127,10 +141,13 @@ public class %s {{//TODO: do not use static functions, we might want different c
 
     private static <TYPE_ARG> void __addArg(JSONArray argsArray, TYPE_ARG arg) throws JSONException {{
         try {{
-            argsArray.add(arg);
-        }} catch (Exception e) {{
+            if(arg.getClass().isPrimitive())
+                argsArray.add(arg);
+            else
+                argsArray.add(gson.toJsonTree(arg));
+        }} catch (Exception e) {{ //todo: do something with this exception
             JSONArray aux = new JSONArray();
-            aux.add(gson.toJson(arg));
+            aux.add(gson.toJsonTree(arg));
             argsArray.add(aux);
         }}
     }}
@@ -142,3 +159,4 @@ public class %s {{//TODO: do not use static functions, we might want different c
 public class {prefix}{name} {{
     // Todo: create client side functions
 }}"""
+    ATTRIBUTE_HUB_TEMPLATE = "    public {name} {name} = new {name}();"
