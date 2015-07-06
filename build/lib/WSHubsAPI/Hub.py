@@ -2,7 +2,7 @@ import inspect
 from WSHubsAPI.ClientFileGenerator.JAVAFileGenerator import JAVAFileGenerator
 from WSHubsAPI.ClientFileGenerator.JSClientFileGenerator import JSClientFileGenerator
 from WSHubsAPI.ClientFileGenerator.PythonClientFileGenerator import PythonClientFileGenerator
-from WSHubsAPI.utils import classproperty
+from WSHubsAPI.utils import classProperty
 
 __author__ = 'Jorge'
 

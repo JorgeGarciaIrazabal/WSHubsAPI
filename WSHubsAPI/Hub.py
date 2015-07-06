@@ -2,7 +2,7 @@ import inspect
 from WSHubsAPI.ClientFileGenerator.JAVAFileGenerator import JAVAFileGenerator
 from WSHubsAPI.ClientFileGenerator.JSClientFileGenerator import JSClientFileGenerator
 from WSHubsAPI.ClientFileGenerator.PythonClientFileGenerator import PythonClientFileGenerator
-from WSHubsAPI.utils import classproperty
+from WSHubsAPI.utils import classProperty
 
 __author__ = 'Jorge'
 
@@ -60,9 +60,15 @@ class Hub(object):
         return None
 
     @property
+    def connections(self):
+        """
+        :rtype : dict of int; CommHandler
+        """
+        return self.sender.connections
+
+    @property
     def allClients(self):
-        connection = self.sender
-        return ConnectionGroup(connection.connections.values())
+        return ConnectionGroup(self.connections.values())
 
     @property
     def otherClients(self):
@@ -72,6 +78,10 @@ class Hub(object):
     def getClients(self, function):
         connection = self.sender
         return ConnectionGroup(filter(function, connection.connections.values()))
+
+    def getClient(self, id):
+        connection = self.sender
+        return connection.connections.get(id,None)
 
     def __init__(self):
         hubName = self.__class__.__dict__.get("__HubName__", self.__class__.__name__)

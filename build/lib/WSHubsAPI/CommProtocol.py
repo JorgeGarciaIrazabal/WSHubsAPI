@@ -6,7 +6,7 @@ import inspect
 import threading
 
 from WSHubsAPI.ValidateStrings import getUnicode
-from WSHubsAPI.utils import classproperty, WSThreadsQueue, serializeObject
+from WSHubsAPI.utils import classProperty, WSThreadsQueue, serializeObject
 
 log = logging.getLogger(__name__)
 __author__ = 'Jorge Garcia Irazabal'
@@ -101,7 +101,7 @@ class CommHandler(object):
                 else:  # obj is the class that defines our method
                     return hub.__HubName__
 
-    @classproperty
+    @classProperty
     def connections(cls):
         return cls._connections
 

@@ -20,7 +20,7 @@ except:
 ASCII_UpperCase = string.uppercase if sys.version_info[0] == 2 else string.ascii_uppercase
 
 
-class classproperty(object):
+class classProperty(object):
     def __init__(self, fget):
         self.fget = fget
 

@@ -116,7 +116,7 @@ public class %s {{//TODO: do not use static functions, we might want different c
     private static Gson gson = new GsonBuilder()
             .excludeFieldsWithModifiers(Modifier.FINAL, Modifier.TRANSIENT, Modifier.STATIC)
             .serializeNulls()
-            .setDateFormat("dd/MMM/yyyy HH:mm:ss")
+            .setDateFormat("yyyy/MM/dd HH:mm:ss S")
             .create();
     public WSHubsAPIClient wsClient;
 {attributesHubs}
