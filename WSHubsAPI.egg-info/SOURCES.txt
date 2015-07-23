@@ -1,4 +1,3 @@
-README.rst
 setup.cfg
 setup.py
 WSHubsAPI/CommProtocol.py
@@ -45,3 +44,5 @@ WSHubsAPI/examples/Servers/TornadoWSServer.py
 WSHubsAPI/examples/Servers/__init__.py
 WSHubsAPI/examples/Servers/logging.json
 WSHubsAPI/examples/Servers/ws4pyServer.py
+WSHubsAPI/examples/Servers/_static/WSHubsApi.py
+WSHubsAPI/examples/Servers/_static/__init__.py
