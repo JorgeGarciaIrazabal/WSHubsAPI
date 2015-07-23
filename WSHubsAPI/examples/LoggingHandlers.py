@@ -9,6 +9,7 @@ class ColoredConsoleHandler(logging.StreamHandler):
         # Need to make a actual copy of the record
         # to prevent altering the message for other loggers
         myrecord = copy.copy(record)
+        self.format(myrecord)
         levelno = myrecord.levelno
         if(levelno >= 50):  # CRITICAL / FATAL
             color = '\x1b[31m'  # red
@@ -22,5 +23,5 @@ class ColoredConsoleHandler(logging.StreamHandler):
             color = '\x1b[35m'  # pink
         else:  # NOTSET and anything else
             color = '\x1b[0m'  # normal
-        myrecord.msg = color + getUnicode(myrecord.msg) + '\x1b[0m'  # normal
+        myrecord.msg = color + myrecord.msg + '\x1b[0m'  # normal
         logging.StreamHandler.emit(self, myrecord)

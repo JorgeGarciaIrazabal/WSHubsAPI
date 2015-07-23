@@ -55,7 +55,7 @@ class JAVAFileGenerator:
             clientHubFile = os.path.join(clientFolder, cls.CLIENT_HUB_PREFIX + hub.__HubName__) + '.java'
             if not os.path.exists(clientHubFile):
                 with open(clientHubFile, "w") as f:
-                    classString = cls.CLIENT_CLASS_TEMPLATE.format(package=package + "." + cls.CLIENT_PACKAGE_NAME,
+                    classString = cls.CLIENT_CLASS_TEMPLATE.format(package=package,
                                                                    name=hub.__HubName__,
                                                                    prefix=cls.CLIENT_HUB_PREFIX)
                     f.write(classString)
@@ -93,7 +93,7 @@ class JAVAFileGenerator:
             {functions}
         }}
         public Server server = new Server();
-        public {prefix}{name} client = new {prefix}{name}();
+        public {prefix}{name} client = new {prefix}{name}(WSHubsApi.this);
     }}"""
     FUNCTION_TEMPLATE = """
             public {types} FunctionResult {name} ({args}) throws JSONException{{
@@ -121,9 +121,10 @@ public class %s {{//TODO: do not use static functions, we might want different c
     public WSHubsAPIClient wsClient;
 {attributesHubs}
 
-    public %s (String uriStr, WebSocketEventHandler webSocketEventHandler) throws URISyntaxException {{
+    public %s (String uriStr, WSHubsEventHandler wsHubsEventHandler) throws URISyntaxException {{
         wsClient = new WSHubsAPIClient(uriStr);
-        wsClient.setEventHandler(webSocketEventHandler);
+        wsHubsEventHandler.setWsHubsApi(this);
+        wsClient.setEventHandler(wsHubsEventHandler);
     }}
 
     public boolean isConnected(){{return wsClient.isConnected();}}
@@ -155,8 +156,13 @@ public class %s {{//TODO: do not use static functions, we might want different c
 }}
     """ % (SERVER_FILE_NAME[:-5], SERVER_FILE_NAME[:-5])
 
-    CLIENT_CLASS_TEMPLATE = """package {package};
-public class {prefix}{name} {{
+    CLIENT_CLASS_TEMPLATE = """package {package}.%s;
+import {package}.ClientBase;
+import {package}.WSHubsApi;
+public class {prefix}{name} extends ClientBase {{
+    public {prefix}{name}(WSHubsApi wsHubsApi) {{
+        super(wsHubsApi);
+    }}
     // Todo: create client side functions
-}}"""
+}}"""%CLIENT_PACKAGE_NAME
     ATTRIBUTE_HUB_TEMPLATE = "    public {name} {name} = new {name}();"

@@ -1,4 +1,4 @@
-
+DATE_TIME_FORMAT = '%Y/%m/%d %H:%M:%S %f'
 try:
     from Queue import Queue
 except:
@@ -66,7 +66,7 @@ def serializeObject(obj2ser):
         sObj = {}
         for key, value in obj.items():
             if isinstance(value,datetime):
-                sObj[key] = value.strftime('%Y/%m/%d %H:%M:%S %f')
+                sObj[key] = value.strftime(DATE_TIME_FORMAT)
             else:
                 try:
                     if not key.startswith("_") and id(value) != id(obj2ser):
@@ -80,7 +80,7 @@ def serializeObject(obj2ser):
         for value in obj:
             try:
                 sValue = serializeObject(value)
-                json.dumps(sValue)
+                json.dumps(sValue, ensure_ascii=False)
                 sObj.append(sValue)
             except TypeError:
                 pass

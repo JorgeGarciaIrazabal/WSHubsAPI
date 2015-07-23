@@ -7,6 +7,7 @@ import threading
 
 from WSHubsAPI.ValidateStrings import getUnicode
 from WSHubsAPI.utils import classProperty, WSThreadsQueue, serializeObject
+import codecs
 
 log = logging.getLogger(__name__)
 __author__ = 'Jorge Garcia Irazabal'
@@ -18,6 +19,7 @@ class CommHandler(object):
     __AVAILABLE_UNPROVIDED_IDS = []
     threadsPool = WSThreadsQueue(50)  # todo: make dynamic queue size
     __lock = threading.Lock()
+    reader = codecs.getreader("utf-8")
 
     def __init__(self, client=None):
         self.ID = None
@@ -42,7 +44,7 @@ class CommHandler(object):
 
     def onMessage(self, message):
         try:
-            msg = FunctionMessage(message, self)
+            msg = FunctionMessage(message.decode('utf-8', 'replace'), self)
             replay = msg.callFunction()
             self.onReplay(replay, msg)
         except Exception as e:

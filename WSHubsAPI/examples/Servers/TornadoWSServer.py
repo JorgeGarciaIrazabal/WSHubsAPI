@@ -1,3 +1,4 @@
+import importlib
 import os
 import logging
 import logging.config
@@ -18,7 +19,7 @@ app = web.Application([
 ], **settings)
 
 if __name__ == '__main__':
-    import ChatHub #necessaty to add this imput for code inspection
+    importlib.import_module("ChatHub")  # necessary to add this import for code inspection
 
     Hub.constructJSFile(settings["static_path"])
     Hub.constructPythonFile(settings["static_path"])

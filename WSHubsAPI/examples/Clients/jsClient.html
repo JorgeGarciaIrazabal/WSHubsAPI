@@ -20,16 +20,16 @@
     </ul>
 </div>
     <script>
-    hubsApi = new HubsAPI('ws://127.0.0.1:8888/', 4.5)
+    hubsApi = new HubsAPI('ws://127.0.0.1:8888/')
     function sendToAll(){
         var name = $('#name').val(),
             message = $('#message').val()
         $('#discussion').append('<li><strong> Me'
                     + '</strong>: ' + message + '</li>');
         hubsApi.ChatHub.server.sendToAll(name, message).done(function (numOfMessagesSent){
-          alert("message sent to " + numOfMessagesSent + " client(s)");
+          console.log("message sent to " + numOfMessagesSent + " client(s)");
         },function (message){
-          alert("message not sent" +message);
+          console.log("message not sent" +message);
         });
         $('#message').val('').focus();
     }
