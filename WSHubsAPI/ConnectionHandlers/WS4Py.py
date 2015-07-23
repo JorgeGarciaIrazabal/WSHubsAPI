@@ -4,6 +4,7 @@ from WSHubsAPI.CommProtocol import CommHandler
 
 __author__ = 'Jorge'
 log = logging.getLogger(__name__)
+log.addHandler(logging.NullHandler())
 
 class ClientHandler(WebSocket):
     def writeMessage(self, message):

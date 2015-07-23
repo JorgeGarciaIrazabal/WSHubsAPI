@@ -1,58 +1,4 @@
-import inspect
-import os
-from WSHubsAPI.utils import isNewFunction, getDefaults, getArgs
-
-__author__ = 'jgarc'
-
-class PythonClientFileGenerator():
-    FILE_NAME = "WSHubsApi.py"
-    TAB = "    "
-
-    @classmethod
-    def __getHubClassStr(cls, class_):
-        funcStrings = ("\n" + cls.TAB * 2).join(cls.__getFunctionStr(class_))
-        return cls.CLASS_TEMPLATE.format(name=class_.__HubName__, functions=funcStrings)
-
-    @classmethod
-    def __getFunctionStr(cls, class_):
-        funcStrings = []
-        functions = inspect.getmembers(class_, predicate=isNewFunction)
-        for name, method in functions:
-            args = getArgs(method)
-            defaults = getDefaults(method)
-            formattedArgs = []
-            for i, arg in enumerate(reversed(args)):
-                if i >= len(defaults):
-                    formattedArgs.insert(0, arg)
-                else:
-                    formattedArgs.insert(0, arg + "=" + str(defaults[-i - 1]))
-            appendInArgs = ("\n" + cls.TAB * 4).join([cls.ARGS_COOK_TEMPLATE.format(name=arg) for arg in args])
-            funcStrings.append(
-                cls.FUNCTION_TEMPLATE.format(name=name, args=", ".join(formattedArgs), cook=appendInArgs))
-        return funcStrings
-
-    @classmethod
-    def __getAttributesHub(cls, hubs):
-        return [cls.ATTRIBUTE_HUB_TEMPLATE.format(name=h.__HubName__) for h in hubs]
-
-    @classmethod
-    def createFile(cls, path, hubs):
-        if not os.path.exists(path): os.makedirs(path)
-        with open(os.path.join(path,"__init__.py"),'w'): #creating __init__.py if not exist
-            pass
-        with open(os.path.join(path, cls.FILE_NAME), "w") as f:
-            classStrings = "".join(cls.__getClassStrings(hubs))
-            attributesHubs = "\n".join(cls.__getAttributesHub(hubs))
-            f.write(cls.WRAPPER.format(Hubs=classStrings, attributesHubs=attributesHubs))
-
-    @classmethod
-    def __getClassStrings(cls, hubs):
-        classStrings = []
-        for h in hubs:
-            classStrings.append(cls.__getHubClassStr(h))
-        return classStrings
-
-    WRAPPER = '''import json
+import json
 import logging
 import threading
 from ws4py.client.threadedclient import WebSocketClient
@@ -93,7 +39,7 @@ class GenericServer(object):
     def _serializeObject(cls, obj2ser):
         obj = obj2ser if not hasattr(obj2ser, "__dict__") else obj2ser.__dict__
         if isinstance(obj,dict):
-            sObj = {{}}
+            sObj = {}
             for key, value in obj.items():
                 if isinstance(value,datetime):
                     sObj[key] = value.strftime('%Y/%m/%d %H:%M:%S %f')
@@ -134,23 +80,22 @@ class WSHubsAPIClient(WebSocketClient):
         self.log.debug("Connection opened")
 
     def closed(self, code, reason=None):
-        self.log.debug("Connection closed with code:\\n%s\\nAnd reason:\\n%s" % (code, reason))
+        self.log.debug("Connection closed with code:\n%s\nAnd reason:\n%s" % (code, reason))
 
     def received_message(self, m):
         try:
             msgObj = json.loads(m.data.decode('utf-8'))
+            if "replay" in msgObj:
+                f = self.__returnFunctions.get(msgObj["ID"], None)
+                if f and msgObj["success"]:
+                    f.onSuccess(msgObj["replay"])
+                elif f and f.onError:
+                    f.onError(msgObj["replay"])
+            else:
+                self.api.__getattribute__(msgObj["hub"]).client.__dict__[msgObj["function"]](*msgObj["args"])
+            self.log.debug("Received message: %s" % m.data.decode('utf-8'))
         except Exception as e:
             self.onError(e)
-            return
-        if "replay" in msgObj:
-            f = self.__returnFunctions.get(msgObj["ID"], None)
-            if f and msgObj["success"]:
-                f.onSuccess(msgObj["replay"])
-            elif f and f.onError:
-                f.onError(msgObj["replay"])
-        else:
-            self.api.__getattribute__(msgObj["hub"]).client.__dict__[msgObj["function"]](*msgObj["args"])
-        log.debug("Received message: %s" % m.data.decode('utf-8'))
 
     def getReturnFunction(self, ID):
         """
@@ -194,37 +139,29 @@ class WSHubsAPIClient(WebSocketClient):
 class HubsAPI(object):
     def __init__(self, url, serverTimeout=5.0):
         self.wsClient = WSHubsAPIClient(self, url, serverTimeout)
-{attributesHubs}
+        self.ChatHub = self.__ChatHub(self.wsClient)
 
     def connect(self):
         self.wsClient.connect()
 
-{Hubs}
-'''
 
-    CLASS_TEMPLATE = '''
-    class __{name}(object):
+    class __ChatHub(object):
         def __init__(self, wsClient):
             hubName = self.__class__.__name__[2:]
             self.server = self.__Server(wsClient, hubName)
             self.client = WSSimpleObject()
 
         class __Server(GenericServer):
-            {functions}
-        '''
-
-    FUNCTION_TEMPLATE = '''
-            def {name}(self, {args}):
+            
+            def sendToAll(self, name, message):
                 """
                 :rtype : WSReturnObject
                 """
                 args = list()
-                {cook}
+                args.append(name)
+                args.append(message)
                 id = self._getNextMessageID()
-                body = {{"hub": self.hubName, "function": "{name}", "args": args, "ID": id}}
+                body = {"hub": self.hubName, "function": "sendToAll", "args": args, "ID": id}
                 self.wsClient.send(json.dumps(self._serializeObject(body)))
-                return self.wsClient.getReturnFunction(id)'''
-
-    ARGS_COOK_TEMPLATE = "args.append({name})"
-
-    ATTRIBUTE_HUB_TEMPLATE = "        self.{name} = self.__{name}(self.wsClient)"
+                return self.wsClient.getReturnFunction(id)
+        

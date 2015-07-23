@@ -5,6 +5,7 @@ from WSHubsAPI.ValidateStrings import getUnicode
 
 __author__ = 'Jorge'
 log = logging.getLogger(__name__)
+log.addHandler(logging.NullHandler())
 
 class ClientHandler(tornado.websocket.WebSocketHandler):
     def __init__(self, application, request, **kwargs):

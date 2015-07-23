@@ -4,7 +4,9 @@ import threading
 from ws4py.client.threadedclient import WebSocketClient
 from threading import Timer
 from datetime import datetime
+
 log = logging.getLogger(__name__)
+log.addHandler(logging.NullHandler())
 
 class WSSimpleObject(object):
     def __setattr__(self, key, value):
@@ -84,16 +86,18 @@ class WSHubsAPIClient(WebSocketClient):
     def received_message(self, m):
         try:
             msgObj = json.loads(m.data.decode('utf-8'))
-            if "replay" in msgObj:
-                f = self.__returnFunctions.get(msgObj["ID"], None)
-                if f and msgObj["success"]:
-                    f.onSuccess(msgObj["replay"])
-                elif f and f.onError:
-                    f.onError(msgObj["replay"])
-            else:
-                self.api.__getattribute__(msgObj["hub"]).client.__dict__[msgObj["function"]](*msgObj["args"])
         except Exception as e:
             self.onError(e)
+            return
+        if "replay" in msgObj:
+            f = self.__returnFunctions.get(msgObj["ID"], None)
+            if f and msgObj["success"]:
+                f.onSuccess(msgObj["replay"])
+            elif f and f.onError:
+                f.onError(msgObj["replay"])
+        else:
+            self.api.__getattribute__(msgObj["hub"]).client.__dict__[msgObj["function"]](*msgObj["args"])
+        log.debug("Received message: %s" % m.data.decode('utf-8'))
 
     def getReturnFunction(self, ID):
         """
@@ -151,17 +155,6 @@ class HubsAPI(object):
 
         class __Server(GenericServer):
             
-            def getNumOfClientsConnected(self, ):
-                """
-                :rtype : WSReturnObject
-                """
-                args = list()
-                
-                id = self._getNextMessageID()
-                body = {"hub": self.hubName, "function": "getNumOfClientsConnected", "args": args, "ID": id}
-                self.wsClient.send(json.dumps(self._serializeObject(body)))
-                return self.wsClient.getReturnFunction(id)
-        
             def sendToAll(self, name, message):
                 """
                 :rtype : WSReturnObject
