@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 class TestThreadPool(unittest.TestCase):
     def setUp(self):
         WSHubsApi = importlib.import_module("client.WSHubsApi")
-        self.ws = WSHubsApi.HubsAPI('ws://127.0.0.1:8888/')
+        self.ws = WSHubsApi.HubsAPI('ws://127.0.0.1:9999/')
         self.ws.connect()
 
     def tearDown(self):

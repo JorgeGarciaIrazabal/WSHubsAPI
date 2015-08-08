@@ -24,7 +24,7 @@ def initServer():
             return True
 
     Hub.constructPythonFile("client")
-    server = make_server('127.0.0.1', 8888, server_class=WSGIServer,
+    server = make_server('127.0.0.1', 9999, server_class=WSGIServer,
                          handler_class=WebSocketWSGIRequestHandler,
                          app=WebSocketWSGIApplication(handler_cls=ClientHandler))
     server.initialize_websockets_manager()
