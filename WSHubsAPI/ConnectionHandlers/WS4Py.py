@@ -1,6 +1,6 @@
 import logging
 from ws4py.websocket import WebSocket
-from WSHubsAPI.CommProtocol import CommHandler
+from wshubsapi.CommProtocol import CommHandler
 
 __author__ = 'Jorge'
 log = logging.getLogger(__name__)

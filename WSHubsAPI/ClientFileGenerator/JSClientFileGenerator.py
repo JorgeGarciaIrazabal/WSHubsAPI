@@ -1,6 +1,6 @@
 import inspect
 import os
-from WSHubsAPI.utils import getDefaults, getArgs, isNewFunction
+from wshubsapi.utils import getDefaults, getArgs, isNewFunction
 
 __author__ = 'jgarc'
 

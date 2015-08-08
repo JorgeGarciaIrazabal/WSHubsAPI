@@ -4,7 +4,7 @@ import os
 from os import listdir
 from os.path import isfile
 
-from WSHubsAPI.utils import isNewFunction, getArgs, ASCII_UpperCase, getModulePath
+from wshubsapi.utils import isNewFunction, getArgs, ASCII_UpperCase, getModulePath
 
 __author__ = 'jgarc'
 log = logging.getLogger(__name__)

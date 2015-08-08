@@ -1,4 +1,4 @@
-from WSHubsAPI.Hub import Hub, HubException
+from wshubsapi.Hub import Hub, HubException
 
 import unittest
 

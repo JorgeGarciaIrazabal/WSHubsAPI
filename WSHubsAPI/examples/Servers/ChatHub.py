@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from WSHubsAPI.Hub import Hub
+from wshubsapi.Hub import Hub
 
 class ChatHub(Hub):
     def sendToAll(self, name, message):

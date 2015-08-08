@@ -1,7 +1,7 @@
 import logging
-from WSHubsAPI.CommProtocol import CommHandler
+from wshubsapi.CommProtocol import CommHandler
 import tornado.websocket
-from WSHubsAPI.ValidateStrings import getUnicode
+from wshubsapi.ValidateStrings import getUnicode
 
 __author__ = 'Jorge'
 log = logging.getLogger(__name__)

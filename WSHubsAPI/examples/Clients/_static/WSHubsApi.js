@@ -60,6 +60,11 @@ function HubsAPI(url, serverTimeout) {
     this.ChatHub.server = {
         __HUB_NAME : "ChatHub",
         
+        getNumOfClientsConnected : function (){
+            
+            return constructMessage(this.__HUB_NAME, "getNumOfClientsConnected",arguments);
+        },
+
         sendToAll : function (name, message){
             
             return constructMessage(this.__HUB_NAME, "sendToAll",arguments);

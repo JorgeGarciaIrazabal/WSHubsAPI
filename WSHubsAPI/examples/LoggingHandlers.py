@@ -1,5 +1,3 @@
-from WSHubsAPI.ValidateStrings import getUnicode
-
 __author__ = 'jgarc'
 import copy
 
@@ -8,8 +6,13 @@ class ColoredConsoleHandler(logging.StreamHandler):
     def emit(self, record):
         # Need to make a actual copy of the record
         # to prevent altering the message for other loggers
+
         myrecord = copy.copy(record)
-        self.format(myrecord)
+        try:
+            self.format(myrecord)
+        except:
+            myrecord.msg = "Unable to format record"
+            self.format(myrecord)
         levelno = myrecord.levelno
         if(levelno >= 50):  # CRITICAL / FATAL
             color = '\x1b[31m'  # red

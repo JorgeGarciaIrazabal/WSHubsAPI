@@ -1,18 +1,17 @@
-DATE_TIME_FORMAT = '%Y/%m/%d %H:%M:%S %f'
 try:
     from Queue import Queue
 except:
     from queue import Queue
-from collections import OrderedDict
+
+import datetime
 import inspect
-import json
-import logging
 import os
 import string
 import sys
 from inspect import getargspec
 import threading
-from datetime import datetime
+DATE_TIME_FORMAT = '%Y/%m/%d %H:%M:%S %f'
+
 try:
     textTypes = [str, unicode]
 except:
@@ -47,7 +46,7 @@ def getDefaults(method):
     return d
 
 def isNewFunction(method):
-    from WSHubsAPI.Hub import Hub
+    from wshubsapi.Hub import Hub
     isFunction = lambda x: inspect.ismethod(x) or inspect.isfunction(x)
     functions = inspect.getmembers(Hub, predicate=isFunction)
     functionNames = [f[0] for f in functions ]
@@ -60,38 +59,9 @@ def getModulePath():
     file = info.filename
     return os.path.dirname(os.path.abspath(file))
 
-def serializeObject(obj2ser):
-    obj = obj2ser if not hasattr(obj2ser, "__dict__") else obj2ser.__dict__
-    if isinstance(obj,dict):
-        sObj = {}
-        for key, value in obj.items():
-            if isinstance(value,datetime):
-                sObj[key] = value.strftime(DATE_TIME_FORMAT)
-            else:
-                try:
-                    if not key.startswith("_") and id(value) != id(obj2ser):
-                        sValue = serializeObject(value)
-                        json.dumps(serializeObject(sValue))
-                        sObj[key] = sValue
-                except TypeError:
-                    pass
-    elif isinstance(obj,(list,tuple,set)):
-        sObj = []
-        for value in obj:
-            try:
-                sValue = serializeObject(value)
-                json.dumps(sValue, ensure_ascii=False)
-                sObj.append(sValue)
-            except TypeError:
-                pass
-    else:
-        sObj = obj
-    return sObj
-
-
-class ThreadsList(list):
+class ThreadsPool(list):
     def __init__(self, threadNum=0, setDaemon=True, *args, **kwargs):
-        super(ThreadsList, self).__init__()
+        super(ThreadsPool, self).__init__()
         self.args = args
         self.kwargs = kwargs
         self.setDaemon = setDaemon
@@ -130,10 +100,12 @@ class ThreadsList(list):
             self[-1].setDaemon(self.setDaemon)
             self[-1].start()
 
-class WSThreadsQueue(Queue):
+class WSMessagesReceivedQueue(Queue):
     def __init__(self, threadNum):
         Queue.__init__(self)
-        self.threads = ThreadsList(threadNum, target=self.onMessage, setDaemon=True)
+        self.threads = ThreadsPool(threadNum, target=self.onMessage, setDaemon=True)
+
+    def startThreads(self):
         self.threads.startAll()
 
     def onMessage(self):
@@ -143,3 +115,15 @@ class WSThreadsQueue(Queue):
                 connection.onMessage(msg)
             except:
                 pass  # todo: create a call back for this exception
+
+
+
+from jsonpickle import handlers
+def setSerializerDateTimeHandler():
+    class WSDateTimeObjects(handlers.BaseHandler):
+        def flatten(self, obj, data):
+            return obj.strftime(DATE_TIME_FORMAT)
+
+    handlers.register(datetime.datetime, WSDateTimeObjects)
+    handlers.register(datetime.date, WSDateTimeObjects)
+    handlers.register(datetime.time, WSDateTimeObjects)

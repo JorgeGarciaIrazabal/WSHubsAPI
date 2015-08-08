@@ -1,8 +1,8 @@
 import inspect
-from WSHubsAPI.ClientFileGenerator.JAVAFileGenerator import JAVAFileGenerator
-from WSHubsAPI.ClientFileGenerator.JSClientFileGenerator import JSClientFileGenerator
-from WSHubsAPI.ClientFileGenerator.PythonClientFileGenerator import PythonClientFileGenerator
-from WSHubsAPI.utils import classProperty
+from wshubsapi.ClientFileGenerator.JAVAFileGenerator import JAVAFileGenerator
+from wshubsapi.ClientFileGenerator.JSClientFileGenerator import JSClientFileGenerator
+from wshubsapi.ClientFileGenerator.PythonClientFileGenerator import PythonClientFileGenerator
+from wshubsapi.utils import classProperty
 
 __author__ = 'Jorge'
 
@@ -31,19 +31,19 @@ class Hub(object):
             cls.__hubsConstructed = True
 
     @classmethod
-    def constructJSFile(cls, path="."):
+    def constructJSFile(cls, path="."): #todo: create client constructor
         cls.initHubsInspection()
         JSClientFileGenerator.createFile(path, cls.HUBs_DICT.values())
 
     @classmethod
-    def constructJAVAFile(cls, package, path="."):
+    def constructJAVAFile(cls, package, path="."):#todo: create client constructor
         cls.initHubsInspection()
         hubs = cls.HUBs_DICT.values()
         JAVAFileGenerator.createFile(path, package, hubs)
         JAVAFileGenerator.createClientTemplate(path, package, hubs)
 
     @classmethod
-    def constructPythonFile(cls, path="."):
+    def constructPythonFile(cls, path="."):#todo: create client constructor
         cls.initHubsInspection()
         PythonClientFileGenerator.createFile(path, cls.HUBs_DICT.values())
 
@@ -95,4 +95,4 @@ class Hub(object):
         self.HUBs_DICT[hubName] = self
 
 
-from WSHubsAPI.CommProtocol import ConnectionGroup, CommHandler
+from wshubsapi.CommProtocol import ConnectionGroup, CommHandler

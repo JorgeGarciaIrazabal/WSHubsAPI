@@ -4,26 +4,32 @@ import logging
 import sys
 import inspect
 import threading
+from datetime import datetime
+import jsonpickle
+from jsonpickle.pickler import Pickler
 
-from WSHubsAPI.ValidateStrings import getUnicode
-from WSHubsAPI.utils import classProperty, WSThreadsQueue, serializeObject
-import codecs
+from wshubsapi.ValidateStrings import getUnicode
+from wshubsapi.utils import classProperty, WSMessagesReceivedQueue, setSerializerDateTimeHandler
 
 log = logging.getLogger(__name__)
 __author__ = 'Jorge Garcia Irazabal'
+
+setSerializerDateTimeHandler()
 
 class CommHandler(object):
     __LAST_UNPROVIDED_ID = 0
     __UNPROVIDED_TEMPLATE = "__%d"
     _connections = {}
     __AVAILABLE_UNPROVIDED_IDS = []
-    threadsPool = WSThreadsQueue(50)  # todo: make dynamic queue size
     __lock = threading.Lock()
-    reader = codecs.getreader("utf-8")
 
-    def __init__(self, client=None):
+    def __init__(self, client=None, serializationPickler = Pickler(max_depth=4, max_iter=50, make_refs=False)):
         self.ID = None
         self.client = client
+        self.pickler = serializationPickler
+
+        self.wsMessageReceivedQueue = WSMessagesReceivedQueue(10)# todo: make dynamic queue size
+        self.wsMessageReceivedQueue.startThreads()
 
     @classmethod
     def getUnprovidedID(cls):
@@ -46,12 +52,12 @@ class CommHandler(object):
         try:
             msg = FunctionMessage(message.decode('utf-8', 'replace'), self)
             replay = msg.callFunction()
-            self.onReplay(replay, msg)
+            self.onReplay(self.serializeMessage(replay), msg)
         except Exception as e:
             self.onError(e)
 
     def onAsyncMessage(self, message):
-        self.threadsPool.put((message, self))
+        self.wsMessageReceivedQueue.put((message, self))
 
     def onClose(self):
         if self.ID in self._connections.keys():
@@ -63,12 +69,11 @@ class CommHandler(object):
         log.exception("Error parsing message")
 
     def onReplay(self, replay, message):
-        try:
-            replayStr = json.dumps(replay)
-        except:
-            replayStr = json.dumps(replay.__dict__)
-
-        self.writeMessage(replayStr)
+        """
+        :param replay: serialized object to be sent as a replay of a message received
+        :param message: Message received (provided for overridden functions)
+        """
+        self.writeMessage(replay)
 
     def __getattr__(self, item):
         if item.startswith("__") and item.endswith("__"):
@@ -76,14 +81,17 @@ class CommHandler(object):
 
         def connectionFunction(*args):
             hubName = self.__getHubName()
-            message = {"function": item, "args": serializeObject(list(args)), "hub": hubName}
-            msgStr = json.dumps(message)
+            message = {"function": item, "args": list(args), "hub": hubName}
+            msgStr = self.serializeMessage(message)
             self.writeMessage(msgStr)
 
         return connectionFunction
 
     def writeMessage(self, *args, **kwargs):
         raise NotImplementedError
+
+    def serializeMessage(self, message):
+        return jsonpickle.encode(self.pickler.flatten(message))
 
     @staticmethod
     def __getHubName():  # todo, try to optimize checking only Hub classes
@@ -110,8 +118,9 @@ class CommHandler(object):
 class ConnectionGroup(list):
     def __init__(self, connections):
         """
-        :type connections: list of CommHandler
-        """
+            :type connections: list of CommHandler
+            """
+        super(ConnectionGroup, self).__init__()
         for c in connections:
             self.append(c)
 
@@ -159,13 +168,13 @@ class FunctionMessage:
 
     def callFunction(self):
         success, replay = self.__executeFunction()
-        replay = serializeObject(replay)
         return {
             "success": success,
             "replay": replay,
             "hub": self.className,
             "function": self.functionName,
-            "ID": self.ID
+            "ID": self.ID,
+            "serverDateTime": datetime.now()
         }
 
-from WSHubsAPI.Hub import Hub
+from wshubsapi.Hub import Hub
