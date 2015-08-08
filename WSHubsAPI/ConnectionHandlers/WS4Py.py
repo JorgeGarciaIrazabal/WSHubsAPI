@@ -1,18 +1,19 @@
 import logging
 from ws4py.websocket import WebSocket
-from wshubsapi.CommProtocol import CommHandler
+from wshubsapi.CommProtocol import CommProtocol
 
 __author__ = 'Jorge'
 log = logging.getLogger(__name__)
 log.addHandler(logging.NullHandler())
 
 class ClientHandler(WebSocket):
+    commProtocol = CommProtocol() #todo: encapsulate to get a commProtocol depending the server (by Port?)
     def writeMessage(self, message):
         log.debug("message to %s:\n%s" % (self._commHandler.ID, message))
         self.send(message)
 
     def opened(self, *args):
-        self._commHandler = CommHandler(self)
+        self._commHandler = self.commProtocol.constructCommHandler(self)
         self._commHandler.writeMessage = self.writeMessage
         id = int(args[0]) if len(args)>0 else None
         self.ID = self._commHandler.onOpen(id)

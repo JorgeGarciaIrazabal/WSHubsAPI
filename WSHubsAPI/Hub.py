@@ -2,7 +2,6 @@ import inspect
 from wshubsapi.ClientFileGenerator.JAVAFileGenerator import JAVAFileGenerator
 from wshubsapi.ClientFileGenerator.JSClientFileGenerator import JSClientFileGenerator
 from wshubsapi.ClientFileGenerator.PythonClientFileGenerator import PythonClientFileGenerator
-from wshubsapi.utils import classProperty
 
 __author__ = 'Jorge'
 

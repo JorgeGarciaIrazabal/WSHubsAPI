@@ -1,5 +1,5 @@
 import logging
-from wshubsapi.CommProtocol import CommHandler
+from wshubsapi.CommProtocol import CommProtocol
 import tornado.websocket
 from wshubsapi.ValidateStrings import getUnicode
 
@@ -8,9 +8,10 @@ log = logging.getLogger(__name__)
 log.addHandler(logging.NullHandler())
 
 class ClientHandler(tornado.websocket.WebSocketHandler):
+    commProtocol = CommProtocol()
     def __init__(self, application, request, **kwargs):
         super(ClientHandler, self).__init__(application, request, **kwargs)
-        self._commHandler = CommHandler(self)
+        self._commHandler = self.commProtocol.constructCommHandler(self)
         self._commHandler.writeMessage = self.writeMessage
         self.ID = None
 

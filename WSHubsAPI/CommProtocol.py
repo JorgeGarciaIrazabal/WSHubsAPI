@@ -9,43 +9,59 @@ import jsonpickle
 from jsonpickle.pickler import Pickler
 
 from wshubsapi.ValidateStrings import getUnicode
-from wshubsapi.utils import classProperty, WSMessagesReceivedQueue, setSerializerDateTimeHandler
+from wshubsapi.utils import WSMessagesReceivedQueue, setSerializerDateTimeHandler
 
 log = logging.getLogger(__name__)
 __author__ = 'Jorge Garcia Irazabal'
 
 setSerializerDateTimeHandler()
 
-class CommHandler(object):
-    __LAST_UNPROVIDED_ID = 0
-    __UNPROVIDED_TEMPLATE = "__%d"
-    _connections = {}
-    __AVAILABLE_UNPROVIDED_IDS = []
-    __lock = threading.Lock()
 
-    def __init__(self, client=None, serializationPickler = Pickler(max_depth=4, max_iter=50, make_refs=False)):
+class CommProtocol(object):
+    def __init__(self, messageReceivedThreadPoolSize=20, unprovidedIdTemplate="UNPROVIDED__%d"):
+        self.lock = threading.Lock()
+        self.availableUnprovidedIds = list()
+        self.connections = dict()
+        self.unprovidedIdTemplate = unprovidedIdTemplate
+        self.lastProvidedId = 0
+        self.messageReceivedThreadPoolSize = messageReceivedThreadPoolSize
+        self.wsMessageReceivedQueue = WSMessagesReceivedQueue(
+            messageReceivedThreadPoolSize)  # todo: make dynamic queue size
+        self.wsMessageReceivedQueue.startThreads()
+
+    def constructCommHandler(self, client=None,
+                             serializationPickler=Pickler(max_depth=4, max_iter=50, make_refs=False)):
+        return CommHandler(client, serializationPickler, self)
+
+    def getUnprovidedID(self):
+        if len(self.availableUnprovidedIds) > 0:
+            return self.availableUnprovidedIds.pop(0)
+        while self.unprovidedIdTemplate % self.lastProvidedId in self.connections:
+            self.lastProvidedId += 1
+        return self.unprovidedIdTemplate % self.lastProvidedId
+
+
+class CommHandler(object):
+    def __init__(self, client=None, serializationPickler=Pickler(max_depth=4, max_iter=50, make_refs=False),
+                 commProtocol=None):
+        """
+        :type commProtocol: CommProtocol
+        """
         self.ID = None
         self.client = client
         self.pickler = serializationPickler
+        self.__commProtocol = commProtocol
 
-        self.wsMessageReceivedQueue = WSMessagesReceivedQueue(10)# todo: make dynamic queue size
+        self.wsMessageReceivedQueue = WSMessagesReceivedQueue(10)  # todo: make dynamic queue size
         self.wsMessageReceivedQueue.startThreads()
 
-    @classmethod
-    def getUnprovidedID(cls):
-        if len(cls.__AVAILABLE_UNPROVIDED_IDS) > 0:
-            return cls.__AVAILABLE_UNPROVIDED_IDS.pop(0)
-        while cls.__UNPROVIDED_TEMPLATE % cls.__LAST_UNPROVIDED_ID in cls._connections:
-            cls.__LAST_UNPROVIDED_ID += 1
-        return cls.__UNPROVIDED_TEMPLATE % cls.__LAST_UNPROVIDED_ID
-
     def onOpen(self, ID=None):
-        with self.__lock:
+        with self.__commProtocol.lock:
             if ID is None or ID in self._connections:
-                self.ID = self.getUnprovidedID()
+                self.ID = self.__commProtocol.getUnprovidedID()
             else:
                 self.ID = ID
-            self._connections[self.ID] = self
+            self.__commProtocol.connections[self.ID] = self
             return self.ID
 
     def onMessage(self, message):
@@ -60,10 +76,11 @@ class CommHandler(object):
         self.wsMessageReceivedQueue.put((message, self))
 
     def onClose(self):
-        if self.ID in self._connections.keys():
-            self._connections.pop(self.ID)
-            if isinstance(self.ID, str) and self.ID.startswith("__"):
-                self.__AVAILABLE_UNPROVIDED_IDS.append(self.ID)
+        if self.ID in self.connections.keys():
+            self.__commProtocol.connections.pop(self.ID)
+            if isinstance(self.ID, str) and self.ID.startswith(
+                    "UNPROVIDED__"):  # todo, need a regex to check if is unprovided
+                self.__commProtocol.availableUnprovidedIds.append(self.ID)
 
     def onError(self, exception):
         log.exception("Error parsing message")
@@ -94,7 +111,7 @@ class CommHandler(object):
         return jsonpickle.encode(self.pickler.flatten(message))
 
     @staticmethod
-    def __getHubName():  # todo, try to optimize checking only Hub classes
+    def __getHubName():
         frame = inspect.currentframe()
         while frame.f_back is not None:
             frame = frame.f_back
@@ -111,15 +128,16 @@ class CommHandler(object):
                 else:  # obj is the class that defines our method
                     return hub.__HubName__
 
-    @classProperty
-    def connections(cls):
-        return cls._connections
+    @property
+    def connections(self):
+        return self.__commProtocol.connections
+
 
 class ConnectionGroup(list):
     def __init__(self, connections):
         """
-            :type connections: list of CommHandler
-            """
+        :type connections: list of CommHandler
+        """
         super(ConnectionGroup, self).__init__()
         for c in connections:
             self.append(c)
@@ -146,6 +164,7 @@ class ConnectionGroup(list):
         :rtype : CommHandler
         """
         return super(ConnectionGroup, self).__getitem__(item)
+
 
 class FunctionMessage:
     def __init__(self, messageStr, connection):
@@ -176,5 +195,6 @@ class FunctionMessage:
             "ID": self.ID,
             "serverDateTime": datetime.now()
         }
+
 
 from wshubsapi.Hub import Hub

@@ -59,7 +59,7 @@ from threading import Timer
 import jsonpickle
 from jsonpickle.pickler import Pickler
 from ws4py.client.threadedclient import WebSocketClient
-from WSHubsAPI import utils
+from wshubsapi import utils
 
 utils.setSerializerDateTimeHandler()
 

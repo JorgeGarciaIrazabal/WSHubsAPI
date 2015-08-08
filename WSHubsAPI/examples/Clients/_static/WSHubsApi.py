@@ -120,13 +120,13 @@ class HubsAPI(object):
     def __init__(self, url, serverTimeout=5.0, pickler=Pickler(max_depth=4, max_iter=100, make_refs=False)):
         self.wsClient = WSHubsAPIClient(self, url, serverTimeout)
         self.pickler = pickler
-        self.BaseHub = self.__BaseHub(self.wsClient, self.pickler)
+        self.ChatHub = self.__ChatHub(self.wsClient, self.pickler)
 
     def connect(self):
         self.wsClient.connect()
 
 
-    class __BaseHub(object):
+    class __ChatHub(object):
         def __init__(self, wsClient, pickler):
             hubName = self.__class__.__name__[2:]
             self.server = self.__Server(wsClient, hubName, pickler)
@@ -134,6 +134,18 @@ class HubsAPI(object):
 
         class __Server(GenericServer):
             
+            def getNumOfClientsConnected(self, ):
+                """
+                :rtype : WSReturnObject
+                """
+                args = list()
+                
+                id = self._getNextMessageID()
+                body = {"hub": self.hubName, "function": "getNumOfClientsConnected", "args": args, "ID": id}
+                retFunction = self.wsClient.getReturnFunction(id)
+                self.wsClient.send(self._serializeObject(body))
+                return retFunction
+        
             def sendToAll(self, name, message):
                 """
                 :rtype : WSReturnObject
@@ -143,18 +155,6 @@ class HubsAPI(object):
                 args.append(message)
                 id = self._getNextMessageID()
                 body = {"hub": self.hubName, "function": "sendToAll", "args": args, "ID": id}
-                retFunction = self.wsClient.getReturnFunction(id)
-                self.wsClient.send(self._serializeObject(body))
-                return retFunction
-        
-            def timeout(self, timeout=3):
-                """
-                :rtype : WSReturnObject
-                """
-                args = list()
-                args.append(timeout)
-                id = self._getNextMessageID()
-                body = {"hub": self.hubName, "function": "timeout", "args": args, "ID": id}
                 retFunction = self.wsClient.getReturnFunction(id)
                 self.wsClient.send(self._serializeObject(body))
                 return retFunction
