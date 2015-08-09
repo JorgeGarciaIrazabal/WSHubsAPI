@@ -57,7 +57,7 @@ class CommHandler(object):
 
     def onOpen(self, ID=None):
         with self.__commProtocol.lock:
-            if ID is None or ID in self._connections:
+            if ID is None or ID in self.__commProtocol.connections:
                 self.ID = self.__commProtocol.getUnprovidedID()
             else:
                 self.ID = ID
