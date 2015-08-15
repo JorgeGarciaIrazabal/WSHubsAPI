@@ -52,9 +52,6 @@ class CommHandler(object):
         self.pickler = serializationPickler
         self.__commProtocol = commProtocol
 
-        self.wsMessageReceivedQueue = WSMessagesReceivedQueue(10)  # todo: make dynamic queue size
-        self.wsMessageReceivedQueue.startThreads()
-
     def onOpen(self, ID=None):
         with self.__commProtocol.lock:
             if ID is None or ID in self.__commProtocol.connections:
@@ -66,14 +63,14 @@ class CommHandler(object):
 
     def onMessage(self, message):
         try:
-            msg = FunctionMessage(message.decode('utf-8', 'replace'), self)
+            msg = FunctionMessage(message, self)
             replay = msg.callFunction()
             self.onReplay(self.serializeMessage(replay), msg)
         except Exception as e:
             self.onError(e)
 
     def onAsyncMessage(self, message):
-        self.wsMessageReceivedQueue.put((message, self))
+        self.__commProtocol.wsMessageReceivedQueue.put((message, self))
 
     def onClose(self):
         if self.ID in self.connections.keys():

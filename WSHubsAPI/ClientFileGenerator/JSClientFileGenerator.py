@@ -1,6 +1,9 @@
 import inspect
 import os
-from wshubsapi.utils import getDefaults, getArgs, isNewFunction
+import jsonpickle
+from jsonpickle.pickler import Pickler
+from wshubsapi.utils import getDefaults, getArgs, isNewFunction, textTypes
+import json
 
 __author__ = 'jgarc'
 
@@ -13,10 +16,14 @@ class JSClientFileGenerator():
 
     @classmethod
     def __getJSFunctionsStr(cls, class_):
+        pickler = Pickler(max_depth=4, max_iter=50, make_refs=False)
         funcStrings = []
         functions = inspect.getmembers(class_.__class__, predicate=isNewFunction)
         for name, method in functions:
             defaults = getDefaults(method)
+            for i,default in enumerate(defaults):
+                if not isinstance(default, tuple(textTypes)) or not default.startswith("\""):
+                    defaults[i] = jsonpickle.encode(pickler.flatten(default))
             args = getArgs(method)
             defaultsArray = []
             for i, d in reversed(list(enumerate(defaults))):
@@ -61,11 +68,13 @@ class JSClientFileGenerator():
                 returnFunctions[ID] = {{}};
             var f = returnFunctions[ID];
             f.onSuccess = function () {{
-                onSuccess.apply(onSuccess, arguments);
+                if(onSuccess !== undefined)
+                    onSuccess.apply(onSuccess, arguments);
                 delete returnFunctions[ID]
             }};
             f.onError = function () {{
-                onError.apply(onError, arguments);
+                if(onError !== undefined)
+                    onError.apply(onError, arguments);
                 delete returnFunctions[ID]
             }};
             //check returnFunctions, memory leak
@@ -104,8 +113,8 @@ class JSClientFileGenerator():
     this.{name}.server = {{
         __HUB_NAME : "{name}",
         {functions}
-    }}
-    this.{name}.client = {{}}"""
+    }};
+    this.{name}.client = {{}};"""
 
     FUNCTION_TEMPLATE = """
         {name} : function ({args}){{
