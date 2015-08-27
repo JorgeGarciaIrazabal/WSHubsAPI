@@ -14,6 +14,8 @@ from wshubsapi.utils import WSMessagesReceivedQueue, setSerializerDateTimeHandle
 log = logging.getLogger(__name__)
 __author__ = 'Jorge Garcia Irazabal'
 
+_DEFAULT_PICKER = Pickler(max_depth=5, max_iter=80, make_refs=False)
+
 setSerializerDateTimeHandler()
 
 
@@ -29,8 +31,7 @@ class CommProtocol(object):
             messageReceivedThreadPoolSize)  # todo: make dynamic queue size
         self.wsMessageReceivedQueue.startThreads()
 
-    def constructCommHandler(self, client=None,
-                             serializationPickler=Pickler(max_depth=4, max_iter=50, make_refs=False)):
+    def constructCommHandler(self, client=None, serializationPickler=_DEFAULT_PICKER):
         return CommHandler(client, serializationPickler, self)
 
     def getUnprovidedID(self):
@@ -42,8 +43,7 @@ class CommProtocol(object):
 
 
 class CommHandler(object):
-    def __init__(self, client=None, serializationPickler=Pickler(max_depth=4, max_iter=50, make_refs=False),
-                 commProtocol=None):
+    def __init__(self, client=None, serializationPickler=_DEFAULT_PICKER, commProtocol=None):
         """
         :type commProtocol: CommProtocol
         """
