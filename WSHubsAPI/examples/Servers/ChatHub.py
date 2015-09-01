@@ -1,19 +1,17 @@
 # -*- coding: utf-8 -*-
-from wshubsapi.ConnectionHandlers.WS4Py import ClientHandler
 from wshubsapi.Hub import Hub
 
 class ChatHub(Hub):
-    @classmethod
-    def sendToAll(cls, name, message):
+    def sendToAll(self, name, message):
         ### we can call a sender's function in a intuitive way (the function has to be defined in the client):
         #self.sender.onMessage(name,message)
         ###call function from all clients
         #self.allClients.onMessage(name,message)
         ###call function from all clients but the sender
-        cls.getAllClients(ClientHandler.commProtocol).onMessage(name,message)
+        self.otherClients.onMessage(name,message)
         ### or call function from a selection of clients
         #self.getClients(lambda x:x.ID > 4).onMessage(name,message)
-        return len(cls.otherClients)
+        return len(self.otherClients)
 
     def getNumOfClientsConnected(self):
         #It is possible to return any kind of object (any no json serializable will be excluded)
