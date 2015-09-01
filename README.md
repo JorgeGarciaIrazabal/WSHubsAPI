@@ -1,12 +1,12 @@
 WSHubsAPI
 ================================================
 
-The ``WSHubsAPI`` package/module allows an intuitive communication between back-end (Python) and front-end (Python, JS, JAVA or Android) applications through the webSocket protocol.
+The ``wshubsapi`` package/module allows an intuitive communication between back-end (Python) and front-end (Python, JS, JAVA or Android) applications through the webSocket protocol.
 
 Installation
 -----------------
 ```bash
-pip install WSHubsAPI
+pip install wshubsapi
 ```
 
 Examples of usage
@@ -18,10 +18,10 @@ Server side
 In this example we will use the WS4Py library and the ws4py clientHandler for the webssocket connections.
 
 ```python
-from WSHubsAPI.ConnectionHandlers.WS4Py import ClientHandler
+from wshubsapi.ConnectionHandlers.WS4Py import ClientHandler
 from wsgiref.simple_server import make_server
 from ws4py.server.wsgirefserver import WSGIServer, WebSocketWSGIRequestHandler
-from WSHubsAPI.Hub import Hub
+from wshubsapi.Hub import Hub
 from ws4py.server.wsgiutils import WebSocketWSGIApplication
 if __name__ == '__main__':
 
