@@ -21,7 +21,7 @@ ASCII_UpperCase = string.uppercase if sys.version_info[0] == 2 else string.ascii
 def getArgs(method):
     args = getargspec(method).args
     if args is None: return []
-    for arg in ("self",):
+    for arg in ("self","cls"):
         try:
             args.remove(arg)
         except:

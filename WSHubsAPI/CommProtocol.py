@@ -118,6 +118,7 @@ class CommHandler(object):
             for hubName, hub in hubs:
                 try:
                     func = hub.__dict__[name]
+                    if isinstance(func,(classmethod, staticmethod)): func = func.__func__
                     func_code = func.func_code if sys.version_info[0] == 2 else func.__code__
                     assert func_code is code
                 except Exception as e:

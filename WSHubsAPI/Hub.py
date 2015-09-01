@@ -30,24 +30,23 @@ class Hub(object):
             cls.__hubsConstructed = True
 
     @classmethod
-    def constructJSFile(cls, path="."): #todo: create client constructor
+    def constructJSFile(cls, path="."):  # todo: create client constructor
         cls.initHubsInspection()
         JSClientFileGenerator.createFile(path, cls.HUBs_DICT.values())
 
     @classmethod
-    def constructJAVAFile(cls, package, path="."):#todo: create client constructor
+    def constructJAVAFile(cls, package, path="."):  # todo: create client constructor
         cls.initHubsInspection()
         hubs = cls.HUBs_DICT.values()
         JAVAFileGenerator.createFile(path, package, hubs)
         JAVAFileGenerator.createClientTemplate(path, package, hubs)
 
     @classmethod
-    def constructPythonFile(cls, path="."):#todo: create client constructor
+    def constructPythonFile(cls, path="."):  # todo: create client constructor
         cls.initHubsInspection()
         PythonClientFileGenerator.createFile(path, cls.HUBs_DICT.values())
 
-    @property
-    def sender(self):
+    def __sender(self):
         """
         :rtype : CommHandler
         """
@@ -58,6 +57,8 @@ class Hub(object):
                 return frame.f_locals["self"]
         return None
 
+    sender = property(__sender)
+
     @property
     def connections(self):
         """
@@ -65,22 +66,38 @@ class Hub(object):
         """
         return self.sender.connections
 
+    @classmethod
+    def getConnections(cls, commProtocol=None):
+        """
+        :type commProtocol: wshubsapi.CommProtocol.CommProtocol
+        :rtype : dict of int; CommHandler
+        """
+        if commProtocol is None:
+            return cls.sender.connections
+        else:
+            return commProtocol.connections
+
     @property
     def allClients(self):
-        return ConnectionGroup(self.connections.values())
+        return ConnectionGroup(self.getConnections().values())
+
+    @classmethod
+    def getAllClients(cls, commProtocol = None):
+        return ConnectionGroup(cls.getConnections(commProtocol).values())
 
     @property
     def otherClients(self):
         connection = self.sender
         return ConnectionGroup(filter(lambda x: x.ID != connection.ID, connection.connections.values()))
 
-    def getClients(self, function):
-        connection = self.sender
-        return ConnectionGroup(filter(function, connection.connections.values()))
+    @classmethod
+    def getClients(cls, function, commProtocol):
+        connections = cls.getConnections(commProtocol)
+        return ConnectionGroup(filter(function, connections.values()))
 
-    def getClient(self, id):
-        connection = self.sender
-        return connection.connections.get(id,None)
+    @classmethod
+    def getClient(cls, id, commProtocol = None):
+        return cls.getConnections(commProtocol).get(id, None)
 
     def __init__(self):
         hubName = self.__class__.__dict__.get("__HubName__", self.__class__.__name__)
