@@ -5,10 +5,14 @@ from wshubsapi.ClientFileGenerator.PythonClientFileGenerator import PythonClient
 
 __author__ = 'Jorge'
 
+class classproperty(object):
+     def __init__(self, getter):
+         self.getter= getter
+     def __get__(self, instance, owner):
+         return self.getter(owner)
 
 class HubException(Exception):
     pass
-
 
 class Hub(object):
     HUBs_DICT = {}
@@ -46,7 +50,8 @@ class Hub(object):
         cls.initHubsInspection()
         PythonClientFileGenerator.createFile(path, cls.HUBs_DICT.values())
 
-    def __sender(self):
+    @classproperty
+    def sender(self):
         """
         :rtype : CommHandler
         """
@@ -56,8 +61,6 @@ class Hub(object):
             if isinstance(frame.f_locals.get("self", None), CommHandler):
                 return frame.f_locals["self"]
         return None
-
-    sender = property(__sender)
 
     @property
     def connections(self):
@@ -91,13 +94,13 @@ class Hub(object):
         return ConnectionGroup(filter(lambda x: x.ID != connection.ID, connection.connections.values()))
 
     @classmethod
-    def getClients(cls, function, commProtocol):
+    def getClients(cls, function, commProtocol = None):
         connections = cls.getConnections(commProtocol)
         return ConnectionGroup(filter(function, connections.values()))
 
     @classmethod
     def getClient(cls, id, commProtocol = None):
-        return cls.getConnections(commProtocol).get(id, None)
+        return cls.getConnections(commProtocol).get(id, ConnectionGroup([]))
 
     def __init__(self):
         hubName = self.__class__.__dict__.get("__HubName__", self.__class__.__name__)
