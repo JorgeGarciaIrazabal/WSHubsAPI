@@ -67,7 +67,8 @@ works like:
     </ul>
 </div>
     <script>
-    hubsApi = new HubsAPI('ws://127.0.0.1:8888/')
+    hubsApi = new HubsAPI('ws://127.0.0.1:8888/');
+    hubsApi.connect();
     function sendToAll(){
         var name = $('#name').val(),
             message = $('#message').val()
