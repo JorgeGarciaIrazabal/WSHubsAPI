@@ -14,11 +14,10 @@ log = logging.getLogger(__name__)
 if __name__ == '__main__':
     importlib.import_module("ChatHub")  # necessary to add this import for code inspection
     # construct the necessary client files in the specified path
-    Hub.constructPythonFile("../Clients/_static")
-    Hub.constructJSFile("../Clients/_static")
+    Hub.constructPythonFile()
     # Hub.constructJAVAFile("tornado.WSHubsApi", "../Clients/_static")
 
-    server = make_server('127.0.0.1', 8888, server_class=WSGIServer,
+    server = make_server('192.168.1.3', 8888, server_class=WSGIServer,
                          handler_class=WebSocketWSGIRequestHandler,
                          app=WebSocketWSGIApplication(handler_cls=ClientHandler))
     server.initialize_websockets_manager()

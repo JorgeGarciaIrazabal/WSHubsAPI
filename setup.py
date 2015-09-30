@@ -24,7 +24,7 @@ setup(
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
-    version='0.4.4a4',
+    version='0.4.4a6',
 
     description='function protocol to communicate backend and frontend in a intuitive way like signalR in C#',
     long_description=long_description,
@@ -70,7 +70,7 @@ setup(
 
     # You can just specify the packages manually here if your project is
     # simple. Or you can use find_packages().
-    packages=find_packages(exclude = ("_static",)),
+    packages=find_packages(exclude = ("_static", "Testing",)),
 
     # List run-time dependencies here.  These will be installed by pip when
     # your project is installed. For an analysis of "install_requires" vs pip's

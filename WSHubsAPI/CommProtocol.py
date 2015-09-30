@@ -65,7 +65,8 @@ class CommHandler(object):
         try:
             msg = FunctionMessage(message, self)
             replay = msg.callFunction()
-            self.onReplay(self.serializeMessage(replay), msg)
+            if replay is not None:
+                self.onReplay(replay, msg)
         except Exception as e:
             self.onError(e)
 
@@ -87,7 +88,7 @@ class CommHandler(object):
         :param replay: serialized object to be sent as a replay of a message received
         :param message: Message received (provided for overridden functions)
         """
-        self.writeMessage(replay)
+        self.writeMessage(self.serializeMessage(replay))
 
     def __getattr__(self, item):
         if item.startswith("__") and item.endswith("__"):
@@ -185,6 +186,10 @@ class FunctionMessage:
 
     def callFunction(self):
         success, replay = self.__executeFunction()
+        if replay:
+            return self.getReplayDict(success, replay)
+
+    def getReplayDict(self, success=None, replay=None):
         return {
             "success": success,
             "replay": replay,

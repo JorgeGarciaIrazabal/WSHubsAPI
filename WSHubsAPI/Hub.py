@@ -5,14 +5,18 @@ from wshubsapi.ClientFileGenerator.PythonClientFileGenerator import PythonClient
 
 __author__ = 'Jorge'
 
+
 class classproperty(object):
-     def __init__(self, getter):
-         self.getter= getter
-     def __get__(self, instance, owner):
-         return self.getter(owner)
+    def __init__(self, getter):
+        self.getter = getter
+
+    def __get__(self, instance, owner):
+        return self.getter(owner)
+
 
 class HubException(Exception):
     pass
+
 
 class Hub(object):
     HUBs_DICT = {}
@@ -85,7 +89,7 @@ class Hub(object):
         return ConnectionGroup(self.getConnections().values())
 
     @classmethod
-    def getAllClients(cls, commProtocol = None):
+    def getAllClients(cls, commProtocol=None):
         return ConnectionGroup(cls.getConnections(commProtocol).values())
 
     @property
@@ -94,13 +98,27 @@ class Hub(object):
         return ConnectionGroup(filter(lambda x: x.ID != connection.ID, connection.connections.values()))
 
     @classmethod
-    def getClients(cls, function, commProtocol = None):
+    def getClients(cls, function, commProtocol=None):
         connections = cls.getConnections(commProtocol)
         return ConnectionGroup(filter(function, connections.values()))
 
     @classmethod
-    def getClient(cls, id, commProtocol = None):
+    def getClient(cls, id, commProtocol=None):
         return cls.getConnections(commProtocol).get(id, ConnectionGroup([]))
+
+    def _getReplayDict(self, success=None, replay=None):
+        frame = inspect.currentframe()
+        while frame.f_back is not None:
+            frame = frame.f_back
+            if isinstance(frame.f_locals.get("self", None), FunctionMessage):
+                return frame.f_locals["self"].getReplayDict(success, replay)
+        return None
+
+    def _replay(self, replay, success = True):
+        sender = self.sender
+        replay = self._getReplayDict(success, replay)
+        sender.onReplay(replay, None)
+
 
     def __init__(self):
         hubName = self.__class__.__dict__.get("__HubName__", self.__class__.__name__)
@@ -114,4 +132,4 @@ class Hub(object):
         self.HUBs_DICT[hubName] = self
 
 
-from wshubsapi.CommProtocol import ConnectionGroup, CommHandler
+from wshubsapi.CommProtocol import ConnectionGroup, CommHandler, FunctionMessage
