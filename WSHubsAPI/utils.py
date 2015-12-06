@@ -1,3 +1,5 @@
+from ConnectedClient import ConnectedClient
+
 try:
 	from Queue import Queue
 except:
@@ -10,6 +12,7 @@ import string
 import sys
 from inspect import getargspec
 from concurrent.futures import ThreadPoolExecutor
+from jsonpickle import handlers
 
 DATE_TIME_FORMAT = '%Y-%m-%dT%H:%M:%S.%f%z'
 NOT_PASSING_PARAMETERS = ("self", "cls", "_sender")
@@ -35,14 +38,14 @@ def getArgs(method):
 def getDefaults(method):
 	d = getargspec(method).defaults
 	if d is None: return []
-	d = filter(lambda x: x not in NOT_PASSING_PARAMETERS, list(d))
+	d = list(filter(lambda x: x not in NOT_PASSING_PARAMETERS, list(d)))
 	for i in range(len(d)):
-		if isinstance(d[i], tuple(textTypes)):  # todo: check with python 3
+		if isinstance(d[i], tuple(textTypes)):
 			d[i] = '"%s"' % d[i]
 	return d
 
 
-def isNewFunctionInHub(method):
+def isFunctionForWSClient(method):
 	from WSHubsAPI.Hub import Hub
 	isFunction = lambda x: inspect.ismethod(x) or inspect.isfunction(x)
 	BaseHubFunctions = inspect.getmembers(Hub, predicate=isFunction)
@@ -54,35 +57,40 @@ def isNewFunctionInHub(method):
 def getModulePath():
 	frame = inspect.currentframe().f_back
 	info = inspect.getframeinfo(frame)
-	file = info.filename
-	return os.path.dirname(os.path.abspath(file))
+	fileName = info.filename
+	return os.path.dirname(os.path.abspath(fileName))
 
 
+# todo: move to different module
 class WSMessagesReceivedQueue(Queue):
-	MAX_WORKERS = 15
+	MAX_WORKERS = 151
 
 	def __init__(self):
 		Queue.__init__(self)
 		self.executor = ThreadPoolExecutor(max_workers=self.MAX_WORKERS)
+		self.keepAlive = True
 
 	def startThreads(self):
 		for i in range(self.MAX_WORKERS):
-			self.executor.submit(self.onMessage)
+			self.executor.submit(self.__infiniteOnMessageHandlerLoop)
 
-	def onMessage(self):
-		while True:
+	def __infiniteOnMessageHandlerLoop(self):
+		while self.keepAlive:
+			connectedClient = None
 			try:
-				msg, connection = self.get()
-				connection.onMessage(msg)
+				msg, connectedClient = self.get()
+				connectedClient.onMessage(msg)
 			except Exception as e:
-				print(str(e))  # todo: create a call back for this exception
-
-
-from jsonpickle import handlers
-
+				if isinstance(connectedClient, ConnectedClient):
+					connectedClient.onError(e)
+				else:
+					print(str(e))  # todo: create a call back for this exception
 
 def setSerializerDateTimeHandler():
 	class WSDateTimeObjects(handlers.BaseHandler):
+		def restore(self, obj):
+			pass
+
 		def flatten(self, obj, data):
 			return obj.strftime(DATE_TIME_FORMAT)
 

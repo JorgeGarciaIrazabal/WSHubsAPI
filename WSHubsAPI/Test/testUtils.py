@@ -1,6 +1,15 @@
 # coding=utf-8
 import unittest
+
+import time
+
+from Hub import Hub
 from WSHubsAPI.utils import *
+
+try:
+	from unittest.mock import MagicMock
+except:
+	from mock import MagicMock
 
 
 class TestUtils(unittest.TestCase):
@@ -36,3 +45,80 @@ class TestUtils(unittest.TestCase):
 			returnedFromFunction = getDefaults(case["method"])
 
 			self.assertEqual(returnedFromFunction, case["expected"])
+
+	def test_isFunctionForWSClient_IncludesStandardFunction(self):
+		def thisIsANewFunction(test):
+			print(test)
+
+		self.assertTrue(isFunctionForWSClient(thisIsANewFunction), "new function is detected")
+
+	def test_isFunctionForWSClient_ExcludesProtectedAndPrivateFunctions(self):
+		def _thisIsAProtectedFunction(test):
+			print(test)
+
+		def __thisIsAPrivateFunction(test):
+			print(test)
+
+		self.assertFalse(isFunctionForWSClient(_thisIsAProtectedFunction), "protected function is excluded")
+		self.assertFalse(isFunctionForWSClient(__thisIsAPrivateFunction), "private function is excluded")
+
+	def test_isFunctionForWSClient_ExcludesAlreadyExistingFunctions(self):
+		self.assertFalse(isFunctionForWSClient(Hub.setClientsHolder), "excludes existing functions")
+
+	def test_getModulePath_ReturnsTestUtilsPyModulePath(self):
+		self.assertEqual(getModulePath(), os.getcwd() + "\\Test")
+
+	def setUp_WSMessagesReceivedQueue(self, MAX_WORKERS):
+		queue = WSMessagesReceivedQueue()
+		queue.MAX_WORKERS = MAX_WORKERS
+		return queue
+
+	def test_WSMessagesReceivedQueue_Creates__MAX_WORKERS__WORKERS(self):
+		queue = self.setUp_WSMessagesReceivedQueue(3)
+		queue.executor.submit = MagicMock()
+
+		queue.startThreads()
+
+		self.assertTrue(queue.executor.submit.called)
+		self.assertEqual(queue.executor.submit.call_count, queue.MAX_WORKERS)
+
+	def setUp_WSMessagesReceivedQueue_infiniteOnMessageHandlerLoop(self, MAX_WORKERS, message):
+		queue = self.setUp_WSMessagesReceivedQueue(MAX_WORKERS)
+		connectedClient = ConnectedClient(None, None, None)
+		connectedClient.onMessage = MagicMock()
+		connectedClient.onError = MagicMock()
+		queue.get = MagicMock(return_value=[message, connectedClient])
+		return queue, connectedClient
+
+	def test_WSMessagesReceivedQueue_infiniteOnMessageHandlerLoop_CallsClientOnMessage(self):
+		queue, connectedClient = self.setUp_WSMessagesReceivedQueue_infiniteOnMessageHandlerLoop(1, "message")
+
+		queue.startThreads()
+		time.sleep(0.02)
+		queue.keepAlive = False
+
+		connectedClient.onMessage.assert_called_with("message")
+
+	def test_WSMessagesReceivedQueue_infiniteOnMessageHandlerLoop_CallsOnErrorIfRaisesException(self):
+		queue, connectedClient = self.setUp_WSMessagesReceivedQueue_infiniteOnMessageHandlerLoop(1, "message")
+		exception = Exception("test")
+		connectedClient.onMessage.side_effect = exception
+
+		queue.startThreads()
+		time.sleep(0.02)
+		queue.keepAlive = False
+
+		connectedClient.onError.assert_called_with(exception)
+
+	def test_WSMessagesReceivedQueue_infiniteOnMessageHandlerLoop_PrintExceptionIfConnectedClientIsNoConnectedClient(self):
+		queue, connectedClient = self.setUp_WSMessagesReceivedQueue_infiniteOnMessageHandlerLoop(1, "message")
+		queue.get = MagicMock(return_value=["message", None])
+
+		queue.startThreads()
+		time.sleep(0.02)
+		queue.keepAlive = False
+
+		self.assertFalse(connectedClient.onError.called)
+		self.assertFalse(connectedClient.onMessage.called)
+
+

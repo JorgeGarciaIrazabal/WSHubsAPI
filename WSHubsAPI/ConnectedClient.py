@@ -8,7 +8,7 @@ log = logging.getLogger(__name__)
 class ConnectedClient(object):
 	def __init__(self, client, serializationPickler, commProtocol):
 		"""
-		:type commProtocol: WSHubsAPI.CommProtocol.CommProtocol
+		:type commProtocol: WSHubsAPI.CommProtocol.CommProtocol | None
 		"""
 		self.ID = None
 		""":type : int|None|str"""

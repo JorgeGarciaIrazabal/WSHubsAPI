@@ -2,7 +2,7 @@ import inspect
 import os
 import jsonpickle
 from jsonpickle.pickler import Pickler
-from WSHubsAPI.utils import getDefaults, getArgs, isNewFunctionInHub, textTypes
+from WSHubsAPI.utils import getDefaults, getArgs, isFunctionForWSClient, textTypes
 import json
 
 __author__ = 'jgarc'
@@ -18,7 +18,7 @@ class JSClientFileGenerator():
     def __getJSFunctionsStr(cls, class_):
         pickler = Pickler(max_depth=4, max_iter=50, make_refs=False)
         funcStrings = []
-        functions = inspect.getmembers(class_.__class__, predicate=isNewFunctionInHub)
+        functions = inspect.getmembers(class_.__class__, predicate=isFunctionForWSClient)
         for name, method in functions:
             defaults = getDefaults(method)
             for i,default in enumerate(defaults):
