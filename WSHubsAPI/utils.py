@@ -1,5 +1,3 @@
-from ConnectedClient import ConnectedClient
-
 try:
 	from Queue import Queue
 except:
@@ -81,10 +79,12 @@ class WSMessagesReceivedQueue(Queue):
 				msg, connectedClient = self.get()
 				connectedClient.onMessage(msg)
 			except Exception as e:
+				from ConnectedClient import ConnectedClient
 				if isinstance(connectedClient, ConnectedClient):
 					connectedClient.onError(e)
 				else:
 					print(str(e))  # todo: create a call back for this exception
+
 
 def setSerializerDateTimeHandler():
 	class WSDateTimeObjects(handlers.BaseHandler):

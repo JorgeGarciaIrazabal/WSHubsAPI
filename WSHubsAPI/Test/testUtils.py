@@ -3,6 +3,7 @@ import unittest
 
 import time
 
+from ConnectedClient import ConnectedClient
 from Hub import Hub
 from WSHubsAPI.utils import *
 
@@ -63,7 +64,7 @@ class TestUtils(unittest.TestCase):
 		self.assertFalse(isFunctionForWSClient(__thisIsAPrivateFunction), "private function is excluded")
 
 	def test_isFunctionForWSClient_ExcludesAlreadyExistingFunctions(self):
-		self.assertFalse(isFunctionForWSClient(Hub.setClientsHolder), "excludes existing functions")
+		self.assertFalse(isFunctionForWSClient(Hub.HUBs_DICT), "excludes existing functions")
 
 	def test_getModulePath_ReturnsTestUtilsPyModulePath(self):
 		self.assertEqual(getModulePath(), os.getcwd() + "\\Test")

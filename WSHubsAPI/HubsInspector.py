@@ -1,7 +1,6 @@
 from WSHubsAPI.ClientFileGenerator.JAVAFileGenerator import JAVAFileGenerator
 from WSHubsAPI.ClientFileGenerator.JSClientFileGenerator import JSClientFileGenerator
 from WSHubsAPI.ClientFileGenerator.PythonClientFileGenerator import PythonClientFileGenerator
-from WSHubsAPI.ConnectedClientsHolder import ConnectedClientsHolder
 from WSHubsAPI.Hub import Hub
 
 
@@ -18,7 +17,7 @@ class HubsInspector:
             Hub.HUBs_DICT.clear()
             for hubClass in Hub.__subclasses__():
                 try:
-                    hubClass().setClientsHolder(ConnectedClientsHolder(hubClass.__name__))
+                    hubClass()
                 except TypeError as e:
                     if "__init__()" in str(e):
                         raise HubsInspectorException(
