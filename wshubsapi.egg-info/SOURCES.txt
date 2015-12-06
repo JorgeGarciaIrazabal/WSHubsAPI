@@ -37,6 +37,13 @@ wshubsapi/Test/testSerialization.py
 wshubsapi/Test/testThreadPool.py
 wshubsapi/Test/client/WSHubsApi.py
 wshubsapi/Test/client/__init__.py
+wshubsapi/Testing/ChatHub.py
+wshubsapi/Testing/LoggingHandlers.py
+wshubsapi/Testing/WSHubsApi.py
+wshubsapi/Testing/__init__.py
+wshubsapi/Testing/logging.json
+wshubsapi/Testing/pythonClient.py
+wshubsapi/Testing/ws4pyServer.py
 wshubsapi/examples/LoggingHandlers.py
 wshubsapi/examples/__init__.py
 wshubsapi/examples/Clients/__init__.py

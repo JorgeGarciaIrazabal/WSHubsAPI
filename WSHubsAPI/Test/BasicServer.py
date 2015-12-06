@@ -7,7 +7,7 @@ from ws4py.server.wsgirefserver import WSGIServer, WebSocketWSGIRequestHandler
 
 from ws4py.server.wsgiutils import WebSocketWSGIApplication
 
-from wshubsapi.ConnectionHandlers.WS4Py import ClientHandler
+from wshubsapi.ConnectionHandlers.WS4Py import ConnectionHandler
 from wshubsapi.Hub import Hub
 
 import logging
@@ -26,7 +26,7 @@ def initServer():
     Hub.constructPythonFile("client")
     server = make_server('127.0.0.1', 9999, server_class=WSGIServer,
                          handler_class=WebSocketWSGIRequestHandler,
-                         app=WebSocketWSGIApplication(handler_cls=ClientHandler))
+                         app=WebSocketWSGIApplication(handler_cls=ConnectionHandler))
     server.initialize_websockets_manager()
     server.serve_forever()
 

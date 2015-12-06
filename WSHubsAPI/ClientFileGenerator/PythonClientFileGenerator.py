@@ -1,6 +1,6 @@
 import inspect
 import os
-from wshubsapi.utils import isNewFunction, getDefaults, getArgs
+from WSHubsAPI.utils import isNewFunction, getDefaults, getArgs
 
 __author__ = 'jgarc'
 
@@ -59,7 +59,7 @@ from threading import Timer
 import jsonpickle
 from jsonpickle.pickler import Pickler
 from ws4py.client.threadedclient import WebSocketClient
-from wshubsapi import utils
+from WSHubsAPI import utils
 
 utils.setSerializerDateTimeHandler()
 

@@ -2,7 +2,7 @@ import importlib
 import json
 import logging
 import logging.config
-from wshubsapi.ConnectionHandlers.WS4Py import ClientHandler
+from wshubsapi.ConnectionHandlers.WS4Py import ConnectionHandler
 from wsgiref.simple_server import make_server
 from ws4py.server.wsgirefserver import WSGIServer, WebSocketWSGIRequestHandler
 from wshubsapi.Hub import Hub
@@ -19,7 +19,7 @@ if __name__ == '__main__':
 
     server = make_server('192.168.1.3', 8888, server_class=WSGIServer,
                          handler_class=WebSocketWSGIRequestHandler,
-                         app=WebSocketWSGIApplication(handler_cls=ClientHandler))
+                         app=WebSocketWSGIApplication(handler_cls=ConnectionHandler))
     server.initialize_websockets_manager()
     log.debug("starting...")
     target = server.serve_forever()
