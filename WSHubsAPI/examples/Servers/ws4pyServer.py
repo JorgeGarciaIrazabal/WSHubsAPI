@@ -14,7 +14,7 @@ log = logging.getLogger(__name__)
 if __name__ == '__main__':
 	importlib.import_module("ChatHub")  # necessary to add this import for code inspection
 	# construct the necessary client files in the specified path
-	HubsInspector.InspectImplementedHubs()
+	HubsInspector.inspectImplementedHubs()
 	HubsInspector.constructPythonFile("../Clients/_static")
 	HubsInspector.constructJSFile("../Clients/_static")
 	# Hub.constructJAVAFile("tornado.WSHubsApi", "../Clients/_static")

@@ -13,13 +13,12 @@ class HubsInspector:
     __hubsConstructed = False
 
     @classmethod
-    def InspectImplementedHubs(cls, forceReconstruction=False):
+    def inspectImplementedHubs(cls, forceReconstruction=False):
         if not cls.__hubsConstructed or forceReconstruction:
             Hub.HUBs_DICT.clear()
             for hubClass in Hub.__subclasses__():
                 try:
-                    hub = hubClass()
-                    hub.setClientsHolder(ConnectedClientsHolder(hubClass.__name__))
+                    hubClass().setClientsHolder(ConnectedClientsHolder(hubClass.__name__))
                 except TypeError as e:
                     if "__init__()" in str(e):
                         raise HubsInspectorException(
@@ -30,17 +29,17 @@ class HubsInspector:
 
     @classmethod
     def constructJSFile(cls, path="."):
-        cls.InspectImplementedHubs()
+        cls.inspectImplementedHubs()
         JSClientFileGenerator.createFile(path, Hub.HUBs_DICT.values())
 
     @classmethod
     def constructJAVAFile(cls, package, path="."):
-        cls.InspectImplementedHubs()
+        cls.inspectImplementedHubs()
         hubs = Hub.HUBs_DICT.values()
         JAVAFileGenerator.createFile(path, package, hubs)
         JAVAFileGenerator.createClientTemplate(path, package, hubs)
 
     @classmethod
     def constructPythonFile(cls, path="."):
-        cls.InspectImplementedHubs()
+        cls.inspectImplementedHubs()
         PythonClientFileGenerator.createFile(path, Hub.HUBs_DICT.values())

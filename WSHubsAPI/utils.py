@@ -1,5 +1,3 @@
-
-
 try:
 	from Queue import Queue
 except:
@@ -14,18 +12,19 @@ from inspect import getargspec
 from concurrent.futures import ThreadPoolExecutor
 
 DATE_TIME_FORMAT = '%Y-%m-%dT%H:%M:%S.%f%z'
+NOT_PASSING_PARAMETERS = ("self", "cls", "_sender")
 
 try:
 	textTypes = [str, unicode]
 except:
-	textTypes = [str]
+	textTypes = [str, bytes]
 ASCII_UpperCase = string.uppercase if sys.version_info[0] == 2 else string.ascii_uppercase
 
 
 def getArgs(method):
 	args = getargspec(method).args
 	if args is None: return []
-	for arg in ("self", "cls", "_sender"):
+	for arg in NOT_PASSING_PARAMETERS:
 		try:
 			args.remove(arg)
 		except:
@@ -36,20 +35,20 @@ def getArgs(method):
 def getDefaults(method):
 	d = getargspec(method).defaults
 	if d is None: return []
-	d = list(d)
+	d = filter(lambda x: x not in NOT_PASSING_PARAMETERS, list(d))
 	for i in range(len(d)):
 		if isinstance(d[i], tuple(textTypes)):  # todo: check with python 3
 			d[i] = '"%s"' % d[i]
 	return d
 
 
-def isNewFunction(method):
+def isNewFunctionInHub(method):
 	from WSHubsAPI.Hub import Hub
 	isFunction = lambda x: inspect.ismethod(x) or inspect.isfunction(x)
-	functions = inspect.getmembers(Hub, predicate=isFunction)
-	functionNames = [f[0] for f in functions]
+	BaseHubFunctions = inspect.getmembers(Hub, predicate=isFunction)
+	BaseHubFunctionsNames = [f[0] for f in BaseHubFunctions]
 
-	return isFunction(method) and not method.__name__.startswith("_") and method.__name__ not in functionNames
+	return isFunction(method) and not method.__name__.startswith("_") and method.__name__ not in BaseHubFunctionsNames
 
 
 def getModulePath():
@@ -76,7 +75,8 @@ class WSMessagesReceivedQueue(Queue):
 				msg, connection = self.get()
 				connection.onMessage(msg)
 			except Exception as e:
-				print(str(e))# todo: create a call back for this exception
+				print(str(e))  # todo: create a call back for this exception
+
 
 from jsonpickle import handlers
 

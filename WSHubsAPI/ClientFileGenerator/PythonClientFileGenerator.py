@@ -1,6 +1,6 @@
 import inspect
 import os
-from WSHubsAPI.utils import isNewFunction, getDefaults, getArgs
+from WSHubsAPI.utils import isNewFunctionInHub, getDefaults, getArgs
 
 __author__ = 'jgarc'
 
@@ -16,7 +16,7 @@ class PythonClientFileGenerator():
     @classmethod
     def __getFunctionStr(cls, class_):
         funcStrings = []
-        functions = inspect.getmembers(class_, predicate=isNewFunction)
+        functions = inspect.getmembers(class_, predicate=isNewFunctionInHub)
         for name, method in functions:
             args = getArgs(method)
             defaults = getDefaults(method)

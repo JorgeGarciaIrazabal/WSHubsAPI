@@ -44,7 +44,7 @@ if __name__ == '__main__':
 			if i % 10 == 0:
 				print("going for {}".format(i))
 			conn.ChatHub.server.sendToAll(str(i), "message {}".format(i)).done(
-				lambda m: m+m,
+				lambda m: m + m,
 				lambda m: sys.stdout.write(str(m)))
 
 	print("end")
