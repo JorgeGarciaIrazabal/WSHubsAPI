@@ -120,13 +120,14 @@ class HubsAPI(object):
     def __init__(self, url, serverTimeout=5.0, pickler=Pickler(max_depth=4, max_iter=100, make_refs=False)):
         self.wsClient = WSHubsAPIClient(self, url, serverTimeout)
         self.pickler = pickler
-        self.ChatHub = self.__ChatHub(self.wsClient, self.pickler)
+        self.TestHub = self.__TestHub(self.wsClient, self.pickler)
+        self.TestHub2 = self.__TestHub2(self.wsClient, self.pickler)
 
     def connect(self):
         self.wsClient.connect()
 
 
-    class __ChatHub(object):
+    class __TestHub(object):
         def __init__(self, wsClient, pickler):
             hubName = self.__class__.__name__[2:]
             self.server = self.__Server(wsClient, hubName, pickler)
@@ -134,39 +135,34 @@ class HubsAPI(object):
 
         class __Server(GenericServer):
             
-            def classMethod(self, ):
+            def getData(self, ):
                 """
                 :rtype : WSReturnObject
                 """
                 args = list()
                 
                 id = self._getNextMessageID()
-                body = {"hub": self.hubName, "function": "classMethod", "args": args, "ID": id}
+                body = {"hub": self.hubName, "function": "getData", "args": args, "ID": id}
                 retFunction = self.wsClient.getReturnFunction(id)
                 self.wsClient.send(self._serializeObject(body))
                 return retFunction
         
-            def sendToAll(self, name, message):
-                """
-                :rtype : WSReturnObject
-                """
-                args = list()
-                args.append(name)
-                args.append(message)
-                id = self._getNextMessageID()
-                body = {"hub": self.hubName, "function": "sendToAll", "args": args, "ID": id}
-                retFunction = self.wsClient.getReturnFunction(id)
-                self.wsClient.send(self._serializeObject(body))
-                return retFunction
-        
-            def static(self, ):
+    class __TestHub2(object):
+        def __init__(self, wsClient, pickler):
+            hubName = self.__class__.__name__[2:]
+            self.server = self.__Server(wsClient, hubName, pickler)
+            self.client = WSSimpleObject()
+
+        class __Server(GenericServer):
+            
+            def getData(self, ):
                 """
                 :rtype : WSReturnObject
                 """
                 args = list()
                 
                 id = self._getNextMessageID()
-                body = {"hub": self.hubName, "function": "static", "args": args, "ID": id}
+                body = {"hub": self.hubName, "function": "getData", "args": args, "ID": id}
                 retFunction = self.wsClient.getReturnFunction(id)
                 self.wsClient.send(self._serializeObject(body))
                 return retFunction

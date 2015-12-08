@@ -2,7 +2,6 @@ import os
 import shutil
 import unittest
 from os import listdir
-
 from WSHubsAPI.ClientFileGenerator.JAVAFileGenerator import JAVAFileGenerator
 from WSHubsAPI.ClientFileGenerator.JSClientFileGenerator import JSClientFileGenerator
 from WSHubsAPI.ClientFileGenerator.PythonClientFileGenerator import PythonClientFileGenerator
@@ -23,9 +22,13 @@ class TestHubDetection(unittest.TestCase):
 		class TestHub2(Hub):
 			pass
 
+		self.testHubClass = TestHub
+		self.testHub2Class = TestHub2
 		HubsInspector.inspectImplementedHubs(forceReconstruction=True)
 
 	def tearDown(self):
+		del self.testHubClass
+		del self.testHub2Class
 		removeHubsSubclasses()
 
 	def test_hubsInspection(self):
@@ -62,6 +65,12 @@ class TestHubDetection(unittest.TestCase):
 			pass
 
 		self.assertRaises(HubException, HubsInspector.inspectImplementedHubs, forceReconstruction=True)
+
+	def test_getHubInstance_returnsAnInstanceOfHubIfExists(self):
+		HubsInspector.getHubInstance(self.testHubClass)
+
+	def test_getHubInstance_RaisesErrorIfNotAHub(self):
+		self.assertRaises(AttributeError, HubsInspector.getHubInstance, (str,))
 
 
 class TestClientFileConstructor(unittest.TestCase):
