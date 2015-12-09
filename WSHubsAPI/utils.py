@@ -85,8 +85,7 @@ class WSMessagesReceivedQueue(Queue):
                 msg, connectedClient = self.get()
                 connectedClient.onMessage(msg)
             except Exception as e:
-                from ConnectedClient import ConnectedClient
-                if isinstance(connectedClient, ConnectedClient):
+                if connectedClient is not None:
                     connectedClient.onError(e)
                 else:
                     print(str(e))  # todo: create a call back for this exception

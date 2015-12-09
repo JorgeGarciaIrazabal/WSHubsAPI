@@ -13,13 +13,13 @@ class FunctionMessage:
         """
         messageStr = messageStr if isinstance(messageStr, str) else messageStr.decode("utf-8")
         msgObj = json.loads(messageStr)
-        self.cls = Hub.HUBs_DICT[msgObj["hub"]]
-        self.HubName = msgObj["hub"]
+        self.hubInstance = Hub.HUBs_DICT[msgObj["hub"]]
+        self.hubName = msgObj["hub"]
         self.args = msgObj["args"]
         self.connectedClient = connectedClient
 
         self.functionName = msgObj["function"]
-        self.method = getattr(self.cls, self.functionName)
+        self.method = getattr(self.hubInstance, self.functionName)
         self.messageID = msgObj.get("ID", -1)
 
     def __executeFunction(self):
@@ -33,13 +33,13 @@ class FunctionMessage:
     def callFunction(self):
         success, replay = self.__executeFunction()
         if replay is not None:
-            return self.getReplayDict(success, replay)
+            return self.constructReplayDict(success, replay)
 
-    def getReplayDict(self, success=None, replay=None):
+    def constructReplayDict(self, success=None, replay=None):
         return {
             "success": success,
             "replay": replay,
-            "hub": self.HubName,
+            "hub": self.hubName,
             "function": self.functionName,
             "ID": self.messageID
         }
