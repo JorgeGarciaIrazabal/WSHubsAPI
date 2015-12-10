@@ -19,11 +19,13 @@ class ConnectedClientsHolder:
     def getClient(self, clientId):
         return ConnectedClientsGroup([self.allConnectedClients[clientId]], self.hubName)
 
-    def appendClient(self, client):
-        self.allConnectedClients[client.ID] = client
+    @classmethod
+    def appendClient(cls, client):
+        cls.allConnectedClients[client.ID] = client
 
-    def popClient(self, clientId):
+    @classmethod
+    def popClient(cls, clientId):
         """
         :type clientId: str|int
         """
-        return self.allConnectedClients.pop(clientId, None)
+        return cls.allConnectedClients.pop(clientId, None)

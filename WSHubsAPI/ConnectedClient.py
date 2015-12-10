@@ -1,21 +1,24 @@
 import logging
 
 import utils
+from ConnectedClientsHolder import ConnectedClientsHolder
 from WSHubsAPI.FunctionMessage import FunctionMessage
 
 log = logging.getLogger(__name__)
 
 
+# Change class name //WSAPIClient? WSHUBsClient? ConnHandler?
 class ConnectedClient(object):
-    def __init__(self, client, serializationPickler, commProtocol):
+    def __init__(self, serializationPickler, commProtocol, writeMessageFunction, closeFunction):
         """
         :type commProtocol: WSHubsAPI.CommProtocol.CommProtocol | None
         """
+        self.__commProtocol = commProtocol
         self.ID = None
         """:type : int|None|str"""
-        self.client = client
         self.pickler = serializationPickler
-        self.__commProtocol = commProtocol
+        self.writeMessage = writeMessageFunction
+        self.close = closeFunction
 
     def onOpen(self, ID=None):
         with self.__commProtocol.lock:
@@ -23,7 +26,7 @@ class ConnectedClient(object):
                 self.ID = self.__commProtocol.getUnprovidedID()
             else:
                 self.ID = ID
-            self.__commProtocol.allConnectedClients[self.ID] = self
+            ConnectedClientsHolder.appendClient(self)
             return self.ID
 
     def onMessage(self, message):
@@ -38,7 +41,7 @@ class ConnectedClient(object):
     def onAsyncMessage(self, message):
         self.__commProtocol.wsMessageReceivedQueue.put((message, self))
 
-    def onClose(self):
+    def onClosed(self):
         if self.ID in self.__commProtocol.allConnectedClients.keys():
             self.__commProtocol.allConnectedClients.pop(self.ID)
             if isinstance(self.ID, str) and self.ID.startswith(
@@ -55,5 +58,8 @@ class ConnectedClient(object):
         """
         self.writeMessage(utils.serializeMessage(self.pickler, replay))
 
-    def writeMessage(self, *args, **kwargs):
+    def writeMessage(self, message):
+        raise NotImplementedError
+
+    def close(self, code, errorMessage):
         raise NotImplementedError

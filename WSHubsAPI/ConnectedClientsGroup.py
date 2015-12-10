@@ -45,3 +45,7 @@ class ConnectedClientsGroup:
             connectedClient.writeMessage(msgStr)
 
         return connectionFunction
+
+    def __iter__(self):
+        for x in self.connectedClients:
+            yield x
