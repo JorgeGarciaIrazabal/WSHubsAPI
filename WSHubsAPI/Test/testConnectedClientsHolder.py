@@ -38,7 +38,7 @@ class TestConnectedClientsHolder(unittest.TestCase):
             self.assertEqual(len(checkedIds), i + 1)
 
     def test_getOtherClients_returns9ConnectedClientsAndNotTheSender(self):
-        sender = filter(lambda x: x.ID == 8, self.connectedClientsHolder.getAllClients())[0]
+        sender = list(filter(lambda x: x.ID == 8, self.connectedClientsHolder.getAllClients()))[0]
 
         otherClients = self.connectedClientsHolder.getOtherClients(sender)
 
@@ -49,7 +49,7 @@ class TestConnectedClientsHolder(unittest.TestCase):
     def test_getClients_returnsOnlyClientsWithEvenIDs(self):
         evenClients = filter(lambda x: x.ID % 2 == 0, self.connectedClientsHolder.getAllClients())
 
-        self.assertEqual(len(evenClients), 5)
+        self.assertEqual(len(list(evenClients)), 5)
         for client in evenClients:
             self.assertTrue(client.ID % 2 == 0)
 

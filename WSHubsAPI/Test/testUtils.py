@@ -95,7 +95,7 @@ class TestUtils(unittest.TestCase):
 
     def setUp_WSMessagesReceivedQueue_infiniteOnMessageHandlerLoop(self, MAX_WORKERS, message):
         queue = self.setUp_WSMessagesReceivedQueue(MAX_WORKERS)
-        connectedClient = ConnectedClient(None, None, None)
+        connectedClient = ConnectedClient(None, None, None, None)
         connectedClient.onMessage = MagicMock()
         connectedClient.onError = MagicMock()
         queue.get = MagicMock(return_value=[message, connectedClient])

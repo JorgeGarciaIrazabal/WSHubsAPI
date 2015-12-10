@@ -1,5 +1,7 @@
 import datetime
 from jsonpickle.pickler import Pickler
+
+from CommProtocol import CommProtocol
 from WSHubsAPI import utils
 from WSHubsAPI.ConnectedClient import ConnectedClient
 import json
@@ -8,9 +10,10 @@ import unittest
 
 class TestSerialization(unittest.TestCase):
     def setUp(self):
-        self.connectedClient = ConnectedClient(client=None,
-                                               serializationPickler=Pickler(max_depth=5, max_iter=80, make_refs=False),
-                                               commProtocol=None)
+        self.connectedClient = ConnectedClient(serializationPickler=Pickler(max_depth=5, max_iter=80, make_refs=False),
+                                               commProtocol=None,
+                                               writeMessageFunction=lambda x: x,
+                                               closeFunction=lambda y: y)
         utils.setSerializerDateTimeHandler()
 
     def test_basicObjectSerialization(self):
