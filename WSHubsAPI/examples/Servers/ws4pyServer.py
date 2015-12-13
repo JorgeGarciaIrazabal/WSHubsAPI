@@ -2,8 +2,8 @@ import importlib
 import json
 import logging
 import logging.config
-from WSHubsAPI.HubsInspector import HubsInspector
-from WSHubsAPI.ConnectionHandlers.WS4Py import ConnectionHandler
+from wshubsapi.HubsInspector import HubsInspector
+from wshubsapi.ConnectionHandlers.WS4Py import ConnectionHandler
 from wsgiref.simple_server import make_server
 from ws4py.server.wsgirefserver import WSGIServer, WebSocketWSGIRequestHandler
 from ws4py.server.wsgiutils import WebSocketWSGIApplication

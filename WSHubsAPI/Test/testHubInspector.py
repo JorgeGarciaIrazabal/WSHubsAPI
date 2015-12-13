@@ -2,14 +2,14 @@ import os
 import shutil
 import unittest
 from os import listdir
-from WSHubsAPI.ClientFileGenerator.JAVAFileGenerator import JAVAFileGenerator
-from WSHubsAPI.ClientFileGenerator.JSClientFileGenerator import JSClientFileGenerator
-from WSHubsAPI.ClientFileGenerator.PythonClientFileGenerator import PythonClientFileGenerator
-from WSHubsAPI.Hub import Hub
-from WSHubsAPI.Hub import HubException
-from WSHubsAPI.HubsInspector import HubsInspector
-from WSHubsAPI.HubsInspector import HubsInspectorException
-from WSHubsAPI.Test.utils.HubsUtils import removeHubsSubclasses
+from wshubsapi.ClientFileGenerator.JAVAFileGenerator import JAVAFileGenerator
+from wshubsapi.ClientFileGenerator.JSClientFileGenerator import JSClientFileGenerator
+from wshubsapi.ClientFileGenerator.PythonClientFileGenerator import PythonClientFileGenerator
+from wshubsapi.Hub import Hub
+from wshubsapi.Hub import HubException
+from wshubsapi.HubsInspector import HubsInspector
+from wshubsapi.HubsInspector import HubsInspectorException
+from wshubsapi.Test.utils.HubsUtils import removeHubsSubclasses
 
 
 class TestHubDetection(unittest.TestCase):

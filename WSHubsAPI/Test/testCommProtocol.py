@@ -6,9 +6,9 @@ except ImportError:
 import unittest
 
 from ConnectedClient import ConnectedClient
-from WSHubsAPI.CommProtocol import CommProtocol
-from WSHubsAPI.ConnectedClientsHolder import ConnectedClientsHolder
-from WSHubsAPI.utils import WSMessagesReceivedQueue
+from wshubsapi.CommProtocol import CommProtocol
+from wshubsapi.ConnectedClientsHolder import ConnectedClientsHolder
+from wshubsapi.utils import WSMessagesReceivedQueue
 
 try:
     from unittest.mock import MagicMock

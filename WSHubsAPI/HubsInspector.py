@@ -1,7 +1,7 @@
-from WSHubsAPI.ClientFileGenerator.JAVAFileGenerator import JAVAFileGenerator
-from WSHubsAPI.ClientFileGenerator.JSClientFileGenerator import JSClientFileGenerator
-from WSHubsAPI.ClientFileGenerator.PythonClientFileGenerator import PythonClientFileGenerator
-from WSHubsAPI.Hub import Hub
+from wshubsapi.ClientFileGenerator.JAVAFileGenerator import JAVAFileGenerator
+from wshubsapi.ClientFileGenerator.JSClientFileGenerator import JSClientFileGenerator
+from wshubsapi.ClientFileGenerator.PythonClientFileGenerator import PythonClientFileGenerator
+from wshubsapi.Hub import Hub
 
 
 class HubsInspectorException(Exception):

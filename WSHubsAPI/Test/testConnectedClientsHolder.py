@@ -5,7 +5,7 @@ import unittest
 from ConnectedClientsHolder import ConnectedClientsHolder
 from FunctionMessage import FunctionMessage
 from HubsInspector import HubsInspector
-from WSHubsAPI.Hub import Hub
+from wshubsapi.Hub import Hub
 from Test.utils.HubsUtils import removeHubsSubclasses
 
 class TestConnectedClientsHolder(unittest.TestCase):

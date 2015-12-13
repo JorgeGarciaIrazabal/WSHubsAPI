@@ -1,7 +1,7 @@
 import json
 import logging
-from WSHubsAPI.utils import getArgs, SENDER_KEY_PARAMETER
-from WSHubsAPI.Hub import Hub
+from wshubsapi.utils import getArgs, SENDER_KEY_PARAMETER
+from wshubsapi.Hub import Hub
 
 log = logging.getLogger(__name__)
 

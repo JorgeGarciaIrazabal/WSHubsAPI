@@ -1,6 +1,6 @@
 # coding=utf-8
 import unittest
-from WSHubsAPI.Hub import Hub, HubException
+from wshubsapi.Hub import Hub, HubException
 from Test.utils.HubsUtils import removeHubsSubclasses
 
 

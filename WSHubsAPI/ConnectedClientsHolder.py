@@ -1,4 +1,4 @@
-from WSHubsAPI.ConnectedClientsGroup import ConnectedClientsGroup
+from wshubsapi.ConnectedClientsGroup import ConnectedClientsGroup
 
 
 class ConnectedClientsHolder:

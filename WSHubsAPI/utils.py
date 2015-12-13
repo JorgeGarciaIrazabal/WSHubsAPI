@@ -50,7 +50,7 @@ def getDefaults(method):
 
 
 def isFunctionForWSClient(method):
-    from WSHubsAPI.Hub import Hub
+    from wshubsapi.Hub import Hub
     isFunction = lambda x: inspect.ismethod(x) or inspect.isfunction(x)
     BaseHubFunctions = inspect.getmembers(Hub, predicate=isFunction)
     BaseHubFunctionsNames = [f[0] for f in BaseHubFunctions]

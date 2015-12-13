@@ -6,7 +6,7 @@ import json
 from tornado import web, ioloop
 
 from HubsInspector import HubsInspector
-from WSHubsAPI.ConnectionHandlers.Tornado import ConnectionHandler
+from wshubsapi.ConnectionHandlers.Tornado import ConnectionHandler
 
 logging.config.dictConfig(json.load(open('logging.json')))
 log = logging.getLogger(__name__)

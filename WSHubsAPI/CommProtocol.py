@@ -1,9 +1,9 @@
 import logging
 import threading
 from jsonpickle.pickler import Pickler
-from WSHubsAPI.ConnectedClient import ConnectedClient
-from WSHubsAPI.ConnectedClientsHolder import ConnectedClientsHolder
-from WSHubsAPI.utils import WSMessagesReceivedQueue, setSerializerDateTimeHandler
+from wshubsapi.ConnectedClient import ConnectedClient
+from wshubsapi.ConnectedClientsHolder import ConnectedClientsHolder
+from wshubsapi.utils import WSMessagesReceivedQueue, setSerializerDateTimeHandler
 
 log = logging.getLogger(__name__)
 __author__ = 'Jorge Garcia Irazabal'

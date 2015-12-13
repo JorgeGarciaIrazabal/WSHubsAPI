@@ -2,7 +2,7 @@ import inspect
 import os
 import jsonpickle
 from jsonpickle.pickler import Pickler
-from WSHubsAPI.utils import getDefaults, getArgs, isFunctionForWSClient, textTypes
+from wshubsapi.utils import getDefaults, getArgs, isFunctionForWSClient, textTypes
 import json
 
 __author__ = 'jgarc'

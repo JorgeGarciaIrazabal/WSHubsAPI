@@ -1,4 +1,4 @@
-from WSHubsAPI.ConnectedClientsHolder import ConnectedClientsHolder
+from wshubsapi.ConnectedClientsHolder import ConnectedClientsHolder
 
 __author__ = 'Jorge'
 

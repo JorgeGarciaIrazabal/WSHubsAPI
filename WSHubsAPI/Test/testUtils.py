@@ -3,7 +3,7 @@ import unittest
 import time
 from ConnectedClient import ConnectedClient
 from Hub import Hub
-from WSHubsAPI.utils import *
+from wshubsapi.utils import *
 
 try:
     from unittest.mock import MagicMock

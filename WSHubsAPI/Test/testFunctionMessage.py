@@ -4,7 +4,7 @@ import unittest
 
 from FunctionMessage import FunctionMessage
 from HubsInspector import HubsInspector
-from WSHubsAPI.Hub import Hub
+from wshubsapi.Hub import Hub
 from Test.utils.HubsUtils import removeHubsSubclasses
 
 

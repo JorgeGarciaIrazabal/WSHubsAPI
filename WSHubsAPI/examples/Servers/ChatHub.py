@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import time
-from WSHubsAPI.Hub import Hub
+from wshubsapi.Hub import Hub
 
 
 class ChatHub(Hub):

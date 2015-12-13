@@ -24,7 +24,7 @@ setup(
         # Versions should comply with PEP440.  For a discussion on single-sourcing
         # the version across setup.py and the project code, see
         # https://packaging.python.org/en/latest/single_source_version.html
-        version='0.4.4a6',
+        version='0.5.0a3',
 
         description='function protocol to communicate backend and frontend in a intuitive way like signalR in C#',
         long_description=long_description,
@@ -63,6 +63,7 @@ setup(
             'Programming Language :: Python :: 3.2',
             'Programming Language :: Python :: 3.3',
             'Programming Language :: Python :: 3.4',
+            'Programming Language :: Python :: 3.5',
         ],
 
         # What does your project relate to?

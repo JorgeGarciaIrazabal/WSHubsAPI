@@ -1,5 +1,5 @@
 import gc
-from WSHubsAPI.Hub import Hub
+from wshubsapi.Hub import Hub
 
 
 def removeHubsSubclasses():

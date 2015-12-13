@@ -2,8 +2,8 @@ import datetime
 from jsonpickle.pickler import Pickler
 
 from CommProtocol import CommProtocol
-from WSHubsAPI import utils
-from WSHubsAPI.ConnectedClient import ConnectedClient
+from wshubsapi import utils
+from wshubsapi.ConnectedClient import ConnectedClient
 import json
 import unittest
 

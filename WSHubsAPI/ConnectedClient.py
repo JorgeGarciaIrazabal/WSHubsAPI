@@ -1,8 +1,8 @@
 import logging
 
-from WSHubsAPI import utils
-from WSHubsAPI.ConnectedClientsHolder import ConnectedClientsHolder
-from WSHubsAPI.FunctionMessage import FunctionMessage
+from wshubsapi import utils
+from wshubsapi.ConnectedClientsHolder import ConnectedClientsHolder
+from wshubsapi.FunctionMessage import FunctionMessage
 
 log = logging.getLogger(__name__)
 
