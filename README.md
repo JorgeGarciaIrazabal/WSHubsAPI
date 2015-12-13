@@ -30,9 +30,10 @@ if __name__ == '__main__':
       #onMessage function has to be defined in the client side
       self.allClients.onMessage(name,message)
       return "Sent to %d clients"%len(self.allClients)
-      
-  #Hub.constructPythonFile("_static") #only if you will use a python client
-  Hub.constructJSFile("_static") #only if you will use a js client
+  
+  HubsInspector.inspectImplementedHubs() #setup api
+  HubsInspector.constructPythonFile("_static") #only if you will use a python client
+  HubsInspector.constructJSFile("_static") #only if you will use a js client
   server = make_server('127.0.0.1', 8888, server_class=WSGIServer,
                    handler_class=WebSocketWSGIRequestHandler,
                    app=WebSocketWSGIApplication(handler_cls=ClientHandler))

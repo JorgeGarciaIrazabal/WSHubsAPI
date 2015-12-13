@@ -5,7 +5,7 @@ from threading import Timer
 import jsonpickle
 from jsonpickle.pickler import Pickler
 from ws4py.client.threadedclient import WebSocketClient
-from wshubsapi import utils
+from WSHubsAPI import utils
 
 utils.setSerializerDateTimeHandler()
 
@@ -134,14 +134,14 @@ class HubsAPI(object):
 
         class __Server(GenericServer):
             
-            def getNumOfClientsConnected(self, ):
+            def classMethod(self, ):
                 """
                 :rtype : WSReturnObject
                 """
                 args = list()
                 
                 id = self._getNextMessageID()
-                body = {"hub": self.hubName, "function": "getNumOfClientsConnected", "args": args, "ID": id}
+                body = {"hub": self.hubName, "function": "classMethod", "args": args, "ID": id}
                 retFunction = self.wsClient.getReturnFunction(id)
                 self.wsClient.send(self._serializeObject(body))
                 return retFunction
@@ -155,6 +155,18 @@ class HubsAPI(object):
                 args.append(message)
                 id = self._getNextMessageID()
                 body = {"hub": self.hubName, "function": "sendToAll", "args": args, "ID": id}
+                retFunction = self.wsClient.getReturnFunction(id)
+                self.wsClient.send(self._serializeObject(body))
+                return retFunction
+        
+            def static(self, ):
+                """
+                :rtype : WSReturnObject
+                """
+                args = list()
+                
+                id = self._getNextMessageID()
+                body = {"hub": self.hubName, "function": "static", "args": args, "ID": id}
                 retFunction = self.wsClient.getReturnFunction(id)
                 self.wsClient.send(self._serializeObject(body))
                 return retFunction

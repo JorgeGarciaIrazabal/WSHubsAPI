@@ -4,7 +4,7 @@ import os
 from os import listdir
 from os.path import isfile
 
-from wshubsapi.utils import isNewFunction, getArgs, ASCII_UpperCase, getModulePath
+from wshubsapi.utils import isFunctionForWSClient, getArgs, ASCII_UpperCase, getModulePath
 
 __author__ = 'jgarc'
 log = logging.getLogger(__name__)
@@ -24,7 +24,7 @@ class JAVAFileGenerator:
     @classmethod
     def __getJSFunctionsStr(cls, class_):
         funcStrings = []
-        functions = inspect.getmembers(class_, predicate=isNewFunction)
+        functions = inspect.getmembers(class_, predicate=isFunctionForWSClient)
         for name, method in functions:
             args = getArgs(method)
             types = ["TYPE_" + l for l in ASCII_UpperCase[:len(args)]]

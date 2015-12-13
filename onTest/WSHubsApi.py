@@ -1,65 +1,11 @@
-import inspect
-import os
-from wshubsapi.utils import isFunctionForWSClient, getDefaults, getArgs
-
-__author__ = 'jgarc'
-
-class PythonClientFileGenerator():
-    FILE_NAME = "WSHubsApi.py"
-    TAB = "    "
-
-    @classmethod
-    def __getHubClassStr(cls, class_):
-        funcStrings = ("\n" + cls.TAB * 2).join(cls.__getFunctionStr(class_))
-        return cls.CLASS_TEMPLATE.format(name=class_.__HubName__, functions=funcStrings)
-
-    @classmethod
-    def __getFunctionStr(cls, class_):
-        funcStrings = []
-        functions = inspect.getmembers(class_, predicate=isFunctionForWSClient)
-        for name, method in functions:
-            args = getArgs(method)
-            defaults = getDefaults(method)
-            formattedArgs = []
-            for i, arg in enumerate(reversed(args)):
-                if i >= len(defaults):
-                    formattedArgs.insert(0, arg)
-                else:
-                    formattedArgs.insert(0, arg + "=" + str(defaults[-i - 1]))
-            appendInArgs = ("\n" + cls.TAB * 4).join([cls.ARGS_COOK_TEMPLATE.format(name=arg) for arg in args])
-            funcStrings.append(
-                cls.FUNCTION_TEMPLATE.format(name=name, args=", ".join(formattedArgs), cook=appendInArgs))
-        return funcStrings
-
-    @classmethod
-    def __getAttributesHub(cls, hubs):
-        return [cls.ATTRIBUTE_HUB_TEMPLATE.format(name=h.__HubName__) for h in hubs]
-
-    @classmethod
-    def createFile(cls, path, hubs):
-        if not os.path.exists(path): os.makedirs(path)
-        with open(os.path.join(path,"__init__.py"),'w'): #creating __init__.py if not exist
-            pass
-        with open(os.path.join(path, cls.FILE_NAME), "w") as f:
-            classStrings = "".join(cls.__getClassStrings(hubs))
-            attributesHubs = "\n".join(cls.__getAttributesHub(hubs))
-            f.write(cls.WRAPPER.format(Hubs=classStrings, attributesHubs=attributesHubs))
-
-    @classmethod
-    def __getClassStrings(cls, hubs):
-        classStrings = []
-        for h in hubs:
-            classStrings.append(cls.__getHubClassStr(h))
-        return classStrings
-
-    WRAPPER = '''import json
+import json
 import logging
 import threading
 from threading import Timer
 import jsonpickle
 from jsonpickle.pickler import Pickler
 from ws4py.client.threadedclient import WebSocketClient
-from wshubsapi import utils
+from WSHubsAPI import utils
 
 utils.setSerializerDateTimeHandler()
 
@@ -113,7 +59,7 @@ class WSHubsAPIClient(WebSocketClient):
         self.log.debug("Connection opened")
 
     def closed(self, code, reason=None):
-        self.log.debug("Connection closed with code:\\n%s\\nAnd reason:\\n%s" % (code, reason))
+        self.log.debug("Connection closed with code:\n%s\nAnd reason:\n%s" % (code, reason))
 
     def received_message(self, m):
         try:
@@ -174,38 +120,50 @@ class HubsAPI(object):
     def __init__(self, url, serverTimeout=5.0, pickler=Pickler(max_depth=4, max_iter=100, make_refs=False)):
         self.wsClient = WSHubsAPIClient(self, url, serverTimeout)
         self.pickler = pickler
-{attributesHubs}
+        self.TestHub = self.__TestHub(self.wsClient, self.pickler)
+        self.TestHub2 = self.__TestHub2(self.wsClient, self.pickler)
 
     def connect(self):
         self.wsClient.connect()
 
-{Hubs}
-'''
 
-    CLASS_TEMPLATE = '''
-    class __{name}(object):
+    class __TestHub(object):
         def __init__(self, wsClient, pickler):
             hubName = self.__class__.__name__[2:]
             self.server = self.__Server(wsClient, hubName, pickler)
             self.client = WSSimpleObject()
 
         class __Server(GenericServer):
-            {functions}
-        '''
-
-    FUNCTION_TEMPLATE = '''
-            def {name}(self, {args}):
+            
+            def getData(self, ):
                 """
                 :rtype : WSReturnObject
                 """
                 args = list()
-                {cook}
+                
                 id = self._getNextMessageID()
-                body = {{"hub": self.hubName, "function": "{name}", "args": args, "ID": id}}
+                body = {"hub": self.hubName, "function": "getData", "args": args, "ID": id}
                 retFunction = self.wsClient.getReturnFunction(id)
                 self.wsClient.send(self._serializeObject(body))
-                return retFunction'''
+                return retFunction
+        
+    class __TestHub2(object):
+        def __init__(self, wsClient, pickler):
+            hubName = self.__class__.__name__[2:]
+            self.server = self.__Server(wsClient, hubName, pickler)
+            self.client = WSSimpleObject()
 
-    ARGS_COOK_TEMPLATE = "args.append({name})"
-
-    ATTRIBUTE_HUB_TEMPLATE = "        self.{name} = self.__{name}(self.wsClient, self.pickler)"
+        class __Server(GenericServer):
+            
+            def getData(self, ):
+                """
+                :rtype : WSReturnObject
+                """
+                args = list()
+                
+                id = self._getNextMessageID()
+                body = {"hub": self.hubName, "function": "getData", "args": args, "ID": id}
+                retFunction = self.wsClient.getReturnFunction(id)
+                self.wsClient.send(self._serializeObject(body))
+                return retFunction
+        

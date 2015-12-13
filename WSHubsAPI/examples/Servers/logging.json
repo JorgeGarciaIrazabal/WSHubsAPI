@@ -9,7 +9,7 @@
   },
   "handlers": {
     "console": {
-      "class": "wshubsapi.examples.LoggingHandlers.ColoredConsoleHandler",
+      "class": "WSHubsAPI.examples.LoggingHandlers.ColoredConsoleHandler",
       "level": "DEBUG",
       "formatter": "simple",
       "stream": "ext://sys.stdout"

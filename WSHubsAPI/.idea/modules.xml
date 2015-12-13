@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/WSFunctionProtocol.iml" filepath="$PROJECT_DIR$/.idea/WSFunctionProtocol.iml" />
+      <module fileurl="file://$PROJECT_DIR$/examples/Clients/.idea/Clients.iml" filepath="$PROJECT_DIR$/examples/Clients/.idea/Clients.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../.idea/WSHubsAPIPackage.iml" filepath="$PROJECT_DIR$/../.idea/WSHubsAPIPackage.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/wshubsapi.iml" filepath="$PROJECT_DIR$/.idea/wshubsapi.iml" />
     </modules>
   </component>

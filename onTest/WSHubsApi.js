@@ -132,25 +132,25 @@ function HubsAPI(url, serverTimeout) {
     };
 
     
-    this.ChatHub = {};
-    this.ChatHub.server = {
-        __HUB_NAME : "ChatHub",
+    this.TestHub = {};
+    this.TestHub.server = {
+        __HUB_NAME : "TestHub",
         
-        classMethod : function (){
+        getData : function (){
             
-            return constructMessage(this.__HUB_NAME, "classMethod",arguments);
-        },
-
-        sendToAll : function (name, message){
-            
-            return constructMessage(this.__HUB_NAME, "sendToAll",arguments);
-        },
-
-        static : function (){
-            
-            return constructMessage(this.__HUB_NAME, "static",arguments);
+            return constructMessage(this.__HUB_NAME, "getData",arguments);
         }
     };
-    this.ChatHub.client = {};
+    this.TestHub.client = {};
+    this.TestHub2 = {};
+    this.TestHub2.server = {
+        __HUB_NAME : "TestHub2",
+        
+        getData : function (){
+            
+            return constructMessage(this.__HUB_NAME, "getData",arguments);
+        }
+    };
+    this.TestHub2.client = {};
 }
     
