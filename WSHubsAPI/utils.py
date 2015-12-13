@@ -67,15 +67,16 @@ def getModulePath():
 
 # todo: move to different module
 class WSMessagesReceivedQueue(Queue):
-    MAX_WORKERS = 151
+    DEFAULT_MAX_WORKERS = 151
 
-    def __init__(self):
+    def __init__(self, maxWorkers = DEFAULT_MAX_WORKERS):
         Queue.__init__(self)
-        self.executor = ThreadPoolExecutor(max_workers=self.MAX_WORKERS)
+        self.maxWorkers = maxWorkers
+        self.executor = ThreadPoolExecutor(max_workers=self.maxWorkers)
         self.keepAlive = True
 
     def startThreads(self):
-        for i in range(self.MAX_WORKERS):
+        for i in range(self.DEFAULT_MAX_WORKERS):
             self.executor.submit(self.__infiniteOnMessageHandlerLoop)
 
     def __infiniteOnMessageHandlerLoop(self):

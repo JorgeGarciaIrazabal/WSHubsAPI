@@ -10,16 +10,16 @@ __author__ = 'Jorge Garcia Irazabal'
 
 _DEFAULT_PICKER = Pickler(max_depth=5, max_iter=80, make_refs=False)
 
-setSerializerDateTimeHandler()
+setSerializerDateTimeHandler()  # todo move this
 
 
 class CommProtocol(object):
-    def __init__(self, unprovidedIdTemplate="UNPROVIDED__{}"):
+    def __init__(self, maxWorkers=WSMessagesReceivedQueue.DEFAULT_MAX_WORKERS, unprovidedIdTemplate="UNPROVIDED__{}"):
         self.lock = threading.Lock()
         self.availableUnprovidedIds = list()
         self.unprovidedIdTemplate = unprovidedIdTemplate
         self.lastProvidedId = 0
-        self.wsMessageReceivedQueue = WSMessagesReceivedQueue()
+        self.wsMessageReceivedQueue = WSMessagesReceivedQueue(maxWorkers)
         self.wsMessageReceivedQueue.startThreads()
         self.allConnectedClients = ConnectedClientsHolder.allConnectedClients
 

@@ -81,7 +81,7 @@ class TestUtils(unittest.TestCase):
 
     def setUp_WSMessagesReceivedQueue(self, MAX_WORKERS):
         queue = WSMessagesReceivedQueue()
-        queue.MAX_WORKERS = MAX_WORKERS
+        queue.DEFAULT_MAX_WORKERS = MAX_WORKERS
         return queue
 
     def test_WSMessagesReceivedQueue_Creates__MAX_WORKERS__WORKERS(self):
@@ -91,7 +91,7 @@ class TestUtils(unittest.TestCase):
         queue.startThreads()
 
         self.assertTrue(queue.executor.submit.called)
-        self.assertEqual(queue.executor.submit.call_count, queue.MAX_WORKERS)
+        self.assertEqual(queue.executor.submit.call_count, queue.DEFAULT_MAX_WORKERS)
 
     def setUp_WSMessagesReceivedQueue_infiniteOnMessageHandlerLoop(self, MAX_WORKERS, message):
         queue = self.setUp_WSMessagesReceivedQueue(MAX_WORKERS)

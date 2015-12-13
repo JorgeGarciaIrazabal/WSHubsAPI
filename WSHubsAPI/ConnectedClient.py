@@ -1,7 +1,7 @@
 import logging
 
-import utils
-from ConnectedClientsHolder import ConnectedClientsHolder
+from WSHubsAPI import utils
+from WSHubsAPI.ConnectedClientsHolder import ConnectedClientsHolder
 from WSHubsAPI.FunctionMessage import FunctionMessage
 
 log = logging.getLogger(__name__)
@@ -34,7 +34,7 @@ class ConnectedClient(object):
             msg = FunctionMessage(message, self)
             replay = msg.callFunction()
             if replay is not None:
-                self.onReplay(replay, msg)
+                self.replay(replay, message)
         except Exception as e:
             self.onError(e)
 
@@ -42,19 +42,15 @@ class ConnectedClient(object):
         self.__commProtocol.wsMessageReceivedQueue.put((message, self))
 
     def onClosed(self):
-        if self.ID in self.__commProtocol.allConnectedClients.keys():
-            self.__commProtocol.allConnectedClients.pop(self.ID)
-            if isinstance(self.ID, str) and self.ID.startswith(
-                    "UNPROVIDED__"):  # todo, need a regex to check if is unprovided
-                self.__commProtocol.availableUnprovidedIds.append(self.ID)
+        ConnectedClientsHolder.popClient(self.ID)
 
     def onError(self, exception):
         log.exception("Error parsing message")
 
-    def onReplay(self, replay, message):
+    def replay(self, replay, originMessage):
         """
         :param replay: serialized object to be sent as a replay of a message received
-        :param message: Message received (provided for overridden functions)
+        :param originMessage: Message received (provided for overridden functions)
         """
         self.writeMessage(utils.serializeMessage(self.pickler, replay))
 

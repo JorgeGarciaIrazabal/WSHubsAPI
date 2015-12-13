@@ -8,12 +8,6 @@ from HubsInspector import HubsInspector
 from WSHubsAPI.Hub import Hub
 from Test.utils.HubsUtils import removeHubsSubclasses
 
-try:
-    from unittest.mock import MagicMock
-except:
-    from mock import MagicMock
-
-
 class TestConnectedClientsHolder(unittest.TestCase):
     def setUp(self):
         self.testHubName = "testHubName"
