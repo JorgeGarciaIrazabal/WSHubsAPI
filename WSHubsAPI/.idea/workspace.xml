@@ -2,40 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="211254e1-d811-4422-971c-47b4575b9280" name="Default" comment="">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/../dist/wshubsapi-0.4.4a6-py2.py3-none-any.whl" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/../dist/wshubsapi-0.4.4a6.zip" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../README.md" afterPath="$PROJECT_DIR$/../README.md" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/modules.xml" afterPath="$PROJECT_DIR$/.idea/modules.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ClientFileGenerator/JAVAFileGenerator.py" afterPath="$PROJECT_DIR$/ClientFileGenerator/JAVAFileGenerator.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ClientFileGenerator/JSClientFileGenerator.py" afterPath="$PROJECT_DIR$/ClientFileGenerator/JSClientFileGenerator.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ClientFileGenerator/PythonClientFileGenerator.py" afterPath="$PROJECT_DIR$/ClientFileGenerator/PythonClientFileGenerator.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/CommProtocol.py" afterPath="$PROJECT_DIR$/CommProtocol.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ConnectedClient.py" afterPath="$PROJECT_DIR$/ConnectedClient.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ConnectedClientsHolder.py" afterPath="$PROJECT_DIR$/ConnectedClientsHolder.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ConnectionHandlers/Tornado.py" afterPath="$PROJECT_DIR$/ConnectionHandlers/Tornado.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ConnectionHandlers/WS4Py.py" afterPath="$PROJECT_DIR$/ConnectionHandlers/WS4Py.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/FunctionMessage.py" afterPath="$PROJECT_DIR$/FunctionMessage.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Hub.py" afterPath="$PROJECT_DIR$/Hub.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/HubsInspector.py" afterPath="$PROJECT_DIR$/HubsInspector.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Test/TestSerialization.py" afterPath="$PROJECT_DIR$/Test/TestSerialization.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Test/testCommProtocol.py" afterPath="$PROJECT_DIR$/Test/testCommProtocol.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Test/testConnectedClient.py" afterPath="$PROJECT_DIR$/Test/testConnectedClient.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Test/testConnectedClientsHolder.py" afterPath="$PROJECT_DIR$/Test/testConnectedClientsHolder.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Test/testFunctionMessage.py" afterPath="$PROJECT_DIR$/Test/testFunctionMessage.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Test/testHub.py" afterPath="$PROJECT_DIR$/Test/testHub.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Test/testHubInspector.py" afterPath="$PROJECT_DIR$/Test/testHubInspector.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Test/testUtils.py" afterPath="$PROJECT_DIR$/Test/testUtils.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Test/utils/HubsUtils.py" afterPath="$PROJECT_DIR$/Test/utils/HubsUtils.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/examples/Servers/ChatHub.py" afterPath="$PROJECT_DIR$/examples/Servers/ChatHub.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/examples/Servers/TornadoWSServer.py" afterPath="$PROJECT_DIR$/examples/Servers/TornadoWSServer.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/examples/Servers/ws4pyServer.py" afterPath="$PROJECT_DIR$/examples/Servers/ws4pyServer.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/utils.py" afterPath="$PROJECT_DIR$/utils.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../setup.py" afterPath="$PROJECT_DIR$/../setup.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../wshubsapi.egg-info/PKG-INFO" afterPath="$PROJECT_DIR$/../wshubsapi.egg-info/PKG-INFO" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../wshubsapi.egg-info/SOURCES.txt" afterPath="$PROJECT_DIR$/../wshubsapi.egg-info/SOURCES.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../wshubsapi.egg-info/requires.txt" afterPath="$PROJECT_DIR$/../wshubsapi.egg-info/requires.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../wshubsapi.egg-info/top_level.txt" afterPath="$PROJECT_DIR$/../wshubsapi.egg-info/top_level.txt" />
     </list>
     <ignored path="WSFunctionProtocol.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -680,7 +647,13 @@
       <option name="project" value="LOCAL" />
       <updated>1449790937497</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="[release] changed WSHubsAPI to wshubsapi in lowercase and fixed some bugs">
+      <created>1450033396527</created>
+      <option name="number" value="00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1450033396527</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -730,6 +703,7 @@
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.1913646" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.28152174" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24673913" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -740,7 +714,6 @@
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.38152173" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -764,13 +737,15 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="VcsManagerConfiguration">
+    <option name="CHECK_NEW_TODO" value="false" />
     <MESSAGE value="created some UnitTests" />
     <MESSAGE value="utils unittest created" />
     <MESSAGE value="fixed minor problems" />
     <MESSAGE value="created more tests" />
     <MESSAGE value="some minor refactoring and created more test" />
     <MESSAGE value="fixing some tests" />
-    <option name="LAST_COMMIT_MESSAGE" value="fixing some tests" />
+    <MESSAGE value="[release] changed WSHubsAPI to wshubsapi in lowercase and fixed some bugs" />
+    <option name="LAST_COMMIT_MESSAGE" value="[release] changed WSHubsAPI to wshubsapi in lowercase and fixed some bugs" />
     <option name="FILE_HISTORY_SPLITTER_PROPORTION" value="0.75714284" />
   </component>
   <component name="XDebuggerManager">
@@ -951,6 +926,10 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="16" column="28" selection-start-line="16" selection-start-column="28" selection-end-line="16" selection-end-column="28" />
+          <folding>
+            <element signature="e#313#409#0" expanded="false" />
+            <element signature="e#448#730#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -958,6 +937,14 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.43001688">
           <caret line="17" column="29" selection-start-line="17" selection-start-column="13" selection-end-line="17" selection-end-column="29" />
+          <folding>
+            <element signature="e#289#293#0" expanded="false" />
+            <element signature="e#641#746#0" expanded="false" />
+            <element signature="e#783#994#0" expanded="false" />
+            <element signature="e#1039#1164#0" expanded="false" />
+            <element signature="e#1198#1319#0" expanded="false" />
+            <element signature="e#1365#1376#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -1042,6 +1029,14 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.5970425">
           <caret line="19" column="0" selection-start-line="19" selection-start-column="0" selection-end-line="19" selection-end-column="0" />
+          <folding>
+            <element signature="e#173#195#0" expanded="false" />
+            <element signature="e#234#317#0" expanded="false" />
+            <element signature="e#366#477#0" expanded="false" />
+            <element signature="e#529#640#0" expanded="false" />
+            <element signature="e#827#870#0" expanded="false" />
+            <element signature="e#931#1037#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -1056,6 +1051,12 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="66" column="0" selection-start-line="66" selection-start-column="0" selection-end-line="66" selection-end-column="0" />
+          <folding>
+            <element signature="e#1932#2091#0" expanded="true" />
+            <element signature="e#2129#2240#0" expanded="true" />
+            <element signature="e#2296#2699#0" expanded="true" />
+            <element signature="e#3159#3222#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -1080,6 +1081,13 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.8590381">
           <caret line="52" column="50" selection-start-line="52" selection-start-column="50" selection-end-line="52" selection-end-column="50" />
+          <folding>
+            <element signature="e#87#102#0" expanded="false" />
+            <element signature="e#475#559#0" expanded="false" />
+            <element signature="e#629#893#0" expanded="false" />
+            <element signature="e#1417#1836#0" expanded="false" />
+            <element signature="e#2176#2417#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -1094,6 +1102,18 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.42825112">
           <caret line="117" column="0" selection-start-line="117" selection-start-column="0" selection-end-line="117" selection-end-column="0" />
+          <folding>
+            <element signature="e#623#1878#0" expanded="false" />
+            <element signature="e#997#1090#0" expanded="false" />
+            <element signature="e#2149#2272#0" expanded="false" />
+            <element signature="e#2925#3661#0" expanded="false" />
+            <element signature="e#4000#4234#0" expanded="false" />
+            <element signature="e#4309#4509#0" expanded="false" />
+            <element signature="e#4588#4870#0" expanded="false" />
+            <element signature="e#4956#5232#0" expanded="false" />
+            <element signature="e#5300#5549#0" expanded="false" />
+            <element signature="e#5610#5809#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -1101,6 +1121,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.076233186">
           <caret line="15" column="20" selection-start-line="15" selection-start-column="20" selection-end-line="15" selection-end-column="20" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -1108,6 +1129,10 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.28587443">
           <caret line="24" column="78" selection-start-line="24" selection-start-column="31" selection-end-line="24" selection-end-column="78" />
+          <folding>
+            <element signature="e#289#733#0" expanded="true" />
+            <element signature="e#767#852#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
