@@ -69,7 +69,7 @@ def getModulePath():
 class WSMessagesReceivedQueue(Queue):
     DEFAULT_MAX_WORKERS = 151
 
-    def __init__(self, maxWorkers = DEFAULT_MAX_WORKERS):
+    def __init__(self, maxWorkers=DEFAULT_MAX_WORKERS):
         Queue.__init__(self)
         self.maxWorkers = maxWorkers
         self.executor = ThreadPoolExecutor(max_workers=self.maxWorkers)

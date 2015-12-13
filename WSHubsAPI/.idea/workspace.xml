@@ -2,15 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="211254e1-d811-4422-971c-47b4575b9280" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Test/utils/messageCreator.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Test/testCommProtocol.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/CommProtocol.py" afterPath="$PROJECT_DIR$/CommProtocol.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ConnectedClient.py" afterPath="$PROJECT_DIR$/ConnectedClient.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Test/testConnectedClient.py" afterPath="$PROJECT_DIR$/Test/testConnectedClient.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Test/testConnectedClientsHolder.py" afterPath="$PROJECT_DIR$/Test/testConnectedClientsHolder.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Test/testFunctionMessage.py" afterPath="$PROJECT_DIR$/Test/testFunctionMessage.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Test/testUtils.py" afterPath="$PROJECT_DIR$/Test/testUtils.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/utils.py" afterPath="$PROJECT_DIR$/utils.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../setup.py" afterPath="$PROJECT_DIR$/../setup.py" />
     </list>
     <ignored path="WSFunctionProtocol.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -43,7 +38,7 @@
           <file leaf-file-name="testFunctionMessage.py" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/Test/testFunctionMessage.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state vertical-scroll-proportion="-8.793103">
+                <state vertical-scroll-proportion="0.0">
                   <caret line="24" column="78" selection-start-line="24" selection-start-column="31" selection-end-line="24" selection-end-column="78" />
                   <folding>
                     <element signature="e#289#733#0" expanded="true" />
@@ -63,11 +58,11 @@
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="testConnectedClient.py" pinned="false" current-in-tab="true">
+          <file leaf-file-name="testConnectedClient.py" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/Test/testConnectedClient.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state vertical-scroll-proportion="0.65829146">
-                  <caret line="135" column="38" selection-start-line="135" selection-start-column="38" selection-end-line="135" selection-end-column="38" />
+                <state vertical-scroll-proportion="0.0">
+                  <caret line="136" column="35" selection-start-line="136" selection-start-column="35" selection-end-line="136" selection-end-column="35" />
                   <folding>
                     <element signature="e#623#1878#0" expanded="true" />
                     <element signature="e#997#1090#0" expanded="true" />
@@ -78,8 +73,33 @@
                     <element signature="e#4588#4870#0" expanded="true" />
                     <element signature="e#4956#5232#0" expanded="true" />
                     <element signature="e#5300#5549#0" expanded="true" />
-                    <element signature="e#5610#5809#0" expanded="true" />
                   </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="testCommProtocol.py" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/Test/testCommProtocol.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state vertical-scroll-proportion="0.0">
+                  <caret line="52" column="50" selection-start-line="52" selection-start-column="50" selection-end-line="52" selection-end-column="50" />
+                  <folding>
+                    <element signature="e#87#102#0" expanded="true" />
+                    <element signature="e#475#559#0" expanded="true" />
+                    <element signature="e#629#893#0" expanded="true" />
+                    <element signature="e#1417#1836#0" expanded="true" />
+                    <element signature="e#2176#2417#0" expanded="true" />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="setup.py" pinned="false" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/../setup.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state vertical-scroll-proportion="1.5074627">
+                  <caret line="63" column="52" selection-start-line="63" selection-start-column="52" selection-end-line="63" selection-end-column="52" />
+                  <folding />
                 </state>
               </provider>
             </entry>
@@ -115,11 +135,28 @@
           <file leaf-file-name="CommProtocol.py" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/CommProtocol.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state vertical-scroll-proportion="0.4840871">
-                  <caret line="22" column="42" selection-start-line="22" selection-start-column="42" selection-end-line="22" selection-end-column="42" />
+                <state vertical-scroll-proportion="0.0">
+                  <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
                   <folding>
+                    <element signature="e#0#14#0" expanded="true" />
+                    <element signature="e#624#989#0" expanded="true" />
                     <element signature="e#1114#1201#0" expanded="true" />
                     <element signature="e#1242#1539#0" expanded="true" />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="utils.py" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/utils.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state vertical-scroll-proportion="0.0">
+                  <caret line="66" column="0" selection-start-line="66" selection-start-column="0" selection-end-line="66" selection-end-column="0" />
+                  <folding>
+                    <element signature="e#1932#2091#0" expanded="true" />
+                    <element signature="e#2129#2240#0" expanded="true" />
+                    <element signature="e#2296#2699#0" expanded="true" />
+                    <element signature="e#3159#3222#0" expanded="true" />
                   </folding>
                 </state>
               </provider>
@@ -147,7 +184,6 @@
         <option value="$PROJECT_DIR$/examples/Clients/_static/WSHubsApi.py" />
         <option value="$PROJECT_DIR$/ValidateStrings.py" />
         <option value="$PROJECT_DIR$/examples/Clients/stressTestPythonClient.py" />
-        <option value="$PROJECT_DIR$/../setup.py" />
         <option value="$PROJECT_DIR$/Test/testClientFileConstructor.py" />
         <option value="$PROJECT_DIR$/Test/testHubDetection.py" />
         <option value="$PROJECT_DIR$/examples/Clients/logging.json" />
@@ -168,7 +204,6 @@
         <option value="$PROJECT_DIR$/ConnectedClientsHolder.py" />
         <option value="$PROJECT_DIR$/Test/testSerialization.py" />
         <option value="$PROJECT_DIR$/Test/testUtils.py" />
-        <option value="$PROJECT_DIR$/utils.py" />
         <option value="$PROJECT_DIR$/CommProtocol.py" />
         <option value="$PROJECT_DIR$/Test/utils/messageCreator.py" />
         <option value="$PROJECT_DIR$/Test/testConnectedClientsHolder.py" />
@@ -176,6 +211,9 @@
         <option value="$PROJECT_DIR$/Test/utils/MessageCreator.py" />
         <option value="$PROJECT_DIR$/Test/testConnectedClient.py" />
         <option value="$PROJECT_DIR$/ConnectedClient.py" />
+        <option value="$PROJECT_DIR$/utils.py" />
+        <option value="$PROJECT_DIR$/Test/testCommProtocol.py" />
+        <option value="$PROJECT_DIR$/../setup.py" />
       </list>
     </option>
   </component>
@@ -236,8 +274,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
-      <pane id="Scratches" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -308,6 +344,8 @@
           </PATH>
         </subPane>
       </pane>
+      <pane id="Scratches" />
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -328,7 +366,7 @@
       <recent name="C:\Software Projects\000\WSHubsAPIPackage\wshubsapi\examples\Clients" />
     </key>
   </component>
-  <component name="RunManager" selected="Python tests.Test_2.7_WSHubsAPI">
+  <component name="RunManager" selected="Python tests.Test_3.4_WSHubsAPI">
     <configuration default="false" name="pythonClient" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -573,7 +611,7 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <module name="WSHubsAPI" />
-      <option name="SCRIPT_NAME" value="Test/testConnectedClient.py" />
+      <option name="SCRIPT_NAME" value="Test/testCommProtocol.py" />
       <option name="CLASS_NAME" value="TestUtils" />
       <option name="METHOD_NAME" value="test_WSMessagesReceivedQueue_infiniteOnMessageHandlerLoop_PrintExceptionIfConnectedClientIsNoConnectedClient" />
       <option name="FOLDER_NAME" value="$PROJECT_DIR$/Test" />
@@ -677,34 +715,34 @@
     <servers />
   </component>
   <component name="TestHistory">
-    <history-entry file="Test_2_7_WSHubsAPI - 2015.12.13 at 00h 40m 52s.xml">
-      <configuration name="Test_2.7_WSHubsAPI" configurationId="tests" />
-    </history-entry>
-    <history-entry file="Test_2_7_WSHubsAPI_Script - 2015.12.12 at 21h 07m 59s.xml">
+    <history-entry file="Test_2_7_WSHubsAPI_Script - 2015.12.13 at 19h 03m 00s.xml">
       <configuration name="Test_2.7_WSHubsAPI_Script" configurationId="tests" />
     </history-entry>
-    <history-entry file="Test_2_7_WSHubsAPI_Script - 2015.12.12 at 21h 08m 53s.xml">
+    <history-entry file="Test_2_7_WSHubsAPI_Script - 2015.12.13 at 19h 05m 09s.xml">
       <configuration name="Test_2.7_WSHubsAPI_Script" configurationId="tests" />
     </history-entry>
-    <history-entry file="Test_2_7_WSHubsAPI_Script - 2015.12.13 at 00h 35m 33s.xml">
+    <history-entry file="Test_2_7_WSHubsAPI_Script - 2015.12.13 at 19h 09m 45s.xml">
       <configuration name="Test_2.7_WSHubsAPI_Script" configurationId="tests" />
     </history-entry>
-    <history-entry file="Test_2_7_WSHubsAPI_Script - 2015.12.13 at 00h 35m 42s.xml">
+    <history-entry file="Test_2_7_WSHubsAPI_Script - 2015.12.13 at 19h 10m 12s.xml">
       <configuration name="Test_2.7_WSHubsAPI_Script" configurationId="tests" />
     </history-entry>
-    <history-entry file="Test_2_7_WSHubsAPI_Script - 2015.12.13 at 00h 39m 47s.xml">
+    <history-entry file="Test_2_7_WSHubsAPI_Script - 2015.12.13 at 19h 10m 17s.xml">
       <configuration name="Test_2.7_WSHubsAPI_Script" configurationId="tests" />
     </history-entry>
-    <history-entry file="Test_3_4_WSHubsAPI - 2015.12.12 at 21h 07m 36s.xml">
+    <history-entry file="Test_2_7_WSHubsAPI_Script - 2015.12.13 at 19h 12m 33s.xml">
+      <configuration name="Test_2.7_WSHubsAPI_Script" configurationId="tests" />
+    </history-entry>
+    <history-entry file="Test_3_4_WSHubsAPI - 2015.12.13 at 19h 12m 39s.xml">
       <configuration name="Test_3.4_WSHubsAPI" configurationId="tests" />
     </history-entry>
-    <history-entry file="Test_3_4_WSHubsAPI - 2015.12.12 at 21h 07m 54s.xml">
+    <history-entry file="Test_3_4_WSHubsAPI - 2015.12.13 at 19h 14m 17s.xml">
       <configuration name="Test_3.4_WSHubsAPI" configurationId="tests" />
     </history-entry>
-    <history-entry file="Test_3_4_WSHubsAPI - 2015.12.13 at 00h 40m 20s.xml">
+    <history-entry file="Test_3_4_WSHubsAPI - 2015.12.13 at 19h 14m 22s.xml">
       <configuration name="Test_3.4_WSHubsAPI" configurationId="tests" />
     </history-entry>
-    <history-entry file="Test_3_4_WSHubsAPI - 2015.12.13 at 00h 40m 49s.xml">
+    <history-entry file="Test_3_4_WSHubsAPI - 2015.12.13 at 19h 14m 26s.xml">
       <configuration name="Test_3.4_WSHubsAPI" configurationId="tests" />
     </history-entry>
   </component>
@@ -718,16 +756,15 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
+    <frame x="-8" y="-8" width="1936" height="1056" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.1748401" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.17643923" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.28152174" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3206522" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3206522" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.31413043" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="true" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32934782" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="true" content_ui="tabs" />
@@ -741,6 +778,7 @@
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Remote Host" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="3" side_tool="false" content_ui="combo" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3206522" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Database" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.20362474" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
     </layout>
@@ -774,13 +812,11 @@
           </properties>
         </breakpoint>
       </default-breakpoints>
-      <option name="time" value="101" />
+      <option name="time" value="102" />
     </breakpoint-manager>
     <watches-manager>
       <configuration name="tests">
-        <watch expression="ConnectedClientsHolder" />
-        <watch expression="self.connectedClient.replay" />
-        <watch expression="callArgs[1]" />
+        <watch expression="self.commProtocol.lock" />
       </configuration>
       <configuration name="PythonConfigurationType">
         <watch expression="connectedClient.onMessage" />
@@ -794,38 +830,10 @@
     </watches-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/Testing/ws4pyServer.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://C:/Python34/Lib/concurrent/futures/thread.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.046008117">
-          <caret line="21" column="24" selection-start-line="21" selection-start-column="24" selection-end-line="21" selection-end-column="24" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Testing/pythonClient.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/../setup.cfg">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../setup.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="67" column="39" selection-start-line="67" selection-start-column="39" selection-end-line="67" selection-end-column="39" />
         </state>
       </provider>
     </entry>
@@ -1001,7 +1009,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="8" column="56" selection-start-line="8" selection-start-column="56" selection-end-line="8" selection-end-column="56" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1042,7 +1049,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="17" column="0" selection-start-line="17" selection-start-column="0" selection-end-line="17" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1050,9 +1056,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.085427135">
           <caret line="4" column="0" selection-start-line="4" selection-start-column="0" selection-end-line="11" selection-end-column="0" />
-          <folding>
-            <element signature="e#74#223#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1060,7 +1063,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="34" column="63" selection-start-line="34" selection-start-column="63" selection-end-line="34" selection-end-column="63" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1068,7 +1070,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.22780569">
           <caret line="15" column="61" selection-start-line="15" selection-start-column="61" selection-end-line="15" selection-end-column="61" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1076,9 +1077,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.072961375">
           <caret line="9" column="0" selection-start-line="9" selection-start-column="0" selection-end-line="9" selection-end-column="0" />
-          <folding>
-            <element signature="e#1159#1472#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1086,9 +1084,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="156" column="23" selection-start-line="156" selection-start-column="23" selection-end-line="156" selection-end-column="93" />
-          <folding>
-            <element signature="e#4369#4786#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1105,9 +1100,9 @@
         <state vertical-scroll-proportion="0.5695142">
           <caret line="20" column="30" selection-start-line="20" selection-start-column="30" selection-end-line="20" selection-end-column="30" />
           <folding>
-            <element signature="e#91#186#0" expanded="true" />
-            <element signature="e#253#438#0" expanded="true" />
-            <element signature="e#680#818#0" expanded="true" />
+            <element signature="e#91#186#0" expanded="false" />
+            <element signature="e#253#438#0" expanded="false" />
+            <element signature="e#680#818#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -1137,7 +1132,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Test/testFunctionMessage.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-8.793103">
+        <state vertical-scroll-proportion="0.0">
           <caret line="24" column="78" selection-start-line="24" selection-start-column="31" selection-end-line="24" selection-end-column="78" />
           <folding>
             <element signature="e#289#733#0" expanded="true" />
@@ -1150,7 +1145,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.6414048">
           <caret line="110" column="52" selection-start-line="110" selection-start-column="34" selection-end-line="110" selection-end-column="52" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1166,12 +1160,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="35" column="0" selection-start-line="35" selection-start-column="0" selection-end-line="35" selection-end-column="0" />
-          <folding>
-            <element signature="e#236#758#0" expanded="true" />
-            <element signature="e#801#1037#0" expanded="true" />
-            <element signature="e#1281#1470#0" expanded="true" />
-            <element signature="e#1531#1809#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1210,8 +1198,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Test/testConnectedClient.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.65829146">
-          <caret line="135" column="38" selection-start-line="135" selection-start-column="38" selection-end-line="135" selection-end-column="38" />
+        <state vertical-scroll-proportion="0.0">
+          <caret line="136" column="35" selection-start-line="136" selection-start-column="35" selection-end-line="136" selection-end-column="35" />
           <folding>
             <element signature="e#623#1878#0" expanded="true" />
             <element signature="e#997#1090#0" expanded="true" />
@@ -1222,31 +1210,73 @@
             <element signature="e#4588#4870#0" expanded="true" />
             <element signature="e#4956#5232#0" expanded="true" />
             <element signature="e#5300#5549#0" expanded="true" />
-            <element signature="e#5610#5809#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://C:/Python27/Lib/site-packages/concurrent/futures/thread.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.5050392">
+          <caret line="84" column="8" selection-start-line="84" selection-start-column="8" selection-end-line="84" selection-end-column="8" />
+          <folding>
+            <element signature="e#2859#3240#0" expanded="false" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/utils.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="1.2847571">
-          <caret line="91" column="23" selection-start-line="91" selection-start-column="23" selection-end-line="91" selection-end-column="23" />
+        <state vertical-scroll-proportion="0.0">
+          <caret line="66" column="0" selection-start-line="66" selection-start-column="0" selection-end-line="66" selection-end-column="0" />
           <folding>
-            <element signature="e#1934#2093#0" expanded="true" />
-            <element signature="e#2131#2242#0" expanded="true" />
-            <element signature="e#3161#3224#0" expanded="true" />
+            <element signature="e#1932#2091#0" expanded="true" />
+            <element signature="e#2129#2240#0" expanded="true" />
+            <element signature="e#2296#2699#0" expanded="true" />
+            <element signature="e#3159#3222#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/.PyCharm50/system/python_stubs/-762174762/thread.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.12569316">
+          <caret line="150" column="14" selection-start-line="150" selection-start-column="6" selection-end-line="150" selection-end-column="14" />
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/CommProtocol.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.4840871">
-          <caret line="22" column="42" selection-start-line="22" selection-start-column="42" selection-end-line="22" selection-end-column="42" />
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
+            <element signature="e#0#14#0" expanded="true" />
+            <element signature="e#624#989#0" expanded="true" />
             <element signature="e#1114#1201#0" expanded="true" />
             <element signature="e#1242#1539#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Test/testCommProtocol.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="52" column="50" selection-start-line="52" selection-start-column="50" selection-end-line="52" selection-end-column="50" />
+          <folding>
+            <element signature="e#87#102#0" expanded="true" />
+            <element signature="e#475#559#0" expanded="true" />
+            <element signature="e#629#893#0" expanded="true" />
+            <element signature="e#1417#1836#0" expanded="true" />
+            <element signature="e#2176#2417#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../setup.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="1.5074627">
+          <caret line="63" column="52" selection-start-line="63" selection-start-column="52" selection-end-line="63" selection-end-column="52" />
+          <folding />
         </state>
       </provider>
     </entry>
