@@ -1,12 +1,8 @@
 # coding=utf-8
-import json
 import unittest
 
-from ConnectedClientsHolder import ConnectedClientsHolder
-from FunctionMessage import FunctionMessage
-from HubsInspector import HubsInspector
-from wshubsapi.Hub import Hub
-from Test.utils.HubsUtils import removeHubsSubclasses
+from wshubsapi.ConnectedClientsHolder import ConnectedClientsHolder
+
 
 class TestConnectedClientsHolder(unittest.TestCase):
     def setUp(self):

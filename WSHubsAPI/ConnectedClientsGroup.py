@@ -1,4 +1,4 @@
-import utils
+from wshubsapi import utils
 
 
 class ConnectedClientsGroup:

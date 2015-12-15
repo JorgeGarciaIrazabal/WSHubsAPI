@@ -1,17 +1,17 @@
 function HubsAPI(url, serverTimeout) {
-    var messageID = 0;
-    var returnFunctions = {};
-    var respondTimeout = (serverTimeout || 5) * 1000;
-    var thisApi = this;
-    var messagesBeforeOpen = [];
-    var onOpenTriggers = [];
-    url = url || "";
+    var messageID = 0,
+        returnFunctions = {},
+        respondTimeout = (serverTimeout || 5) * 1000,
+        thisApi = this,
+        messagesBeforeOpen = [],
+        onOpenTriggers = [],
+        url = url || '';
 
     this.connect = function (reconnectTimeout) {
         reconnectTimeout = reconnectTimeout || -1;
 
         function reconnect() {
-            if (reconnectTimeout != -1) {
+            if (reconnectTimeout !== -1) {
                 window.setTimeout(function () {
                     thisApi.connect(reconnectTimeout);
                     thisApi.callbacks.onReconnecting();
@@ -23,6 +23,7 @@ function HubsAPI(url, serverTimeout) {
             this.wsClient = new WebSocket(url);
         } catch (err) {
             reconnect();
+            return;
         }
 
         this.wsClient.onopen = function () {
@@ -41,30 +42,31 @@ function HubsAPI(url, serverTimeout) {
         };
 
         this.wsClient.addOnOpenTrigger = function (trigger) {
-            if (thisApi.wsClient.readyState == 0)
+            if (thisApi.wsClient.readyState === 0) {
                 onOpenTriggers.push(trigger);
-            else if (thisApi.wsClient.readyState == 1)
+            } else if (thisApi.wsClient.readyState === 1) {
                 trigger();
-            else
+            } else {
                 throw new Error("web socket is closed");
+            }
         };
 
         this.wsClient.onmessage = function (ev) {
-            var f,
-                msgObj;
             try {
+                var f,
                 msgObj = JSON.parse(ev.data);
-                if (msgObj.hasOwnProperty("replay")) {
+                if (msgObj.hasOwnProperty('replay')) {
                     f = returnFunctions[msgObj.ID];
-                    if (msgObj.success && f != undefined && f.onSuccess != undefined)
+                    if (msgObj.success && f !== undefined && f.onSuccess !== undefined) {
                         f.onSuccess(msgObj.replay);
+                    }
                     if (!msgObj.success) {
-                        if (f != undefined && f.onError != undefined)
+                        if (f !== undefined && f.onError !== undefined)
                             f.onError(msgObj.replay);
                     }
                 } else {
                     f = thisApi[msgObj.hub].client[msgObj.function];
-                    f.apply(f, msgObj.args)
+                    f.apply(f, msgObj.args);
                 }
             } catch (err) {
                 this.onMessageError(err)
@@ -86,38 +88,40 @@ function HubsAPI(url, serverTimeout) {
     this.defaultErrorHandler = null;
 
     var constructMessage = function (hubName, functionName, args) {
-        if(thisApi.wsClient === undefined) throw Error("ws not connected");
+        if(thisApi.wsClient === undefined) throw Error('ws not connected');
         args = Array.prototype.slice.call(args);
         var id = messageID++;
-        var body = {"hub": hubName, "function": functionName, "args": args, "ID": id};
-        if(thisApi.wsClient.readyState === WebSocket.CONNECTING)
+        var body = {'hub': hubName, 'function': functionName, 'args': args, 'ID': id};
+        if(thisApi.wsClient.readyState === WebSocket.CONNECTING) {
             messagesBeforeOpen.push(JSON.stringify(body));
-         else if (thisApi.wsClient.readyState !== WebSocket.OPEN) {
+        } else if (thisApi.wsClient.readyState !== WebSocket.OPEN) {
             window.setTimeout(function () {
                 f = returnFunctions[id];
-                if (f != undefined && f.onError != undefined)
-                    f.onError("webSocket not connected");
+                if (f !== undefined && f.onError !== undefined)
+                    f.onError('webSocket not connected');
             }, 0);
-            return {done: getReturnFunction(id, {hubName: hubName, functionName: functionName, args: args})}
+            return {done: getReturnFunction(id, {hubName: hubName, functionName: functionName, args: args})};
         }
-        else
+        else {
             thisApi.wsClient.send(JSON.stringify(body));
-        return {done: getReturnFunction(id, {hubName: hubName, functionName: functionName, args: args})}
+        }
+        return {done: getReturnFunction(id, {hubName: hubName, functionName: functionName, args: args})};
     };
     var getReturnFunction = function (ID, callInfo) {
         return function (onSuccess, onError) {
-            if (returnFunctions[ID] == undefined)
+            if (returnFunctions[ID] === undefined)
                 returnFunctions[ID] = {};
             var f = returnFunctions[ID];
             f.onSuccess = function () {
-                if(onSuccess !== undefined)
+                if(onSuccess !== undefined) {
                     onSuccess.apply(onSuccess, arguments);
+                }
                 delete returnFunctions[ID]
             };
             f.onError = function () {
-                if(onError !== undefined)
+                if(onError !== undefined) {
                     onError.apply(onError, arguments);
-                else if (thisApi.defaultErrorHandler != null){
+                } else if (thisApi.defaultErrorHandler !== null){
                     var argumentsArray = [callInfo].concat(arguments);
                     thisApi.defaultErrorHandler.apply(thisApi.defaultErrorHandler.apply, argumentsArray);
                 }
@@ -125,8 +129,9 @@ function HubsAPI(url, serverTimeout) {
             };
             //check returnFunctions, memory leak
             setTimeout(function () {
-                if (returnFunctions[ID] && returnFunctions[ID].onError)
-                    returnFunctions[ID].onError("timeOut Error");
+                if (returnFunctions[ID] && returnFunctions[ID].onError) {
+                    returnFunctions[ID].onError('timeOut Error');
+                }
             }, respondTimeout)
         }
     };
@@ -134,21 +139,21 @@ function HubsAPI(url, serverTimeout) {
     
     this.ChatHub = {};
     this.ChatHub.server = {
-        __HUB_NAME : "ChatHub",
+        __HUB_NAME : 'ChatHub',
         
         classMethod : function (){
             
-            return constructMessage(this.__HUB_NAME, "classMethod",arguments);
+            return constructMessage('ChatHub', 'classMethod', arguments);
         },
 
-        sendToAll : function (name, message){
+        sendToAll : function (self, name, message){
             
-            return constructMessage(this.__HUB_NAME, "sendToAll",arguments);
+            return constructMessage('ChatHub', 'sendToAll', arguments);
         },
 
         static : function (){
             
-            return constructMessage(this.__HUB_NAME, "static",arguments);
+            return constructMessage('ChatHub', 'static', arguments);
         }
     };
     this.ChatHub.client = {};

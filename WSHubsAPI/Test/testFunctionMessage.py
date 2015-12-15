@@ -2,10 +2,11 @@
 import json
 import unittest
 
-from FunctionMessage import FunctionMessage
-from HubsInspector import HubsInspector
+from wshubsapi.ConnectedClientsGroup import ConnectedClientsGroup
+from wshubsapi.FunctionMessage import FunctionMessage
+from wshubsapi.HubsInspector import HubsInspector
 from wshubsapi.Hub import Hub
-from Test.utils.HubsUtils import removeHubsSubclasses
+from wshubsapi.Test.utils.HubsUtils import removeHubsSubclasses
 
 
 class TestFunctionMessage(unittest.TestCase):
@@ -77,7 +78,10 @@ class TestFunctionMessage(unittest.TestCase):
 
         functionResult = fn.callFunction()
 
-        self.assertEqual(functionResult["replay"], ("x", "_sender", 1))
+        self.assertEqual(functionResult["replay"][0], "x")
+        self.assertIsInstance(functionResult["replay"][1], ConnectedClientsGroup)
+        self.assertEqual(functionResult["replay"][1][0], "_sender")
+        self.assertEqual(functionResult["replay"][2], 1)
         self.assertEqual(functionResult["success"], True)
 
     def test_CallFunction_DoesNotIncludesSenderIfNotRequested(self):

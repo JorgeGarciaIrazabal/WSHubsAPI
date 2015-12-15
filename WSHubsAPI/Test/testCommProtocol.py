@@ -5,7 +5,7 @@ except ImportError:
     import _thread as thread
 import unittest
 
-from ConnectedClient import ConnectedClient
+from wshubsapi.ConnectedClient import ConnectedClient
 from wshubsapi.CommProtocol import CommProtocol
 from wshubsapi.ConnectedClientsHolder import ConnectedClientsHolder
 from wshubsapi.utils import WSMessagesReceivedQueue

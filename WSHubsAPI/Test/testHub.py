@@ -1,7 +1,7 @@
 # coding=utf-8
 import unittest
 from wshubsapi.Hub import Hub, HubException
-from Test.utils.HubsUtils import removeHubsSubclasses
+from wshubsapi.Test.utils.HubsUtils import removeHubsSubclasses
 
 
 class TestHub(unittest.TestCase):

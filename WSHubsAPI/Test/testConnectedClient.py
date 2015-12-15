@@ -4,13 +4,12 @@ import unittest
 
 from jsonpickle.pickler import Pickler
 
-from wshubsapi.FunctionMessage import FunctionMessage
-from wshubsapi.HubsInspector import HubsInspector
-from wshubsapi.Test.utils.HubsUtils import removeHubsSubclasses
-from wshubsapi.Hub import Hub
-from wshubsapi.Test.utils.MessageCreator import MessageCreator
 from wshubsapi.CommProtocol import CommProtocol
 from wshubsapi.ConnectedClientsHolder import ConnectedClientsHolder
+from wshubsapi.Hub import Hub
+from wshubsapi.HubsInspector import HubsInspector
+from wshubsapi.Test.utils.HubsUtils import removeHubsSubclasses
+from wshubsapi.Test.utils.MessageCreator import MessageCreator
 
 try:
     from unittest.mock import MagicMock

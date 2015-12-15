@@ -1,13 +1,14 @@
 import inspect
 import os
+
 import jsonpickle
 from jsonpickle.pickler import Pickler
+
 from wshubsapi.utils import getDefaults, getArgs, isFunctionForWSClient, textTypes
-import json
 
 __author__ = 'jgarc'
 
-class JSClientFileGenerator():
+class JSClientFileGenerator:
     FILE_NAME = "WSHubsApi.js"
     @classmethod
     def __getHubClassStr(cls, class_):
@@ -29,7 +30,7 @@ class JSClientFileGenerator():
             for i, d in reversed(list(enumerate(defaults))):
                 defaultsArray.insert(0,cls.ARGS_COOK_TEMPLATE.format(iter = i, name = args[i], default=d))
             defaultsStr = "\n\t\t\t".join(defaultsArray)
-            funcStrings.append(cls.FUNCTION_TEMPLATE.format(name=name, args=", ".join(args), cook=defaultsStr))
+            funcStrings.append(cls.FUNCTION_TEMPLATE.format(name=name, args=", ".join(args), cook=defaultsStr, hubName=class_.__HubName__))
         return funcStrings
 
     @classmethod
@@ -46,20 +47,24 @@ class JSClientFileGenerator():
             classStrings.append(cls.__getHubClassStr(h))
         return classStrings
 
-    WRAPPER = """function HubsAPI(url, serverTimeout) {{
-    var messageID = 0;
-    var returnFunctions = {{}};
-    var respondTimeout = (serverTimeout || 5) * 1000;
-    var thisApi = this;
-    var messagesBeforeOpen = [];
-    var onOpenTriggers = [];
-    url = url || "";
+    WRAPPER = """/* jshint ignore:start */
+/* ignore jslint start */
+function HubsAPI(url, serverTimeout) {{
+    'use strict';
+
+    var messageID = 0,
+        returnFunctions = {{}},
+        respondTimeout = (serverTimeout || 5) * 1000,
+        thisApi = this,
+        messagesBeforeOpen = [],
+        onOpenTriggers = [];
+    url = url || '';
 
     this.connect = function (reconnectTimeout) {{
         reconnectTimeout = reconnectTimeout || -1;
 
         function reconnect() {{
-            if (reconnectTimeout != -1) {{
+            if (reconnectTimeout !== -1) {{
                 window.setTimeout(function () {{
                     thisApi.connect(reconnectTimeout);
                     thisApi.callbacks.onReconnecting();
@@ -71,6 +76,7 @@ class JSClientFileGenerator():
             this.wsClient = new WebSocket(url);
         }} catch (err) {{
             reconnect();
+            return;
         }}
 
         this.wsClient.onopen = function () {{
@@ -89,33 +95,35 @@ class JSClientFileGenerator():
         }};
 
         this.wsClient.addOnOpenTrigger = function (trigger) {{
-            if (thisApi.wsClient.readyState == 0)
+            if (thisApi.wsClient.readyState === 0) {{
                 onOpenTriggers.push(trigger);
-            else if (thisApi.wsClient.readyState == 1)
+            }} else if (thisApi.wsClient.readyState === 1) {{
                 trigger();
-            else
+            }} else {{
                 throw new Error("web socket is closed");
+            }}
         }};
 
         this.wsClient.onmessage = function (ev) {{
-            var f,
-                msgObj;
             try {{
+                var f,
                 msgObj = JSON.parse(ev.data);
-                if (msgObj.hasOwnProperty("replay")) {{
+                if (msgObj.hasOwnProperty('replay')) {{
                     f = returnFunctions[msgObj.ID];
-                    if (msgObj.success && f != undefined && f.onSuccess != undefined)
+                    if (msgObj.success && f !== undefined && f.onSuccess !== undefined) {{
                         f.onSuccess(msgObj.replay);
+                    }}
                     if (!msgObj.success) {{
-                        if (f != undefined && f.onError != undefined)
+                        if (f !== undefined && f.onError !== undefined) {{
                             f.onError(msgObj.replay);
+			}}
                     }}
                 }} else {{
                     f = thisApi[msgObj.hub].client[msgObj.function];
-                    f.apply(f, msgObj.args)
+                    f.apply(f, msgObj.args);
                 }}
             }} catch (err) {{
-                this.onMessageError(err)
+                this.onMessageError(err);
             }}
         }};
 
@@ -134,58 +142,67 @@ class JSClientFileGenerator():
     this.defaultErrorHandler = null;
 
     var constructMessage = function (hubName, functionName, args) {{
-        if(thisApi.wsClient === undefined) throw Error("ws not connected");
-        args = Array.prototype.slice.call(args);
-        var id = messageID++;
-        var body = {{"hub": hubName, "function": functionName, "args": args, "ID": id}};
-        if(thisApi.wsClient.readyState === WebSocket.CONNECTING)
-            messagesBeforeOpen.push(JSON.stringify(body));
-         else if (thisApi.wsClient.readyState !== WebSocket.OPEN) {{
-            window.setTimeout(function () {{
-                f = returnFunctions[id];
-                if (f != undefined && f.onError != undefined)
-                    f.onError("webSocket not connected");
-            }}, 0);
-            return {{done: getReturnFunction(id, {{hubName: hubName, functionName: functionName, args: args}})}}
+        if(thisApi.wsClient === undefined) {{
+            throw Error('ws not connected');
         }}
-        else
+        args = Array.prototype.slice.call(args);
+        var id = messageID++,
+            body = {{'hub': hubName, 'function': functionName, 'args': args, 'ID': id}};
+        if(thisApi.wsClient.readyState === WebSocket.CONNECTING) {{
+            messagesBeforeOpen.push(JSON.stringify(body));
+        }} else if (thisApi.wsClient.readyState !== WebSocket.OPEN) {{
+            window.setTimeout(function () {{
+                var f = returnFunctions[id];
+                if (f !== undefined && f.onError !== undefined) {{
+                    f.onError('webSocket not connected');
+		}}
+            }}, 0);
+            return {{done: getReturnFunction(id, {{hubName: hubName, functionName: functionName, args: args}})}};
+        }}
+        else {{
             thisApi.wsClient.send(JSON.stringify(body));
-        return {{done: getReturnFunction(id, {{hubName: hubName, functionName: functionName, args: args}})}}
+        }}
+        return {{done: getReturnFunction(id, {{hubName: hubName, functionName: functionName, args: args}})}};
     }};
     var getReturnFunction = function (ID, callInfo) {{
         return function (onSuccess, onError) {{
-            if (returnFunctions[ID] == undefined)
+            if (returnFunctions[ID] === undefined) {{
                 returnFunctions[ID] = {{}};
+            }}
             var f = returnFunctions[ID];
             f.onSuccess = function () {{
-                if(onSuccess !== undefined)
+                if(onSuccess !== undefined) {{
                     onSuccess.apply(onSuccess, arguments);
-                delete returnFunctions[ID]
+                }}
+                delete returnFunctions[ID];
             }};
             f.onError = function () {{
-                if(onError !== undefined)
+                if(onError !== undefined) {{
                     onError.apply(onError, arguments);
-                else if (thisApi.defaultErrorHandler != null){{
+                }} else if (thisApi.defaultErrorHandler !== null){{
                     var argumentsArray = [callInfo].concat(arguments);
                     thisApi.defaultErrorHandler.apply(thisApi.defaultErrorHandler.apply, argumentsArray);
                 }}
-                delete returnFunctions[ID]
+                delete returnFunctions[ID];
             }};
             //check returnFunctions, memory leak
             setTimeout(function () {{
-                if (returnFunctions[ID] && returnFunctions[ID].onError)
-                    returnFunctions[ID].onError("timeOut Error");
-            }}, respondTimeout)
-        }}
+                if (returnFunctions[ID] && returnFunctions[ID].onError) {{
+                    returnFunctions[ID].onError('timeOut Error');
+                }}
+            }}, respondTimeout);
+        }};
     }};
 
     {main}
 }}
+/* jshint ignore:end */
+/* ignore jslint end */
     """
     CLASS_TEMPLATE = """
     this.{name} = {{}};
     this.{name}.server = {{
-        __HUB_NAME : "{name}",
+        __HUB_NAME : '{name}',
         {functions}
     }};
     this.{name}.client = {{}};"""
@@ -193,7 +210,7 @@ class JSClientFileGenerator():
     FUNCTION_TEMPLATE = """
         {name} : function ({args}){{
             {cook}
-            return constructMessage(this.__HUB_NAME, "{name}",arguments);
+            return constructMessage('{hubName}', '{name}', arguments);
         }}"""
 
-    ARGS_COOK_TEMPLATE = "arguments[{iter}] = {name} == undefined ? {default} : {name};"
+    ARGS_COOK_TEMPLATE = "arguments[{iter}] = {name} === undefined ? {default} : {name};"

@@ -1,8 +1,8 @@
 # coding=utf-8
 import unittest
 import time
-from ConnectedClient import ConnectedClient
-from Hub import Hub
+from wshubsapi.ConnectedClient import ConnectedClient
+from wshubsapi.Hub import Hub
 from wshubsapi.utils import *
 
 try:
@@ -77,7 +77,7 @@ class TestUtils(unittest.TestCase):
         self.assertFalse(isFunctionForWSClient(Hub.HUBs_DICT), "excludes existing functions")
 
     def test_getModulePath_ReturnsTestUtilsPyModulePath(self):
-        self.assertEqual(getModulePath(), os.getcwd() + "\\Test")
+        self.assertEqual(getModulePath(), os.getcwd() + os.sep + "Test")
 
     def setUp_WSMessagesReceivedQueue(self, MAX_WORKERS):
         queue = WSMessagesReceivedQueue()

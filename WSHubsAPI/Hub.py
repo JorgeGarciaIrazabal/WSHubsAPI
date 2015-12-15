@@ -22,3 +22,10 @@ class Hub(object):
         self.HUBs_DICT[hubName] = self
 
         self.__class__._clientsHolder = ConnectedClientsHolder(hubName)
+
+    @classmethod
+    def getClientsHolder(cls):
+        """
+        :rtype: ConnectedClientsHolder
+        """
+        return cls._clientsHolder
