@@ -11,7 +11,10 @@ class ConnectedClientsHolder:
         return ConnectedClientsGroup(list(self.allConnectedClients.values()), self.hubName)
 
     def getOtherClients(self, sender):
-        return ConnectedClientsGroup([c for c in self.allConnectedClients.values() if c.ID != sender.ID], self.hubName)
+        """
+        :type sender: ConnectedClientsGroup
+        """
+        return ConnectedClientsGroup([c for c in self.allConnectedClients.values() if c.ID != sender[0].ID], self.hubName)
 
     def getClients(self, filterFunction):
         return ConnectedClientsGroup([c for c in self.allConnectedClients.values() if filterFunction(c)], self.hubName)

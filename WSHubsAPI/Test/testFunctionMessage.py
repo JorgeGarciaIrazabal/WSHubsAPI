@@ -21,6 +21,9 @@ class TestFunctionMessage(unittest.TestCase):
             def testNoSender(self, x):
                 return x
 
+            def testReplayUnsuccessful(self, x):
+                return self._constructUnsuccessfulReplay(x)
+
         self.testHubClass = TestHub
         HubsInspector.inspectImplementedHubs(forceReconstruction=True)
         self.testHubInstance = HubsInspector.getHubInstance(self.testHubClass)
@@ -99,3 +102,11 @@ class TestFunctionMessage(unittest.TestCase):
 
         self.assertEqual(functionResult["success"], False)
         self.assertEqual(functionResult["replay"], "MyException")
+
+    def test_CallFunction_ReplaysSuccessFalseIfReturnsUnsuccessfulReplayObject(self):
+        fn = FunctionMessage(self.__constructMessageStr(function="testReplayUnsuccessful", args=["x"]), "_sender")
+
+        functionResult = fn.callFunction()
+
+        self.assertEqual(functionResult["success"], False)
+        self.assertEqual(functionResult["replay"], "x")

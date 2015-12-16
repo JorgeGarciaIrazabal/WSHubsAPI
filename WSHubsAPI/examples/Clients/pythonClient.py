@@ -25,5 +25,5 @@ if __name__ == '__main__':
         message = input("")
         if sys.version_info[0] == 2:
             message = message.decode(sys.stdin.encoding)
-        ws.ChatHub.server.sendToAll(name, message).done(lambda m: sys.stdout.write("message sent to %d client(s)\n"%m),
-                                                        lambda m: sys.stdout.write("!!!!!message not sent!!!!!\n"))
+        ws.ChatHub.server.sendToAll(name, message).done(lambda m: sys.stdout.write("message sent to {} client(s)\n".format(m)),
+                                                        lambda m: sys.stdout.write("!!!!!message not sent!!!!! {}\n".format(m)))

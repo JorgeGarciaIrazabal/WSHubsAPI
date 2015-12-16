@@ -1,6 +1,6 @@
 # coding=utf-8
 import unittest
-from wshubsapi.Hub import Hub, HubException
+from wshubsapi.Hub import Hub, HubException, UnsuccessfulReplay
 from wshubsapi.Test.utils.HubsUtils import removeHubsSubclasses
 
 
@@ -56,5 +56,15 @@ class TestHub(unittest.TestCase):
             pass
 
         self.assertRaises(HubException, wsClient)
+
+    def test_ConstructUnsuccessfulReplay_returnsUnsuccessfulReplayInstance(self):
+        class TestHub1(Hub):
+            pass
+        hub = TestHub1()
+
+        unsuccessfulReplay = hub._constructUnsuccessfulReplay("replay")
+
+        self.assertIsInstance(unsuccessfulReplay, UnsuccessfulReplay)
+        self.assertEqual(unsuccessfulReplay.replay, "replay")
 
 

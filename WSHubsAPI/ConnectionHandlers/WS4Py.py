@@ -1,6 +1,6 @@
 import logging
 from ws4py.websocket import WebSocket
-from wshubsapi.CommProtocol import CommProtocol
+from wshubsapi.CommEnvironment import CommEnvironment
 
 __author__ = 'Jorge'
 log = logging.getLogger(__name__)
@@ -8,14 +8,14 @@ log.addHandler(logging.NullHandler())
 
 
 class ConnectionHandler(WebSocket):
-    commProtocol = CommProtocol()
+    commEnvironment = CommEnvironment()
 
     def writeMessage(self, message):
         log.debug("message to %s:\n%s" % (self._connectedClient.ID, message))
         self.send(message)
 
     def opened(self, *args):
-        self._connectedClient = self.commProtocol.constructConnectedClient(self.writeMessage, self.close)
+        self._connectedClient = self.commEnvironment.constructConnectedClient(self.writeMessage, self.close)
         clientId = int(args[0]) if len(args) > 0 else None
         self.ID = self._connectedClient.onOpen(clientId)
         log.debug("open new connection with ID: %s " % str(self.ID))
