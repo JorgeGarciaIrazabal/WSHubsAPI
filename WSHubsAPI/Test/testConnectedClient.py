@@ -4,13 +4,12 @@ import unittest
 
 from jsonpickle.pickler import Pickler
 
-from wshubsapi.FunctionMessage import FunctionMessage
+from wshubsapi.CommEnvironment import CommEnvironment
+from wshubsapi.ConnectedClientsHolder import ConnectedClientsHolder
+from wshubsapi.Hub import Hub
 from wshubsapi.HubsInspector import HubsInspector
 from wshubsapi.Test.utils.HubsUtils import removeHubsSubclasses
-from wshubsapi.Hub import Hub
 from wshubsapi.Test.utils.MessageCreator import MessageCreator
-from wshubsapi.CommProtocol import CommProtocol
-from wshubsapi.ConnectedClientsHolder import ConnectedClientsHolder
 
 try:
     from unittest.mock import MagicMock
@@ -40,11 +39,11 @@ class TestConnectedClient(unittest.TestCase):
         self.testHubInstance = HubsInspector.getHubInstance(self.testHubClass)
 
         self.jsonPickler = Pickler(max_depth=3, max_iter=30, make_refs=False)
-        self.commProtocol = CommProtocol(maxWorkers=0, unprovidedIdTemplate="unprovidedTest__{}")
+        self.commEnvironment = CommEnvironment(maxWorkers=0, unprovidedIdTemplate="unprovidedTest__{}")
         self.clientMock = ClientMock()
-        self.connectedClient = self.commProtocol.constructConnectedClient(self.clientMock.writeMessage,
-                                                                          self.clientMock.close,
-                                                                          self.jsonPickler)
+        self.connectedClient = self.commEnvironment.constructConnectedClient(self.clientMock.writeMessage,
+                                                                             self.clientMock.close,
+                                                                             self.jsonPickler)
         self.connectedClientsHolder = ConnectedClientsHolder(self.testHubClass.__HubName__)
 
     def tearDown(self):
@@ -118,11 +117,11 @@ class TestConnectedClient(unittest.TestCase):
 
     def test_onAsyncMessage_putsTheMessageAndTheConnectionInTheQueue(self):
         message = MessageCreator.createOnMessageMessage()
-        self.commProtocol.wsMessageReceivedQueue.put = MagicMock()
+        self.commEnvironment.wsMessageReceivedQueue.put = MagicMock()
 
         self.connectedClient.onAsyncMessage(message)
 
-        self.commProtocol.wsMessageReceivedQueue.put.assert_called_with((message, self.connectedClient))
+        self.commEnvironment.wsMessageReceivedQueue.put.assert_called_with((message, self.connectedClient))
 
     def test_onClose_removeExistingConnectedClient(self):
         ID = 3

@@ -1,12 +1,9 @@
 # coding=utf-8
-import json
 import unittest
 
-from ConnectedClientsHolder import ConnectedClientsHolder
-from FunctionMessage import FunctionMessage
-from HubsInspector import HubsInspector
-from wshubsapi.Hub import Hub
-from Test.utils.HubsUtils import removeHubsSubclasses
+from wshubsapi.ConnectedClientsGroup import ConnectedClientsGroup
+from wshubsapi.ConnectedClientsHolder import ConnectedClientsHolder
+
 
 class TestConnectedClientsHolder(unittest.TestCase):
     def setUp(self):
@@ -32,7 +29,8 @@ class TestConnectedClientsHolder(unittest.TestCase):
             self.assertEqual(len(checkedIds), i + 1)
 
     def test_getOtherClients_returns9ConnectedClientsAndNotTheSender(self):
-        sender = list(filter(lambda x: x.ID == 8, self.connectedClientsHolder.getAllClients()))[0]
+        sender = self.connectedClientsHolder.getClient(8)
+        sender = ConnectedClientsGroup(sender,'test')
 
         otherClients = self.connectedClientsHolder.getOtherClients(sender)
 

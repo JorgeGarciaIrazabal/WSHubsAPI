@@ -28,7 +28,7 @@ ASCII_UpperCase = string.uppercase if sys.version_info[0] == 2 else string.ascii
 def getArgs(method, includeSender=False):
     args = getargspec(method).args
     if args is None: return []
-    if inspect.ismethod(method):
+    if hasattr(method, "__self__"):
         args.pop(0)
     if not includeSender:
         for arg in NOT_PASSING_PARAMETERS:

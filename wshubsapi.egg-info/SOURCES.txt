@@ -103,6 +103,7 @@ wshubsapi/ClientFileGenerator/JavaExtraFiles/__init__.py
 wshubsapi/ConnectionHandlers/Tornado.py
 wshubsapi/ConnectionHandlers/WS4Py.py
 wshubsapi/ConnectionHandlers/__init__.py
+wshubsapi/Test/TestSerialization.py
 wshubsapi/Test/__init__.py
 wshubsapi/Test/testCommProtocol.py
 wshubsapi/Test/testConnectedClient.py
@@ -117,6 +118,7 @@ wshubsapi/Test/client/__init__.py
 wshubsapi/Test/utils/HubsUtils.py
 wshubsapi/Test/utils/MessageCreator.py
 wshubsapi/Test/utils/__init__.py
+wshubsapi/Test/utils/messageCreator.py
 wshubsapi/Testing/ChatHub.py
 wshubsapi/Testing/LoggingHandlers.py
 wshubsapi/Testing/WSHubsApi.py

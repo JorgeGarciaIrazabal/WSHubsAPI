@@ -13,7 +13,7 @@ _DEFAULT_PICKER = Pickler(max_depth=5, max_iter=80, make_refs=False)
 setSerializerDateTimeHandler()  # todo move this
 
 
-class CommProtocol(object):
+class CommEnvironment(object):
     def __init__(self, maxWorkers=WSMessagesReceivedQueue.DEFAULT_MAX_WORKERS, unprovidedIdTemplate="UNPROVIDED__{}"):
         self.lock = threading.Lock()
         self.availableUnprovidedIds = list()

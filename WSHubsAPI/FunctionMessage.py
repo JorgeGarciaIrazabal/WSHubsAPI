@@ -1,7 +1,10 @@
 import json
 import logging
+
+from wshubsapi.ConnectedClientsGroup import ConnectedClientsGroup
+from wshubsapi.ConnectedClientsHolder import ConnectedClientsHolder
 from wshubsapi.utils import getArgs, SENDER_KEY_PARAMETER
-from wshubsapi.Hub import Hub
+from wshubsapi.Hub import Hub, UnsuccessfulReplay
 
 log = logging.getLogger(__name__)
 
@@ -32,6 +35,8 @@ class FunctionMessage:
 
     def callFunction(self):
         success, replay = self.__executeFunction()
+        if isinstance(replay, UnsuccessfulReplay):
+            return self.constructReplayDict(False, replay.replay)
         if replay is not None:
             return self.constructReplayDict(success, replay)
 
@@ -51,6 +56,6 @@ class FunctionMessage:
         methodArgs = getArgs(method, includeSender=True)
         try:
             senderIndex = methodArgs.index(SENDER_KEY_PARAMETER)
-            args.insert(senderIndex, self.connectedClient)
+            args.insert(senderIndex, ConnectedClientsGroup([self.connectedClient], self.hubName))
         except ValueError:
             pass

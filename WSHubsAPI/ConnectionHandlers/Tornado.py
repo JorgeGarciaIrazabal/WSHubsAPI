@@ -1,5 +1,5 @@
 import logging
-from wshubsapi.CommProtocol import CommProtocol
+from wshubsapi.CommEnvironment import CommEnvironment
 import tornado.websocket
 
 __author__ = 'Jorge'
@@ -11,11 +11,11 @@ class ConnectionHandler(tornado.websocket.WebSocketHandler):
     def data_received(self, chunk):
         pass
 
-    commProtocol = CommProtocol()
+    commEnvironment = CommEnvironment()
 
     def __init__(self, application, request, **kwargs):
         super(ConnectionHandler, self).__init__(application, request, **kwargs)
-        self._connectedClient = self.commProtocol.constructConnectedClient(self.writeMessage, self.close)
+        self._connectedClient = self.commEnvironment.constructConnectedClient(self.writeMessage, self.close)
         self.ID = None
 
     def writeMessage(self, message):

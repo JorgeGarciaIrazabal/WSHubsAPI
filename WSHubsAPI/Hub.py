@@ -2,6 +2,9 @@ from wshubsapi.ConnectedClientsHolder import ConnectedClientsHolder
 
 __author__ = 'Jorge'
 
+class UnsuccessfulReplay:
+    def __init__(self, replay):
+        self.replay = replay
 
 class HubException(Exception):
     pass
@@ -22,3 +25,13 @@ class Hub(object):
         self.HUBs_DICT[hubName] = self
 
         self.__class__._clientsHolder = ConnectedClientsHolder(hubName)
+
+    @classmethod
+    def getClientsHolder(cls):
+        """
+        :rtype: ConnectedClientsHolder
+        """
+        return cls._clientsHolder
+
+    def _constructUnsuccessfulReplay(self, replay):
+        return UnsuccessfulReplay(replay)

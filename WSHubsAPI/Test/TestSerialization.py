@@ -1,7 +1,6 @@
 import datetime
 from jsonpickle.pickler import Pickler
 
-from CommProtocol import CommProtocol
 from wshubsapi import utils
 from wshubsapi.ConnectedClient import ConnectedClient
 import json
@@ -11,7 +10,7 @@ import unittest
 class TestSerialization(unittest.TestCase):
     def setUp(self):
         self.connectedClient = ConnectedClient(serializationPickler=Pickler(max_depth=5, max_iter=80, make_refs=False),
-                                               commProtocol=None,
+                                               commEnvironment=None,
                                                writeMessageFunction=lambda x: x,
                                                closeFunction=lambda y: y)
         utils.setSerializerDateTimeHandler()

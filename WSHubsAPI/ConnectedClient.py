@@ -9,11 +9,11 @@ log = logging.getLogger(__name__)
 
 # Change class name //WSAPIClient? WSHUBsClient? ConnHandler?
 class ConnectedClient(object):
-    def __init__(self, serializationPickler, commProtocol, writeMessageFunction, closeFunction):
+    def __init__(self, serializationPickler, commEnvironment, writeMessageFunction, closeFunction):
         """
-        :type commProtocol: WSHubsAPI.CommProtocol.CommProtocol | None
+        :type commEnvironment: WSHubsAPI.CommEnvironment.CommEnvironment | None
         """
-        self.__commProtocol = commProtocol
+        self.__commEnvironment = commEnvironment
         self.ID = None
         """:type : int|None|str"""
         self.pickler = serializationPickler
@@ -21,9 +21,9 @@ class ConnectedClient(object):
         self.close = closeFunction
 
     def onOpen(self, ID=None):
-        with self.__commProtocol.lock:
-            if ID is None or ID in self.__commProtocol.allConnectedClients:
-                self.ID = self.__commProtocol.getUnprovidedID()
+        with self.__commEnvironment.lock:
+            if ID is None or ID in self.__commEnvironment.allConnectedClients:
+                self.ID = self.__commEnvironment.getUnprovidedID()
             else:
                 self.ID = ID
             ConnectedClientsHolder.appendClient(self)
@@ -39,7 +39,7 @@ class ConnectedClient(object):
             self.onError(e)
 
     def onAsyncMessage(self, message):
-        self.__commProtocol.wsMessageReceivedQueue.put((message, self))
+        self.__commEnvironment.wsMessageReceivedQueue.put((message, self))
 
     def onClosed(self):
         ConnectedClientsHolder.popClient(self.ID)
