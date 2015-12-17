@@ -69,7 +69,6 @@ works like:
 </div>
     <script>
     hubsApi = new HubsAPI('ws://127.0.0.1:8888/');
-    hubsApi.connect();
     function sendToAll(){
         var name = $('#name').val(),
             message = $('#message').val()
@@ -83,7 +82,7 @@ works like:
         $('#message').val('').focus();
     }
 
-    hubsApi.wsClient.onopen = function(){
+    hubsApi.connect().done(function(){
         $('#status').text("Connected")
 
         //function to be called from server
@@ -98,13 +97,12 @@ works like:
             if (e.which == 13)
                 sendToAll()
         });
-    };
+    }, function (error) {
+        console.error(error);
+    });
 
-    hubsApi.wsClient.onclose = function(ev){
-        $('#status').text("Closed")
-    };
     hubsApi.wsClient.onerror = function(ev){
-        alert(ev)
+        console.log(ev.reason);
     };
 </script>
 </body>
