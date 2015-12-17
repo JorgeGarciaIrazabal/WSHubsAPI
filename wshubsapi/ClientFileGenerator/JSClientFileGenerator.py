@@ -60,26 +60,36 @@ function HubsAPI(url, serverTimeout) {{
         onOpenTriggers = [];
     url = url || '';
 
+    this.clearTriggers = function () {{
+        messagesBeforeOpen = [];
+        onOpenTriggers = [];
+    }}
+
     this.connect = function (reconnectTimeout) {{
         reconnectTimeout = reconnectTimeout || -1;
-
-        function reconnect() {{
+        var openPromise = {{
+            onSuccess : function() {{}},
+            onError : function(error) {{}},
+        }};
+        function reconnect(error) {{
             if (reconnectTimeout !== -1) {{
                 window.setTimeout(function () {{
                     thisApi.connect(reconnectTimeout);
-                    thisApi.callbacks.onReconnecting();
+                    thisApi.callbacks.onReconnecting(error);
                 }}, reconnectTimeout * 1000);
             }}
         }}
 
         try {{
             this.wsClient = new WebSocket(url);
-        }} catch (err) {{
-            reconnect();
+        }} catch (error) {{
+            reconnect(error);
             return;
         }}
 
         this.wsClient.onopen = function () {{
+            openPromise.onSuccess();
+            openPromise.onError = function () {{}};
             thisApi.callbacks.onOpen(thisApi);
             onOpenTriggers.forEach(function (trigger) {{
                 trigger();
@@ -90,8 +100,9 @@ function HubsAPI(url, serverTimeout) {{
         }};
 
         this.wsClient.onclose = function (error) {{
+            openPromise.onError(error);
             thisApi.callbacks.onClose(error);
-            reconnect();
+            reconnect(error);
         }};
 
         this.wsClient.addOnOpenTrigger = function (trigger) {{
@@ -129,6 +140,12 @@ function HubsAPI(url, serverTimeout) {{
 
         this.wsClient.onMessageError = function (error) {{
             thisApi.callbacks.onMessageError(error);
+        }};
+
+        return {{ done: function (onSuccess, onError) {{
+                openPromise.onSuccess = onSuccess;
+                openPromise.onError = onError;
+            }}
         }};
     }};
 

@@ -1,6 +1,5 @@
 setup.cfg
 setup.py
-WSHubsAPI/CommProtocol.py
 WSHubsAPI/ConnectedClient.py
 WSHubsAPI/ConnectedClientsGroup.py
 WSHubsAPI/ConnectedClientsHolder.py
@@ -69,7 +68,7 @@ WSHubsAPI/examples/Servers/ws4pyServer.py
 onTest/WSHubsApi.js
 onTest/WSHubsApi.py
 onTest/__init__.py
-wshubsapi/CommProtocol.py
+wshubsapi/CommEnvironment.py
 wshubsapi/ConnectedClient.py
 wshubsapi/ConnectedClientsGroup.py
 wshubsapi/ConnectedClientsHolder.py

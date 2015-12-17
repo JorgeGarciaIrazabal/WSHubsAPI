@@ -1,32 +1,46 @@
+/* jshint ignore:start */
+/* ignore jslint start */
 function HubsAPI(url, serverTimeout) {
+    'use strict';
+
     var messageID = 0,
         returnFunctions = {},
         respondTimeout = (serverTimeout || 5) * 1000,
         thisApi = this,
         messagesBeforeOpen = [],
-        onOpenTriggers = [],
-        url = url || '';
+        onOpenTriggers = [];
+    url = url || '';
+
+    this.clearTriggers = function () {
+        messagesBeforeOpen = [];
+        onOpenTriggers = [];
+    }
 
     this.connect = function (reconnectTimeout) {
         reconnectTimeout = reconnectTimeout || -1;
-
-        function reconnect() {
+        var openPromise = {
+            onSuccess : function() {},
+            onError : function(error) {},
+        };
+        function reconnect(error) {
             if (reconnectTimeout !== -1) {
                 window.setTimeout(function () {
                     thisApi.connect(reconnectTimeout);
-                    thisApi.callbacks.onReconnecting();
+                    thisApi.callbacks.onReconnecting(error);
                 }, reconnectTimeout * 1000);
             }
         }
 
         try {
             this.wsClient = new WebSocket(url);
-        } catch (err) {
-            reconnect();
+        } catch (error) {
+            reconnect(error);
             return;
         }
 
         this.wsClient.onopen = function () {
+            openPromise.onSuccess();
+            openPromise.onError = function () {};
             thisApi.callbacks.onOpen(thisApi);
             onOpenTriggers.forEach(function (trigger) {
                 trigger();
@@ -37,8 +51,9 @@ function HubsAPI(url, serverTimeout) {
         };
 
         this.wsClient.onclose = function (error) {
+            openPromise.onError(error);
             thisApi.callbacks.onClose(error);
-            reconnect();
+            reconnect(error);
         };
 
         this.wsClient.addOnOpenTrigger = function (trigger) {
@@ -61,20 +76,27 @@ function HubsAPI(url, serverTimeout) {
                         f.onSuccess(msgObj.replay);
                     }
                     if (!msgObj.success) {
-                        if (f !== undefined && f.onError !== undefined)
+                        if (f !== undefined && f.onError !== undefined) {
                             f.onError(msgObj.replay);
+			}
                     }
                 } else {
                     f = thisApi[msgObj.hub].client[msgObj.function];
                     f.apply(f, msgObj.args);
                 }
             } catch (err) {
-                this.onMessageError(err)
+                this.onMessageError(err);
             }
         };
 
         this.wsClient.onMessageError = function (error) {
             thisApi.callbacks.onMessageError(error);
+        };
+
+        return { done: function (onSuccess, onError) {
+                openPromise.onSuccess = onSuccess;
+                openPromise.onError = onError;
+            }
         };
     };
 
@@ -88,17 +110,20 @@ function HubsAPI(url, serverTimeout) {
     this.defaultErrorHandler = null;
 
     var constructMessage = function (hubName, functionName, args) {
-        if(thisApi.wsClient === undefined) throw Error('ws not connected');
+        if(thisApi.wsClient === undefined) {
+            throw Error('ws not connected');
+        }
         args = Array.prototype.slice.call(args);
-        var id = messageID++;
-        var body = {'hub': hubName, 'function': functionName, 'args': args, 'ID': id};
+        var id = messageID++,
+            body = {'hub': hubName, 'function': functionName, 'args': args, 'ID': id};
         if(thisApi.wsClient.readyState === WebSocket.CONNECTING) {
             messagesBeforeOpen.push(JSON.stringify(body));
         } else if (thisApi.wsClient.readyState !== WebSocket.OPEN) {
             window.setTimeout(function () {
-                f = returnFunctions[id];
-                if (f !== undefined && f.onError !== undefined)
+                var f = returnFunctions[id];
+                if (f !== undefined && f.onError !== undefined) {
                     f.onError('webSocket not connected');
+		}
             }, 0);
             return {done: getReturnFunction(id, {hubName: hubName, functionName: functionName, args: args})};
         }
@@ -109,14 +134,15 @@ function HubsAPI(url, serverTimeout) {
     };
     var getReturnFunction = function (ID, callInfo) {
         return function (onSuccess, onError) {
-            if (returnFunctions[ID] === undefined)
+            if (returnFunctions[ID] === undefined) {
                 returnFunctions[ID] = {};
+            }
             var f = returnFunctions[ID];
             f.onSuccess = function () {
                 if(onSuccess !== undefined) {
                     onSuccess.apply(onSuccess, arguments);
                 }
-                delete returnFunctions[ID]
+                delete returnFunctions[ID];
             };
             f.onError = function () {
                 if(onError !== undefined) {
@@ -125,15 +151,15 @@ function HubsAPI(url, serverTimeout) {
                     var argumentsArray = [callInfo].concat(arguments);
                     thisApi.defaultErrorHandler.apply(thisApi.defaultErrorHandler.apply, argumentsArray);
                 }
-                delete returnFunctions[ID]
+                delete returnFunctions[ID];
             };
             //check returnFunctions, memory leak
             setTimeout(function () {
                 if (returnFunctions[ID] && returnFunctions[ID].onError) {
                     returnFunctions[ID].onError('timeOut Error');
                 }
-            }, respondTimeout)
-        }
+            }, respondTimeout);
+        };
     };
 
     
@@ -158,4 +184,6 @@ function HubsAPI(url, serverTimeout) {
     };
     this.ChatHub.client = {};
 }
+/* jshint ignore:end */
+/* ignore jslint end */
     

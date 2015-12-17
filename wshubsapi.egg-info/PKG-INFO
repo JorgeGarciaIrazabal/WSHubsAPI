@@ -1,6 +1,6 @@
 Metadata-Version: 1.1
 Name: wshubsapi
-Version: 0.5.0a5
+Version: 0.5.0a6
 Summary: function protocol to communicate backend and frontend in a intuitive way like signalR in C#
 Home-page: https://github.com/JorgeGarciaIrazabal/WSHubsAPI.git
 Author: Jorge Garcia Irazabal
