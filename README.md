@@ -28,8 +28,8 @@ if __name__ == '__main__':
   class ChatHub(Hub):
     def sendToAll(self, name, message):
       #onMessage function has to be defined in the client side
-      self.getClientsHolder().getAllClients()
-      return "Sent to %d clients"%len(self.allClients)
+      allConnectedClients = self.getClientsHolder().getAllClients()
+      return "Sent to %d clients"%len(allConnectedClients)
   
   HubsInspector.inspectImplementedHubs() #setup api
   HubsInspector.constructPythonFile("_static") #only if you will use a python client
