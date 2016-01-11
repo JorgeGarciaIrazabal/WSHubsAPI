@@ -8,15 +8,17 @@ log.addHandler(logging.NullHandler())
 
 
 class ConnectionHandler(tornado.websocket.WebSocketHandler):
-    def data_received(self, chunk):
-        pass
-
-    commEnvironment = CommEnvironment()
+    commEnvironment = None
 
     def __init__(self, application, request, **kwargs):
         super(ConnectionHandler, self).__init__(application, request, **kwargs)
         self._connectedClient = self.commEnvironment.constructConnectedClient(self.writeMessage, self.close)
         self.ID = None
+        if self.commEnvironment is None:
+            self.commEnvironment = CommEnvironment()
+
+    def data_received(self, chunk):
+        pass
 
     def writeMessage(self, message):
         log.debug("message to %s:\n%s" % (self._connectedClient.ID, message))
