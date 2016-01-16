@@ -3,6 +3,7 @@ import logging
 
 from wshubsapi.ConnectedClientsGroup import ConnectedClientsGroup
 from wshubsapi.ConnectedClientsHolder import ConnectedClientsHolder
+from wshubsapi.HubsInspector import HubsInspector
 from wshubsapi.utils import getArgs, SENDER_KEY_PARAMETER
 from wshubsapi.Hub import Hub, UnsuccessfulReplay
 
@@ -16,7 +17,7 @@ class FunctionMessage:
         """
         messageStr = messageStr if isinstance(messageStr, str) else messageStr.decode("utf-8")
         msgObj = json.loads(messageStr)
-        self.hubInstance = Hub.HUBs_DICT[msgObj["hub"]]
+        self.hubInstance = HubsInspector.HUBs_DICT[msgObj["hub"]]
         self.hubName = msgObj["hub"]
         self.args = msgObj["args"]
         self.connectedClient = connectedClient

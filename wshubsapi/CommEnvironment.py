@@ -4,6 +4,9 @@ from jsonpickle.pickler import Pickler
 from wshubsapi.ConnectedClient import ConnectedClient
 from wshubsapi.ConnectedClientsHolder import ConnectedClientsHolder
 from wshubsapi.utils import WSMessagesReceivedQueue, setSerializerDateTimeHandler
+#do not remove this line (hubs inspector needs to find it)
+from wshubsapi import UtilAPIHub
+
 
 log = logging.getLogger(__name__)
 __author__ = 'Jorge Garcia Irazabal'
@@ -21,7 +24,7 @@ class CommEnvironment(object):
         self.lastProvidedId = 0
         self.wsMessageReceivedQueue = WSMessagesReceivedQueue(maxWorkers)
         self.wsMessageReceivedQueue.startThreads()
-        self.allConnectedClients = ConnectedClientsHolder.allConnectedClients
+        self.allConnectedClients = ConnectedClientsHolder.allConnectedClientsDict
 
     def constructConnectedClient(self, writeMessageFunction, closeFunction, serializationPickler=_DEFAULT_PICKER):
         return ConnectedClient(serializationPickler, self, writeMessageFunction, closeFunction)

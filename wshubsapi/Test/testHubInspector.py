@@ -32,10 +32,10 @@ class TestHubDetection(unittest.TestCase):
         removeHubsSubclasses()
 
     def test_hubsInspection(self):
-        self.assertEqual(len(Hub.HUBs_DICT), 2, 'Detects all Hubs')
-        self.assertTrue(issubclass(Hub.HUBs_DICT['TestHub'].__class__, Hub), 'Hubs subclass is class')
-        self.assertTrue(issubclass(Hub.HUBs_DICT['TestHub2'].__class__, Hub), 'Hubs subclass is class')
-        self.assertTrue(getattr(Hub.HUBs_DICT['TestHub'], "getData"), 'Detects function')
+        self.assertEqual(len(HubsInspector.HUBs_DICT), 2, 'Detects all Hubs')
+        self.assertTrue(issubclass(HubsInspector.HUBs_DICT['TestHub'].__class__, Hub), 'Hubs subclass is class')
+        self.assertTrue(issubclass(HubsInspector.HUBs_DICT['TestHub2'].__class__, Hub), 'Hubs subclass is class')
+        self.assertTrue(getattr(HubsInspector.HUBs_DICT['TestHub'], "getData"), 'Detects function')
 
     def test_hubsLimitations(self):
         class TestHubLimitation(Hub):
@@ -71,6 +71,33 @@ class TestHubDetection(unittest.TestCase):
 
     def test_getHubInstance_RaisesErrorIfNotAHub(self):
         self.assertRaises(AttributeError, HubsInspector.getHubInstance, (str,))
+
+    def test_getHubsInformation_ReturnsDictionaryWithNoClientFunctions(self):
+        infoReport = HubsInspector.getHubsInformation()
+
+        self.assertIn("TestHub2", infoReport)
+        self.assertIn("getData", infoReport["TestHub"]["serverMethods"])
+
+    def test_getHubsInformation_ReturnsDictionaryWithClientFunctions(self):
+        class TestHubWithClient(Hub):
+            def getData(self):
+                pass
+
+            def _defineClientFunctions(self):
+                self.clientFunctions = dict(client1=lambda x, y: None,
+                                            client2=lambda x, y=1: None,
+                                            client3=lambda x=0, y=1: None)
+        HubsInspector.inspectImplementedHubs(forceReconstruction=True)
+
+        infoReport = HubsInspector.getHubsInformation()
+
+        self.assertIn("TestHubWithClient", infoReport)
+        client1Method = infoReport["TestHubWithClient"]["clientMethods"]["client1"]
+        client2Method = infoReport["TestHubWithClient"]["clientMethods"]["client2"]
+        client3Method = infoReport["TestHubWithClient"]["clientMethods"]["client3"]
+        self.assertEqual(client1Method["args"], ["x", "y"])
+        self.assertEqual(client2Method["defaults"], [1])
+        self.assertEqual(client3Method["defaults"], [0,1])
 
 
 class TestClientFileConstructor(unittest.TestCase):

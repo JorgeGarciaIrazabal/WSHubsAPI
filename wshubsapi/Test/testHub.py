@@ -1,6 +1,7 @@
 # coding=utf-8
 import unittest
 from wshubsapi.Hub import Hub, HubException, UnsuccessfulReplay
+from wshubsapi.HubsInspector import HubsInspector
 from wshubsapi.Test.utils.HubsUtils import removeHubsSubclasses
 
 
@@ -13,7 +14,7 @@ class TestHub(unittest.TestCase):
             pass
         hub = TestHub1()
 
-        self.assertTrue(hub in Hub.HUBs_DICT.values())
+        self.assertTrue(hub in HubsInspector.HUBs_DICT.values())
 
         del hub
 
@@ -32,7 +33,7 @@ class TestHub(unittest.TestCase):
             pass
         hub = TestHub1()
 
-        self.assertEqual("newValue", list(Hub.HUBs_DICT.keys())[0])
+        self.assertEqual("newValue", list(HubsInspector.HUBs_DICT.keys())[0])
 
         del hub
 

@@ -3,49 +3,51 @@ import os
 
 import jsonpickle
 from jsonpickle.pickler import Pickler
-
-from wshubsapi.utils import getDefaults, getArgs, isFunctionForWSClient, textTypes
+from wshubsapi.utils import getDefaults, getArgs, isFunctionForWSClient
 
 __author__ = 'jgarc'
 
+
 class JSClientFileGenerator:
     FILE_NAME = "WSHubsApi.js"
-    @classmethod
-    def __getHubClassStr(cls, class_):
-        funcStrings = ",\n".join(cls.__getJSFunctionsStr(class_))
-        return cls.CLASS_TEMPLATE.format(name=class_.__HubName__, functions=funcStrings)
 
     @classmethod
-    def __getJSFunctionsStr(cls, class_):
+    def __getClassStrings(cls, hubsInfo):
+        classStrings = []
+        for hubName, hubInfo in hubsInfo.items():
+            classStrings.append(cls.__getHubClassStr(hubName, hubInfo))
+        return classStrings
+
+    @classmethod
+    def __getHubClassStr(cls, hubName, hubInfo):
+        funcStrings = ",\n".join(cls.__getJSFunctionsStr(hubName, hubInfo))
+        return cls.CLASS_TEMPLATE.format(name=hubName, functions=funcStrings)
+
+    @classmethod
+    def __getJSFunctionsStr(cls, hubName, hubInfo):
         pickler = Pickler(max_depth=4, max_iter=50, make_refs=False)
         funcStrings = []
-        functions = inspect.getmembers(class_.__class__, predicate=isFunctionForWSClient)
-        for name, method in functions:
-            defaults = getDefaults(method)
-            for i,default in enumerate(defaults):
-                if not isinstance(default, tuple(textTypes)) or not default.startswith("\""):
+
+        for methodName, methodInfo in hubInfo["serverMethods"].items():
+            defaults = methodInfo["defaults"]
+            for i, default in enumerate(defaults):
+                if not isinstance(default, basestring) or not default.startswith("\""):
                     defaults[i] = jsonpickle.encode(pickler.flatten(default))
-            args = getArgs(method)
+            args = methodInfo["args"]
             defaultsArray = []
             for i, d in reversed(list(enumerate(defaults))):
-                defaultsArray.insert(0,cls.ARGS_COOK_TEMPLATE.format(iter = i, name = args[i], default=d))
+                defaultsArray.insert(0, cls.ARGS_COOK_TEMPLATE.format(iter=i, name=args[i], default=d))
             defaultsStr = "\n\t\t\t".join(defaultsArray)
-            funcStrings.append(cls.FUNCTION_TEMPLATE.format(name=name, args=", ".join(args), cook=defaultsStr, hubName=class_.__HubName__))
+            funcStrings.append(cls.FUNCTION_TEMPLATE.format(name=methodName, args=", ".join(args), cook=defaultsStr,
+                                                            hubName=hubName))
         return funcStrings
 
     @classmethod
-    def createFile(cls, path, hubs):
+    def createFile(cls, path, hubsInfo):
         if not os.path.exists(path): os.makedirs(path)
         with open(os.path.join(path, cls.FILE_NAME), "w") as f:
-            classStrings = "".join(cls.__getClassStrings(hubs))
+            classStrings = "".join(cls.__getClassStrings(hubsInfo))
             f.write(cls.WRAPPER.format(main=classStrings))
-
-    @classmethod
-    def __getClassStrings(cls, hubs):
-        classStrings = []
-        for h in hubs:
-            classStrings.append(cls.__getHubClassStr(h))
-        return classStrings
 
     WRAPPER = """/* jshint ignore:start */
 /* ignore jslint start */
@@ -54,7 +56,7 @@ function HubsAPI(url, serverTimeout) {{
 
     var messageID = 0,
         returnFunctions = {{}},
-        respondTimeout = (serverTimeout || 5) * 1000,
+        defaultRespondTimeout = (serverTimeout || 5) * 1000,
         thisApi = this,
         messagesBeforeOpen = [],
         onOpenTriggers = [];
@@ -203,11 +205,14 @@ function HubsAPI(url, serverTimeout) {{
                 delete returnFunctions[ID];
             }};
             //check returnFunctions, memory leak
-            setTimeout(function () {{
-                if (returnFunctions[ID] && returnFunctions[ID].onError) {{
-                    returnFunctions[ID].onError('timeOut Error');
-                }}
-            }}, respondTimeout);
+            respondsTimeout = respondsTimeout === undefined ? defaultRespondTimeout : respondsTimeout;
+            if(respondsTimeout >=0) {{
+                setTimeout(function () {{
+                    if (returnFunctions[ID] && returnFunctions[ID].onError) {{
+                        returnFunctions[ID].onError('timeOut Error');
+                    }}
+                }}, defaultRespondTimeout);
+            }}
         }};
     }};
 

@@ -18,10 +18,6 @@ SENDER_KEY_PARAMETER = "_sender"
 DATE_TIME_FORMAT = '%Y-%m-%dT%H:%M:%S.%f%z'
 NOT_PASSING_PARAMETERS = (SENDER_KEY_PARAMETER,)
 
-try:
-    textTypes = [str, unicode]
-except:
-    textTypes = [str, bytes]
 ASCII_UpperCase = string.uppercase if sys.version_info[0] == 2 else string.ascii_uppercase
 
 
@@ -40,13 +36,13 @@ def getArgs(method, includeSender=False):
 
 
 def getDefaults(method):
-    d = getargspec(method).defaults
-    if d is None: return []
-    d = list(filter(lambda x: x not in NOT_PASSING_PARAMETERS, list(d)))
-    for i in range(len(d)):
-        if isinstance(d[i], tuple(textTypes)):
-            d[i] = '"%s"' % d[i]
-    return d
+    defaults = getargspec(method).defaults
+    if defaults is None: return []
+    defaults = list(filter(lambda x: x not in NOT_PASSING_PARAMETERS, list(defaults)))
+    for i, dValue in enumerate(defaults):
+        if isinstance(defaults[i], basestring):
+            defaults[i] = '"%s"' % dValue
+    return defaults
 
 
 def isFunctionForWSClient(method):
@@ -67,7 +63,7 @@ def getModulePath():
 
 # todo: move to different module
 class WSMessagesReceivedQueue(Queue):
-    DEFAULT_MAX_WORKERS = 151
+    DEFAULT_MAX_WORKERS = 20
 
     def __init__(self, maxWorkers=DEFAULT_MAX_WORKERS):
         Queue.__init__(self)

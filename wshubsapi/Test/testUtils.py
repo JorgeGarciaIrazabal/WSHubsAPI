@@ -3,15 +3,13 @@ import unittest
 import time
 from wshubsapi.ConnectedClient import ConnectedClient
 from wshubsapi.Hub import Hub
+from wshubsapi.HubsInspector import HubsInspector
 from wshubsapi.utils import *
-
-try:
-    from unittest.mock import MagicMock
-except:
-    from mock import MagicMock
+from flexmock import flexmock
 
 
 class TestUtils(unittest.TestCase):
+
     def test_ASCII_UpperCaseIsInitialized(self):
         randomExistingLetters = ["A", "Q", "P"]
         for letter in randomExistingLetters:
@@ -33,6 +31,7 @@ class TestUtils(unittest.TestCase):
             @classmethod
             def auxClassMethod(cls, x, y):
                 pass
+
         testCases = [
             {"method": lambda x, y, z: x, "expected": ["x", "y", "z"]},
             {"method": lambda y=2, z=1: y, "expected": ["y", "z"]},
@@ -74,7 +73,7 @@ class TestUtils(unittest.TestCase):
         self.assertFalse(isFunctionForWSClient(__thisIsAPrivateFunction), "private function is excluded")
 
     def test_isFunctionForWSClient_ExcludesAlreadyExistingFunctions(self):
-        self.assertFalse(isFunctionForWSClient(Hub.HUBs_DICT), "excludes existing functions")
+        self.assertFalse(isFunctionForWSClient(HubsInspector.HUBs_DICT), "excludes existing functions")
 
     def test_getModulePath_ReturnsTestUtilsPyModulePath(self):
         self.assertEqual(getModulePath(), os.getcwd() + os.sep + "Test")
@@ -86,49 +85,40 @@ class TestUtils(unittest.TestCase):
 
     def test_WSMessagesReceivedQueue_Creates__MAX_WORKERS__WORKERS(self):
         queue = self.setUp_WSMessagesReceivedQueue(3)
-        queue.executor.submit = MagicMock()
+        queue.executor.submit = flexmock()
 
         queue.startThreads()
-
-        self.assertTrue(queue.executor.submit.called)
-        self.assertEqual(queue.executor.submit.call_count, queue.DEFAULT_MAX_WORKERS)
 
     def setUp_WSMessagesReceivedQueue_infiniteOnMessageHandlerLoop(self, MAX_WORKERS, message):
         queue = self.setUp_WSMessagesReceivedQueue(MAX_WORKERS)
         connectedClient = ConnectedClient(None, None, None, None)
-        connectedClient.onMessage = MagicMock()
-        connectedClient.onError = MagicMock()
-        queue.get = MagicMock(return_value=[message, connectedClient])
+        connectedClient = flexmock(connectedClient)
+        queue = flexmock(queue, get=lambda: [message, connectedClient])
         return queue, connectedClient
 
     def test_WSMessagesReceivedQueue_infiniteOnMessageHandlerLoop_CallsClientOnMessage(self):
         queue, connectedClient = self.setUp_WSMessagesReceivedQueue_infiniteOnMessageHandlerLoop(1, "message")
-
+        connectedClient.should_receive("onMessage").with_args("message").once()
         queue.startThreads()
         time.sleep(0.02)
         queue.keepAlive = False
 
-        connectedClient.onMessage.assert_called_with("message")
 
     def test_WSMessagesReceivedQueue_infiniteOnMessageHandlerLoop_CallsOnErrorIfRaisesException(self):
         queue, connectedClient = self.setUp_WSMessagesReceivedQueue_infiniteOnMessageHandlerLoop(1, "message")
-        exception = Exception("test")
-        connectedClient.onMessage.side_effect = exception
-
+        connectedClient.should_receive("onMessage").and_raise(Exception,"test").once()
+        connectedClient.should_receive("onError").with_args(Exception).once()
         queue.startThreads()
         time.sleep(0.02)
         queue.keepAlive = False
-
-        connectedClient.onError.assert_called_with(exception)
 
     def test_WSMessagesReceivedQueue_infiniteOnMessageHandlerLoop_PrintExceptionIfConnectedClientIsNoConnectedClient(
             self):
         queue, connectedClient = self.setUp_WSMessagesReceivedQueue_infiniteOnMessageHandlerLoop(1, "message")
-        queue.get = MagicMock(return_value=["message", None])
+        queue.should_receive("get").and_return(["message", None]).once()
+        connectedClient.should_receive("onMessage").never()
+        connectedClient.should_receive("onError").never()
 
         queue.startThreads()
         time.sleep(0.02)
         queue.keepAlive = False
-
-        self.assertFalse(connectedClient.onError.called)
-        self.assertFalse(connectedClient.onMessage.called)

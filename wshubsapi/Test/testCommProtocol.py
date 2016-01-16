@@ -10,10 +10,6 @@ from wshubsapi.CommEnvironment import CommEnvironment
 from wshubsapi.ConnectedClientsHolder import ConnectedClientsHolder
 from wshubsapi.utils import WSMessagesReceivedQueue
 
-try:
-    from unittest.mock import MagicMock
-except:
-    from mock import MagicMock
 
 
 class TestCommProtocol(unittest.TestCase):
@@ -23,7 +19,7 @@ class TestCommProtocol(unittest.TestCase):
     def test_construct_initializeMandatoryAttributes(self):
         self.assertIsInstance(self.commEnvironment.wsMessageReceivedQueue, WSMessagesReceivedQueue)
         self.assertIsInstance(self.commEnvironment.lock, thread.LockType)
-        self.assertIs(self.commEnvironment.allConnectedClients, ConnectedClientsHolder.allConnectedClients)
+        self.assertIs(self.commEnvironment.allConnectedClients, ConnectedClientsHolder.allConnectedClientsDict)
 
     def test_ConstructConnectedClient_returnsConnectedClient(self):
         def w():

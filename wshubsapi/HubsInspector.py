@@ -1,7 +1,9 @@
+import inspect
+
 from wshubsapi.ClientFileGenerator.JAVAFileGenerator import JAVAFileGenerator
 from wshubsapi.ClientFileGenerator.JSClientFileGenerator import JSClientFileGenerator
 from wshubsapi.ClientFileGenerator.PythonClientFileGenerator import PythonClientFileGenerator
-from wshubsapi.Hub import Hub
+from wshubsapi.utils import isFunctionForWSClient, getArgs, getDefaults
 
 
 class HubsInspectorException(Exception):
@@ -10,11 +12,12 @@ class HubsInspectorException(Exception):
 
 class HubsInspector:
     __hubsConstructed = False
+    HUBs_DICT = {}
 
     @classmethod
     def inspectImplementedHubs(cls, forceReconstruction=False):
         if not cls.__hubsConstructed or forceReconstruction:
-            Hub.HUBs_DICT.clear()
+            cls.HUBs_DICT.clear()
             for hubClass in Hub.__subclasses__():
                 try:
                     hubClass()
@@ -29,20 +32,46 @@ class HubsInspector:
     @classmethod
     def constructJSFile(cls, path="."):
         cls.inspectImplementedHubs()
-        JSClientFileGenerator.createFile(path, Hub.HUBs_DICT.values())
+        JSClientFileGenerator.createFile(path, cls.getHubsInformation())
 
     @classmethod
     def constructJAVAFile(cls, package, path="."):
         cls.inspectImplementedHubs()
-        hubs = Hub.HUBs_DICT.values()
+        hubs = cls.HUBs_DICT.values()
         JAVAFileGenerator.createFile(path, package, hubs)
         JAVAFileGenerator.createClientTemplate(path, package, hubs)
 
     @classmethod
     def constructPythonFile(cls, path="."):
         cls.inspectImplementedHubs()
-        PythonClientFileGenerator.createFile(path, Hub.HUBs_DICT.values())
+        PythonClientFileGenerator.createFile(path, cls.HUBs_DICT.values())
 
     @classmethod
-    def getHubInstance(cls, hubClass):
-        return Hub.HUBs_DICT[hubClass.__HubName__]
+    def getHubInstance(cls, hub):
+        if not isinstance(hub, basestring):
+            hub = hub.__HubName__
+        return cls.HUBs_DICT[hub]
+
+    @classmethod
+    def getHubsInformation(cls):
+        infoReport = {}
+        hubs = cls.HUBs_DICT.values()
+        for hub in hubs:
+            functions = inspect.getmembers(hub, predicate=isFunctionForWSClient)
+            serverMethods = {}
+            for name, method in functions:
+                argsDict = dict(args=getArgs(method),
+                                defaults = getDefaults(method))
+                serverMethods[name] = argsDict
+            clientMethods = {}
+            for name, method in hub.clientFunctions.items():
+                argsDict = dict(args=getArgs(method),
+                                defaults = getDefaults(method))
+                clientMethods[name] = argsDict
+
+            infoReport[hub.__HubName__] = dict(serverMethods=serverMethods,
+                                               clientMethods=clientMethods)
+        return infoReport
+
+
+from wshubsapi.Hub import Hub
