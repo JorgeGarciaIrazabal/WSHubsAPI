@@ -19,6 +19,7 @@ class ConnectedClient(object):
         self.pickler = serializationPickler
         self.writeMessage = writeMessageFunction
         self.close = closeFunction
+        self.isClosed = False
 
     def onOpen(self, ID=None):
         with self.__commEnvironment.lock:
@@ -43,6 +44,7 @@ class ConnectedClient(object):
 
     def onClosed(self):
         ConnectedClientsHolder.popClient(self.ID)
+        self.isClosed = True
 
     def onError(self, exception):
         log.exception("Error parsing message")

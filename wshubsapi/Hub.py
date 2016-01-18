@@ -1,5 +1,3 @@
-from wshubsapi.ConnectedClientsHolder import ConnectedClientsHolder
-
 __author__ = 'Jorge'
 
 
@@ -13,6 +11,8 @@ class HubException(Exception):
 
 
 class Hub(object):
+    __hubSubscribers = []
+
     def __init__(self):
         hubName = self.__class__.__dict__.get("__HubName__", self.__class__.__name__)
         if hubName in HubsInspector.HUBs_DICT:
@@ -27,6 +27,22 @@ class Hub(object):
         self._clientFunctions = dict()
         self._defineClientFunctions()
         self.__class__._clientsHolder = ConnectedClientsHolder(hubName)
+
+    def subscribeToHub(self, _sender):
+        if _sender[0] in self.__hubSubscribers:
+            return False
+        self.__hubSubscribers.append(_sender[0])
+        return True
+
+    def unsubscribeToHub(self, _sender):
+        if _sender[0] in self.__hubSubscribers:
+            self.__hubSubscribers.remove(_sender[0])
+            return True
+        return False
+
+    def getSubscribedClientsToHub(self):
+        self.__hubSubscribers = list(filter(lambda x: not x.isClosed, self.__hubSubscribers))
+        return map(lambda x: x.ID, self.__hubSubscribers)
 
     @classmethod
     def getClientsHolder(cls):
@@ -45,8 +61,8 @@ class Hub(object):
     def clientFunctions(self, clientFunctions):
         assert (isinstance(clientFunctions, dict))
         for functionName, function in clientFunctions.items():
-            assert(isinstance(functionName, basestring))
-            assert(hasattr(function, '__call__'))
+            assert (isinstance(functionName, basestring))
+            assert (hasattr(function, '__call__'))
         self._clientFunctions = clientFunctions
 
     def _constructUnsuccessfulReplay(self, replay):
@@ -55,4 +71,6 @@ class Hub(object):
     def _defineClientFunctions(self):
         pass
 
+
 from wshubsapi.HubsInspector import HubsInspector
+from wshubsapi.ConnectedClientsHolder import ConnectedClientsHolder

@@ -1,9 +1,7 @@
-import inspect
 import os
 
 import jsonpickle
 from jsonpickle.pickler import Pickler
-from wshubsapi.utils import getDefaults, getArgs, isFunctionForWSClient
 
 __author__ = 'jgarc'
 
@@ -65,13 +63,13 @@ function HubsAPI(url, serverTimeout) {{
     this.clearTriggers = function () {{
         messagesBeforeOpen = [];
         onOpenTriggers = [];
-    }}
+    }};
 
     this.connect = function (reconnectTimeout) {{
         reconnectTimeout = reconnectTimeout || -1;
         var openPromise = {{
             onSuccess : function() {{}},
-            onError : function(error) {{}},
+            onError : function(error) {{}}
         }};
         function reconnect(error) {{
             if (reconnectTimeout !== -1) {{
@@ -129,7 +127,7 @@ function HubsAPI(url, serverTimeout) {{
                     if (!msgObj.success) {{
                         if (f !== undefined && f.onError !== undefined) {{
                             f.onError(msgObj.replay);
-			}}
+                        }}
                     }}
                 }} else {{
                     f = thisApi[msgObj.hub].client[msgObj.function];
@@ -174,7 +172,7 @@ function HubsAPI(url, serverTimeout) {{
                 var f = returnFunctions[id];
                 if (f !== undefined && f.onError !== undefined) {{
                     f.onError('webSocket not connected');
-		}}
+                }}
             }}, 0);
             return {{done: getReturnFunction(id, {{hubName: hubName, functionName: functionName, args: args}})}};
         }}
@@ -184,7 +182,7 @@ function HubsAPI(url, serverTimeout) {{
         return {{done: getReturnFunction(id, {{hubName: hubName, functionName: functionName, args: args}})}};
     }};
     var getReturnFunction = function (ID, callInfo) {{
-        return function (onSuccess, onError) {{
+        return function (onSuccess, onError, respondsTimeout) {{
             if (returnFunctions[ID] === undefined) {{
                 returnFunctions[ID] = {{}};
             }}
@@ -205,7 +203,7 @@ function HubsAPI(url, serverTimeout) {{
                 delete returnFunctions[ID];
             }};
             //check returnFunctions, memory leak
-            respondsTimeout = respondsTimeout === undefined ? defaultRespondTimeout : respondsTimeout;
+            respondsTimeout = undefined ? defaultRespondTimeout : respondsTimeout;
             if(respondsTimeout >=0) {{
                 setTimeout(function () {{
                     if (returnFunctions[ID] && returnFunctions[ID].onError) {{

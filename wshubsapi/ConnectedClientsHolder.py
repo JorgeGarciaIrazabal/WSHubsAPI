@@ -1,5 +1,3 @@
-from wshubsapi.ConnectedClientsGroup import ConnectedClientsGroup
-
 
 class ConnectedClientsHolder:
     allConnectedClientsDict = dict()
@@ -23,6 +21,10 @@ class ConnectedClientsHolder:
     def getClient(self, clientId):
         return ConnectedClientsGroup([self.allConnectedClientsDict[clientId]], self.hubName)
 
+    def getSubscribedClients(self):
+        subscribedClients = HubsInspector.getHubInstance(self.hubName).getSubscribedClientsToHub()
+        return ConnectedClientsGroup([self.allConnectedClientsDict[ID] for ID in subscribedClients], self.hubName)
+
     @classmethod
     def appendClient(cls, client):
         cls.allConnectedClientsDict[client.ID] = client
@@ -33,3 +35,7 @@ class ConnectedClientsHolder:
         :type clientId: str|int
         """
         return cls.allConnectedClientsDict.pop(clientId, None)
+
+
+from wshubsapi.ConnectedClientsGroup import ConnectedClientsGroup
+from wshubsapi.HubsInspector import HubsInspector

@@ -15,7 +15,7 @@
 </div>
 <script>
     var hubsApi = new HubsAPI('ws://127.0.0.1:8888/');
-    hubsApi.connect();
+    hubsApi.connect(0.1);
 
     var STRIP_COMMENTS = /(\/\/.*$)|(\/\*[\s\S]*?\*\/)|(\s*=[^,\)]*(('(?:\\'|[^'\r\n])*')|("(?:\\"|[^"\r\n])*"))|(\s*=[^,\)]*))/mg;
     var ARGUMENT_NAMES = /([^\s,]+)/g;
@@ -45,6 +45,16 @@
             }
             return '<span class="' + cls + '">' + match + '</span>';
         });
+    }
+
+    function getSortedElements(object) {
+        var elements = [];
+        for (var element in object) {
+            if(object.hasOwnProperty(element)){
+                elements.push(element);
+            }
+        }
+        return elements.sort();
     }
 
     var resultPreElement = document.createElement('pre');
@@ -81,7 +91,8 @@
             row.insertCell(-1).innerHTML = "<b>Args</b>";
             row.insertCell(-1).innerHTML = "<b>Args values</b>";
             row.insertCell(-1).innerHTML = "<b>Send</b>";
-            for (var functionName in hubsInfo[hubName]) {
+
+            getSortedElements(hubsInfo[hubName]).forEach(function (functionName) {
                 var args = hubsInfo[hubName][functionName].args;
                 var newRow = table.insertRow(-1);
                 newRow.insertCell(-1).innerHTML = functionName;
@@ -114,7 +125,7 @@
                         }
                     )
                 };
-            }
+            });
         }
     }
 

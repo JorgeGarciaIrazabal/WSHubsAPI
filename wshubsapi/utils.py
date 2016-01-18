@@ -51,7 +51,7 @@ def isFunctionForWSClient(method):
     BaseHubFunctions = inspect.getmembers(Hub, predicate=isFunction)
     BaseHubFunctionsNames = [f[0] for f in BaseHubFunctions]
 
-    return isFunction(method) and not method.__name__.startswith("_") and method.__name__ not in BaseHubFunctionsNames
+    return isFunction(method) and not method.__name__.startswith("_") and method.__name__
 
 
 def getModulePath():

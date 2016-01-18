@@ -14,13 +14,13 @@ function HubsAPI(url, serverTimeout) {
     this.clearTriggers = function () {
         messagesBeforeOpen = [];
         onOpenTriggers = [];
-    }
+    };
 
     this.connect = function (reconnectTimeout) {
         reconnectTimeout = reconnectTimeout || -1;
         var openPromise = {
             onSuccess : function() {},
-            onError : function(error) {},
+            onError : function(error) {}
         };
         function reconnect(error) {
             if (reconnectTimeout !== -1) {
@@ -78,7 +78,7 @@ function HubsAPI(url, serverTimeout) {
                     if (!msgObj.success) {
                         if (f !== undefined && f.onError !== undefined) {
                             f.onError(msgObj.replay);
-			}
+                        }
                     }
                 } else {
                     f = thisApi[msgObj.hub].client[msgObj.function];
@@ -123,7 +123,7 @@ function HubsAPI(url, serverTimeout) {
                 var f = returnFunctions[id];
                 if (f !== undefined && f.onError !== undefined) {
                     f.onError('webSocket not connected');
-		}
+                }
             }, 0);
             return {done: getReturnFunction(id, {hubName: hubName, functionName: functionName, args: args})};
         }
@@ -154,13 +154,13 @@ function HubsAPI(url, serverTimeout) {
                 delete returnFunctions[ID];
             };
             //check returnFunctions, memory leak
-            respondsTimeout = respondsTimeout === undefined ? defaultRespondTimeout : respondsTimeout;
+            respondsTimeout = undefined ? defaultRespondTimeout : respondsTimeout;
             if(respondsTimeout >=0) {
-              setTimeout(function () {
-                if (returnFunctions[ID] && returnFunctions[ID].onError) {
-                  returnFunctions[ID].onError('timeOut Error');
-                }
-              }, respondsTimeout);
+                setTimeout(function () {
+                    if (returnFunctions[ID] && returnFunctions[ID].onError) {
+                        returnFunctions[ID].onError('timeOut Error');
+                    }
+                }, defaultRespondTimeout);
             }
         };
     };
@@ -170,9 +170,19 @@ function HubsAPI(url, serverTimeout) {
     this.ChatHub.server = {
         __HUB_NAME : 'ChatHub',
         
+        getClientsHolder : function (){
+            
+            return constructMessage('ChatHub', 'getClientsHolder', arguments);
+        },
+
         classMethod : function (){
             
             return constructMessage('ChatHub', 'classMethod', arguments);
+        },
+
+        unsubscribeToHub : function (){
+            
+            return constructMessage('ChatHub', 'unsubscribeToHub', arguments);
         },
 
         sendToAll : function (name, message){
@@ -180,9 +190,19 @@ function HubsAPI(url, serverTimeout) {
             return constructMessage('ChatHub', 'sendToAll', arguments);
         },
 
+        getSubscribedClientsToHub : function (){
+            
+            return constructMessage('ChatHub', 'getSubscribedClientsToHub', arguments);
+        },
+
         static : function (){
             
             return constructMessage('ChatHub', 'static', arguments);
+        },
+
+        subscribeToHub : function (){
+            
+            return constructMessage('ChatHub', 'subscribeToHub', arguments);
         }
     };
     this.ChatHub.client = {};
@@ -190,9 +210,24 @@ function HubsAPI(url, serverTimeout) {
     this.UtilAPIHub.server = {
         __HUB_NAME : 'UtilAPIHub',
         
-        setId : function (clientId){
+        getClientsHolder : function (){
             
-            return constructMessage('UtilAPIHub', 'setId', arguments);
+            return constructMessage('UtilAPIHub', 'getClientsHolder', arguments);
+        },
+
+        unsubscribeToHub : function (){
+            
+            return constructMessage('UtilAPIHub', 'unsubscribeToHub', arguments);
+        },
+
+        getSubscribedClientsToHub : function (){
+            
+            return constructMessage('UtilAPIHub', 'getSubscribedClientsToHub', arguments);
+        },
+
+        getId : function (){
+            
+            return constructMessage('UtilAPIHub', 'getId', arguments);
         },
 
         isClientConnected : function (clientId){
@@ -200,9 +235,14 @@ function HubsAPI(url, serverTimeout) {
             return constructMessage('UtilAPIHub', 'isClientConnected', arguments);
         },
 
-        getId : function (){
+        subscribeToHub : function (){
             
-            return constructMessage('UtilAPIHub', 'getId', arguments);
+            return constructMessage('UtilAPIHub', 'subscribeToHub', arguments);
+        },
+
+        setId : function (clientId){
+            
+            return constructMessage('UtilAPIHub', 'setId', arguments);
         },
 
         getHubsStructure : function (){

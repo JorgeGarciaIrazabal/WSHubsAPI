@@ -32,7 +32,7 @@ class TestHubDetection(unittest.TestCase):
         removeHubsSubclasses()
 
     def test_hubsInspection(self):
-        self.assertEqual(len(HubsInspector.HUBs_DICT), 2, 'Detects all Hubs')
+        self.assertEqual(len(HubsInspector.HUBs_DICT), 3, 'Detects all Hubs')
         self.assertTrue(issubclass(HubsInspector.HUBs_DICT['TestHub'].__class__, Hub), 'Hubs subclass is class')
         self.assertTrue(issubclass(HubsInspector.HUBs_DICT['TestHub2'].__class__, Hub), 'Hubs subclass is class')
         self.assertTrue(getattr(HubsInspector.HUBs_DICT['TestHub'], "getData"), 'Detects function')
@@ -87,6 +87,7 @@ class TestHubDetection(unittest.TestCase):
                 self.clientFunctions = dict(client1=lambda x, y: None,
                                             client2=lambda x, y=1: None,
                                             client3=lambda x=0, y=1: None)
+
         HubsInspector.inspectImplementedHubs(forceReconstruction=True)
 
         infoReport = HubsInspector.getHubsInformation()
@@ -97,7 +98,7 @@ class TestHubDetection(unittest.TestCase):
         client3Method = infoReport["TestHubWithClient"]["clientMethods"]["client3"]
         self.assertEqual(client1Method["args"], ["x", "y"])
         self.assertEqual(client2Method["defaults"], [1])
-        self.assertEqual(client3Method["defaults"], [0,1])
+        self.assertEqual(client3Method["defaults"], [0, 1])
 
 
 class TestClientFileConstructor(unittest.TestCase):

@@ -48,6 +48,9 @@ class HubsInspector:
 
     @classmethod
     def getHubInstance(cls, hub):
+        """
+        :rtype: Hub
+        """
         if not isinstance(hub, basestring):
             hub = hub.__HubName__
         return cls.HUBs_DICT[hub]
