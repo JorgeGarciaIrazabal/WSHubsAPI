@@ -11,7 +11,6 @@ from wshubsapi.ConnectedClientsHolder import ConnectedClientsHolder
 from wshubsapi.utils import WSMessagesReceivedQueue
 
 
-
 class TestCommProtocol(unittest.TestCase):
     def setUp(self):
         self.commEnvironment = CommEnvironment(maxWorkers=0, unprovidedIdTemplate="unprovided_{}")
@@ -25,19 +24,15 @@ class TestCommProtocol(unittest.TestCase):
         def w():
             pass
 
-        def c():
-            pass
-
         serialization = "serialization"
-        connectedClient = self.commEnvironment.constructConnectedClient(w, c, serialization)
+        connectedClient = self.commEnvironment.constructConnectedClient(w, serialization)
 
         self.assertEqual(connectedClient.writeMessage, w)
-        self.assertEqual(connectedClient.close, c)
         self.assertEqual(connectedClient.pickler, serialization)
 
     def test_getUnprovidedID_returnsFirstAvailableUnprovidedID(self):
-        firstClient = ConnectedClient(None, self.commEnvironment, lambda x: x, lambda z: z)
-        secondClient = ConnectedClient(None, self.commEnvironment, lambda x: x, lambda z: z)
+        firstClient = ConnectedClient(None, self.commEnvironment, lambda x: x)
+        secondClient = ConnectedClient(None, self.commEnvironment, lambda x: x)
         firstClient.onOpen()  # first UnprovidedID = unprovided_0
         secondClient.onOpen()  # first UnprovidedID = unprovided_1
 

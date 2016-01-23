@@ -38,7 +38,6 @@ class TestConnectedClient(unittest.TestCase):
         self.commEnvironment = CommEnvironment(maxWorkers=0, unprovidedIdTemplate="unprovidedTest__{}")
         self.clientMock = ClientMock()
         self.connectedClient = self.commEnvironment.constructConnectedClient(self.clientMock.writeMessage,
-                                                                             self.clientMock.close,
                                                                              self.jsonPickler)
         self.connectedClientsHolder = ConnectedClientsHolder(self.testHubClass.__HubName__)
 

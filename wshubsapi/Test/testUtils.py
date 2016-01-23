@@ -76,7 +76,7 @@ class TestUtils(unittest.TestCase):
         self.assertFalse(isFunctionForWSClient(HubsInspector.HUBs_DICT), "excludes existing functions")
 
     def test_getModulePath_ReturnsTestUtilsPyModulePath(self):
-        self.assertEqual(getModulePath(), os.getcwd() + os.sep + "Test")
+        self.assertIn("wshubsapi" + os.sep + "Test", getModulePath())
 
     def setUp_WSMessagesReceivedQueue(self, MAX_WORKERS):
         queue = WSMessagesReceivedQueue()
@@ -91,7 +91,7 @@ class TestUtils(unittest.TestCase):
 
     def setUp_WSMessagesReceivedQueue_infiniteOnMessageHandlerLoop(self, MAX_WORKERS, message):
         queue = self.setUp_WSMessagesReceivedQueue(MAX_WORKERS)
-        connectedClient = ConnectedClient(None, None, None, None)
+        connectedClient = ConnectedClient(None, None, None)
         connectedClient = flexmock(connectedClient)
         queue = flexmock(queue, get=lambda: [message, connectedClient])
         return queue, connectedClient
