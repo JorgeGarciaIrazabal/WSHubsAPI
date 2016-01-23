@@ -45,7 +45,7 @@ class Hub(object):
         return map(lambda x: x.ID, self.__hubSubscribers)
 
     @classmethod
-    def getClientsHolder(cls):
+    def _getClientsHolder(cls):
         """
         :rtype: ConnectedClientsHolder
         """
