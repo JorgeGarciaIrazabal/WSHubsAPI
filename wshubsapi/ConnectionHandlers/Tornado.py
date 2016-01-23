@@ -12,8 +12,7 @@ class ConnectionHandler(tornado.websocket.WebSocketHandler):
 
     def __init__(self, application, request, **kwargs):
         super(ConnectionHandler, self).__init__(application, request, **kwargs)
-        self._connectedClient = self.commEnvironment.constructConnectedClient(self.writeMessage, self.close)
-        self.ID = None
+        self._connectedClient = self.commEnvironment.constructConnectedClient(self.writeMessage)
         if self.commEnvironment is None:
             self.commEnvironment = CommEnvironment()
 
@@ -29,11 +28,11 @@ class ConnectionHandler(tornado.websocket.WebSocketHandler):
             clientId = int(args[0])
         except:
             clientId = None
-        self.ID = self._connectedClient.onOpen(clientId)
-        log.debug("open new connection with ID: {} ".format(self.ID))
+        ID = self._connectedClient.onOpen(clientId)
+        log.debug("open new connection with ID: {} ".format(ID))
 
     def on_message(self, message):
-        log.debug("Message received from ID: {}\n{} ".format(self.ID, message))
+        log.debug("Message received from ID: {}\n{} ".format(self._connectedClient.ID, message))
         self._connectedClient.onAsyncMessage(message)
 
     def on_close(self):

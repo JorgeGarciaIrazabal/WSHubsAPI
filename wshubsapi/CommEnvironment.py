@@ -26,8 +26,8 @@ class CommEnvironment(object):
         self.wsMessageReceivedQueue.startThreads()
         self.allConnectedClients = ConnectedClientsHolder.allConnectedClientsDict
 
-    def constructConnectedClient(self, writeMessageFunction, closeFunction, serializationPickler=_DEFAULT_PICKER):
-        return ConnectedClient(serializationPickler, self, writeMessageFunction, closeFunction)
+    def constructConnectedClient(self, writeMessageFunction, serializationPickler=_DEFAULT_PICKER):
+        return ConnectedClient(serializationPickler, self, writeMessageFunction)
 
     def getUnprovidedID(self):
         if len(self.availableUnprovidedIds) > 0:

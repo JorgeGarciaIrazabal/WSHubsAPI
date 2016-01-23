@@ -9,7 +9,7 @@ log = logging.getLogger(__name__)
 
 # Change class name //WSAPIClient? WSHUBsClient? ConnHandler?
 class ConnectedClient(object):
-    def __init__(self, serializationPickler, commEnvironment, writeMessageFunction, closeFunction):
+    def __init__(self, serializationPickler, commEnvironment, writeMessageFunction):
         """
         :type commEnvironment: WSHubsAPI.CommEnvironment.CommEnvironment | None
         """
@@ -18,7 +18,6 @@ class ConnectedClient(object):
         """:type : int|None|str"""
         self.pickler = serializationPickler
         self.writeMessage = writeMessageFunction
-        self.close = closeFunction
         self.isClosed = False
 
     def onOpen(self, ID=None):
