@@ -22,6 +22,7 @@ class SocketHandler(SocketServer):
 
     def onClientConnected(self, client):
         connectedClient = self.commEnvironment.constructConnectedClient(client.socket.sendall)
+        connectedClient.onOpen()
         self.clientConnectedClientHashMap[client] = connectedClient
 
         def onClose():
@@ -30,6 +31,7 @@ class SocketHandler(SocketServer):
             self.clientConnectedClientHashMap.pop(client, None)
 
         client.onClose = onClose
+        log.debug("open new connection with ID: {} ".format(connectedClient.ID))
 
     def onMessageReceived(self, client, message):
         connectedClient = self.clientConnectedClientHashMap[client]

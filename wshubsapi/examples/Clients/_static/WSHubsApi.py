@@ -147,18 +147,6 @@ class HubsAPI(object):
                 self.wsClient.send(self._serializeObject(body))
                 return retFunction
         
-            def getClientsHolder(self, ):
-                """
-                :rtype : WSReturnObject
-                """
-                args = list()
-                
-                id = self._getNextMessageID()
-                body = {"hub": self.hubName, "function": "getClientsHolder", "args": args, "ID": id}
-                retFunction = self.wsClient.getReturnFunction(id)
-                self.wsClient.send(self._serializeObject(body))
-                return retFunction
-        
             def getSubscribedClientsToHub(self, ):
                 """
                 :rtype : WSReturnObject
@@ -228,18 +216,6 @@ class HubsAPI(object):
 
         class __Server(GenericServer):
             
-            def getClientsHolder(self, ):
-                """
-                :rtype : WSReturnObject
-                """
-                args = list()
-                
-                id = self._getNextMessageID()
-                body = {"hub": self.hubName, "function": "getClientsHolder", "args": args, "ID": id}
-                retFunction = self.wsClient.getReturnFunction(id)
-                self.wsClient.send(self._serializeObject(body))
-                return retFunction
-        
             def getHubsStructure(self, ):
                 """
                 :rtype : WSReturnObject

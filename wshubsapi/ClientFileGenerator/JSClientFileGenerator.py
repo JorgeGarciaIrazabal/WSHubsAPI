@@ -131,7 +131,11 @@ function HubsAPI(url, serverTimeout) {{
                     }}
                 }} else {{
                     f = thisApi[msgObj.hub].client[msgObj.function];
-                    f.apply(f, msgObj.args);
+                    if (f!== undefined) {{
+                        f.apply(f, msgObj.args);
+                    }} else {{
+                        this.onClientFunctionNotFound(msgObj.hub, msgObj.function);
+                    }}
                 }}
             }} catch (err) {{
                 this.onMessageError(err);
@@ -153,7 +157,8 @@ function HubsAPI(url, serverTimeout) {{
         onClose: function (error) {{}},
         onOpen: function () {{}},
         onReconnecting: function () {{}},
-        onMessageError: function (error){{}}
+        onMessageError: function (error){{}},
+        onClientFunctionNotFound: function (hub, function {{}}
     }};
 
     this.defaultErrorHandler = null;

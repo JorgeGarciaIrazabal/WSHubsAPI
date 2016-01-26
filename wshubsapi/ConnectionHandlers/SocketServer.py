@@ -19,7 +19,7 @@ class ConnectedClient:
 class SocketServer(socket.socket):
     SOCKET_BUFFER_SIZE = 1024 * 10
 
-    def __init__(self, IP=socket.gethostbyname(socket.gethostname()), port=9999, *args, **kwargs):
+    def __init__(self, IP="127.0.0.1", port=9999, *args, **kwargs):
         super(SocketServer, self).__init__(*args, **kwargs)
         self.IP = IP
         self.port = port
@@ -36,6 +36,7 @@ class SocketServer(socket.socket):
     # one thread
     def _acceptConnection(self):
         threading.current_thread().name = "RServer accept thread"
+        print "accepting connection"
         while self.keepAlive:
             sc, addr = self.accept()
             self.clients.append(ConnectedClient(socketObj=sc, address=addr))

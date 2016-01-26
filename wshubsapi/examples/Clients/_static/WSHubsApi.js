@@ -170,11 +170,6 @@ function HubsAPI(url, serverTimeout) {
     this.ChatHub.server = {
         __HUB_NAME : 'ChatHub',
         
-        getClientsHolder : function (){
-            
-            return constructMessage('ChatHub', 'getClientsHolder', arguments);
-        },
-
         classMethod : function (){
             
             return constructMessage('ChatHub', 'classMethod', arguments);
@@ -210,11 +205,6 @@ function HubsAPI(url, serverTimeout) {
     this.UtilAPIHub.server = {
         __HUB_NAME : 'UtilAPIHub',
         
-        getClientsHolder : function (){
-            
-            return constructMessage('UtilAPIHub', 'getClientsHolder', arguments);
-        },
-
         unsubscribeToHub : function (){
             
             return constructMessage('UtilAPIHub', 'unsubscribeToHub', arguments);
