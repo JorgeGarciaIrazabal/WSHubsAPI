@@ -49,22 +49,22 @@ class SocketServer(socket.socket):
 
     # one thread for each client
     def _readClientMessage(self, client):
-        def retFunction():
-            threading.current_thread().name += " RServer Client reader"
-            while self.keepAlive:
-                try:
-                    message = client.socket.recv(self.SOCKET_BUFFER_SIZE)
-                    self.onMessageReceived(client, message)
-                except (IOError, socket.error) as e:
-                    self.onError(client, e)
-                    client.socket.close()
-                    self.clients.remove(client)
+        threading.current_thread().name += " RServer Client reader"
+        while self.keepAlive:
+            try:
+                message = client.socket.recv(self.SOCKET_BUFFER_SIZE)
+                if message == "":
                     self.onClosed(client)
                     break
-                except Exception as e:
-                    self.onError(client, e)
-
-        return retFunction
+                self.onMessageReceived(client, message)
+            except (IOError, socket.error) as e:
+                self.onError(client, e)
+                client.socket.close()
+                self.clients.remove(client)
+                self.onClosed(client)
+                break
+            except Exception as e:
+                self.onError(client, e)
 
     def onClientConnected(self, client):
         """

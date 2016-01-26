@@ -18,7 +18,7 @@ if __name__ == '__main__':
     HubsInspector.constructPythonFile("../Clients/_static")
     HubsInspector.constructJSFile("../Clients/_static")
 
-    server = SocketHandler("localhost", 9999)
+    server = SocketHandler("localhost", 8889)
 
     while True:
         time.sleep(0.1)
