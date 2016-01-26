@@ -128,7 +128,13 @@ class WSHubsAPIClient(WebSocketClient):
             elif f and f.onError:
                 f.onError(msgObj["replay"])
         else:
-            self.api.__getattribute__(msgObj["hub"]).client.__dict__[msgObj["function"]](*msgObj["args"])
+            try:
+                clientFunction = self.api.__getattribute__(msgObj["hub"]).client.__dict__[msgObj["function"]]
+                clientFunction(*msgObj["args"])
+            except:
+                pass
+
+
         self.log.debug("Received message: %s" % m.data.decode('utf-8'))
 
     def getReturnFunction(self, ID):
@@ -136,7 +142,7 @@ class WSHubsAPIClient(WebSocketClient):
         :rtype : WSReturnObject
         """
 
-        def returnFunction(onSuccess, onError=None):
+        def returnFunction(onSuccess, onError=None, timeOut=None):
             callBacks = self.__returnFunctions.get(ID, WSReturnObject.WSCallbacks())
 
             def onSuccessWrapper(*args, **kwargs):
@@ -153,7 +159,9 @@ class WSHubsAPIClient(WebSocketClient):
             else:
                 callBacks.onError = None
             self.__returnFunctions[ID] = callBacks
-            r = Timer(self.serverTimeout, self.onTimeOut, (ID,))
+
+            timeOut = timeOut if timeOut is not None else self.onTimeOut
+            r = Timer(self.serverTimeout, timeOut, (ID,))
             r.start()
 
         retObject = WSReturnObject()

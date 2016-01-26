@@ -18,6 +18,7 @@ if __name__ == '__main__':
         print(u"From {0}: {1}".format(senderName, message))
 
     ws.ChatHub.client.onMessage = printMessage
+    ws.ChatHub.server.subscribeToHub().done(lambda x: ws.ChatHub.server.getSubscribedClientsToHub())
     name = input("Enter your name:")
     #ws.server.ChatHub.getNumOfClientsConnected().done(lambda x: sys.stdout.write(x[1]+"\n"), lambda x: sys.stdout.write("Error:%s\n"%x))
     print("Hello %s. You have entered in the chat room, write and press enter to send message" % name)

@@ -9,7 +9,7 @@ class ChatHub(Hub):
         ###call function from all clients
         # self.allClients.onMessage(name,message)
         ###call function from all clients but the sender
-        otherClients = self.getClientsHolder().getOtherClients(_sender)
+        otherClients = self._getClientsHolder().getOtherClients(_sender)
         otherClients.onMessage(name, message)
         _sender.onMessage("sender", message)
         ### or call function from a selection of clients
