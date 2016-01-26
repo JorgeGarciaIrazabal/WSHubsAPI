@@ -12,8 +12,8 @@ class ConnectionHandler(tornado.websocket.WebSocketHandler):
 
     def __init__(self, application, request, **kwargs):
         super(ConnectionHandler, self).__init__(application, request, **kwargs)
-        if self.commEnvironment is None:
-            self.commEnvironment = CommEnvironment()
+        if ConnectionHandler.commEnvironment is None:
+            ConnectionHandler.commEnvironment = CommEnvironment()
         self._connectedClient = self.commEnvironment.constructConnectedClient(self.writeMessage)
 
 

@@ -12,8 +12,8 @@ class ConnectionHandler(WebSocket):
 
     def __init__(self, sock, protocols=None, extensions=None, environ=None, heartbeat_freq=None):
         super(ConnectionHandler, self).__init__(sock, protocols, extensions, environ, heartbeat_freq)
-        if self.commEnvironment is None:
-            self.commEnvironment = CommEnvironment()
+        if ConnectionHandler.commEnvironment is None:
+            ConnectionHandler.commEnvironment = CommEnvironment()
 
     def writeMessage(self, message):
         log.debug("message to %s:\n%s" % (self._connectedClient.ID, message))

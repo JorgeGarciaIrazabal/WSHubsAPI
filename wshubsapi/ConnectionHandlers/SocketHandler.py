@@ -14,8 +14,8 @@ class SocketHandler(SocketServer):
 
     def __init__(self, IP=socket.gethostbyname(socket.gethostname()), port=9999, *args, **kwargs):
         super(SocketHandler, self).__init__(IP, port, *args, **kwargs)
-        if self.commEnvironment is None:
-            self.commEnvironment = CommEnvironment()
+        if SocketHandler.commEnvironment is None:
+            SocketHandler.commEnvironment = CommEnvironment()
 
         self.clientConnectedClientHashMap = dict()
         """ :type : dict[SocketServer.ConnectedClient,wshubsapi.ConnectedClient.ConnectedClient]"""
