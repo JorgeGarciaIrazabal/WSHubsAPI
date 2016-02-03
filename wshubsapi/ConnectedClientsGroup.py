@@ -1,7 +1,7 @@
 from wshubsapi import utils
 
 
-class ConnectedClientsGroup:
+class ConnectedClientsGroup(object):
     def __init__(self, connectedClientsInGroup, hubName):
         """
         :type connectedClientsInGroup: list of ConnectedClient
@@ -19,6 +19,8 @@ class ConnectedClientsGroup:
         """
         :param item: function name defined in the client side ("item" name keep because it is a magic function)
         """
+        if item.startswith("__") and item.endswith(__):
+            return super(ConnectedClientsGroup, self).__sizeof__()
         functions = []
         for c in self.connectedClients:
             functions.append(self.__constructFunctionToSendMessageToClient(c, item))

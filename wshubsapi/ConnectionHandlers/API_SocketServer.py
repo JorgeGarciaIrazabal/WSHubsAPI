@@ -16,11 +16,11 @@ class ConnectedClient:
         return "Client in-> Socket: %s, Address: %s" % (self.socket, self.address)
 
 
-class SocketServer(socket.socket):
+class API_SocketServer(socket.socket):
     SOCKET_BUFFER_SIZE = 1024 * 10
 
     def __init__(self, IP="127.0.0.1", port=9999, *args, **kwargs):
-        super(SocketServer, self).__init__(*args, **kwargs)
+        super(API_SocketServer, self).__init__(*args, **kwargs)
         self.IP = IP
         self.port = port
         self.bind((IP, port))

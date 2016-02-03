@@ -1,5 +1,6 @@
 import inspect
 
+from wshubsapi.ClientFileGenerator.CppFileGenerator import CppFileGenerator
 from wshubsapi.ClientFileGenerator.JAVAFileGenerator import JAVAFileGenerator
 from wshubsapi.ClientFileGenerator.JSClientFileGenerator import JSClientFileGenerator
 from wshubsapi.ClientFileGenerator.PythonClientFileGenerator import PythonClientFileGenerator
@@ -45,6 +46,11 @@ class HubsInspector:
     def constructPythonFile(cls, path="."):
         cls.inspectImplementedHubs()
         PythonClientFileGenerator.createFile(path, cls.HUBs_DICT.values())
+
+    @classmethod
+    def constructCppFile(cls, path="."):
+        cls.inspectImplementedHubs()
+        CppFileGenerator.createFile(path, cls.getHubsInformation())
 
     @classmethod
     def getHubInstance(cls, hub):

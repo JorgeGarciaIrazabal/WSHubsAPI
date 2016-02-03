@@ -3,7 +3,7 @@ from wshubsapi.Hub import Hub
 
 
 class ChatHub(Hub):
-    def sendToAll(self, name, _sender, message):  # _sender is an automatically passed argument
+    def sendToAll(self, name, _sender, message = "hello"):  # _sender is an automatically passed argument
         ### we can call a sender's function in a intuitive way (the function has to be defined in the client):
         # _sender.onMessage(name,message)
         ###call function from all clients
@@ -17,7 +17,7 @@ class ChatHub(Hub):
         return len(otherClients)
 
     @staticmethod
-    def static():
+    def staticFunc():
         pass
 
     @classmethod

@@ -129,7 +129,7 @@ class HubsAPI(object):
         self.wsClient = WSHubsAPIClient(self, url, serverTimeout)
         self.pickler = pickler
         self.ChatHub = self.__ChatHub(self.wsClient, self.pickler)
-        self.UtilAPIHub = self.__UtilAPIHub(self.wsClient, self.pickler)
+        self.UtilsAPIHub = self.__UtilsAPIHub(self.wsClient, self.pickler)
 
     def connect(self):
         self.wsClient.connect()
@@ -167,7 +167,7 @@ class HubsAPI(object):
                 self.wsClient.send(self._serializeObject(body))
                 return retFunction
         
-            def sendToAll(self, name, message):
+            def sendToAll(self, name, message="hello"):
                 """
                 :rtype : WSReturnObject
                 """
@@ -180,14 +180,14 @@ class HubsAPI(object):
                 self.wsClient.send(self._serializeObject(body))
                 return retFunction
         
-            def static(self, ):
+            def staticFunc(self, ):
                 """
                 :rtype : WSReturnObject
                 """
                 args = list()
                 
                 id = self._getNextMessageID()
-                body = {"hub": self.hubName, "function": "static", "args": args, "ID": id}
+                body = {"hub": self.hubName, "function": "staticFunc", "args": args, "ID": id}
                 retFunction = self.wsClient.getReturnFunction(id)
                 self.wsClient.send(self._serializeObject(body))
                 return retFunction
@@ -216,7 +216,7 @@ class HubsAPI(object):
                 self.wsClient.send(self._serializeObject(body))
                 return retFunction
         
-    class __UtilAPIHub(object):
+    class __UtilsAPIHub(object):
         def __init__(self, wsClient, pickler):
             hubName = self.__class__.__name__[2:]
             self.server = self.__Server(wsClient, hubName, pickler)

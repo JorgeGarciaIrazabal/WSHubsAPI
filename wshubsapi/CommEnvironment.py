@@ -5,7 +5,7 @@ from wshubsapi.ConnectedClient import ConnectedClient
 from wshubsapi.ConnectedClientsHolder import ConnectedClientsHolder
 from wshubsapi.utils import WSMessagesReceivedQueue, setSerializerDateTimeHandler
 #do not remove this line (hubs inspector needs to find it)
-from wshubsapi import UtilAPIHub
+from wshubsapi import UtilsAPIHub
 
 
 log = logging.getLogger(__name__)
