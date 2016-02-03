@@ -133,7 +133,7 @@ class HubsAPI(object):
             self.client = WSSimpleObject()
 
         class __Server(GenericServer):
-            
+
             def basic(self, arg=False):
                 """
                 :rtype : WSReturnObject
@@ -145,19 +145,19 @@ class HubsAPI(object):
                 retFunction = self.wsClient.getReturnFunction(id)
                 self.wsClient.send(self._serializeObject(body))
                 return retFunction
-        
+
             def getNumOfClientsConnected(self, ):
                 """
                 :rtype : WSReturnObject
                 """
                 args = list()
-                
+
                 id = self._getNextMessageID()
                 body = {"hub": self.hubName, "function": "getNumOfClientsConnected", "args": args, "ID": id}
                 retFunction = self.wsClient.getReturnFunction(id)
                 self.wsClient.send(self._serializeObject(body))
                 return retFunction
-        
+
             def sendToAll(self, name, message):
                 """
                 :rtype : WSReturnObject
@@ -170,4 +170,4 @@ class HubsAPI(object):
                 retFunction = self.wsClient.getReturnFunction(id)
                 self.wsClient.send(self._serializeObject(body))
                 return retFunction
-        
+

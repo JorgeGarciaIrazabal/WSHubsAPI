@@ -11,7 +11,7 @@ log.addHandler(logging.NullHandler())
 
 class SocketHandler(API_SocketServer):
     commEnvironment = None
-    API_SEP="*API_SEP*"
+    API_SEP = "*API_SEP*"
 
     def __init__(self, IP=socket.gethostbyname(socket.gethostname()), port=9999, *args, **kwargs):
         super(SocketHandler, self).__init__(IP, port, *args, **kwargs)
@@ -23,7 +23,7 @@ class SocketHandler(API_SocketServer):
 
     def onClientConnected(self, client):
         connectedClient = self.commEnvironment.constructConnectedClient(
-                lambda m: client.socket.sendall(m + self.API_SEP))
+            lambda m: client.socket.sendall(m + self.API_SEP))
         connectedClient.onOpen()
         self.clientConnectedClientHashMap[client] = connectedClient
 
@@ -43,8 +43,8 @@ class SocketHandler(API_SocketServer):
             return connectedClient.onAsyncMessage(message)
         for i, m in enumerate(messages):
             if i == 0:
-                m = m + "}"
-            elif i == len(messages)-1:
+                m += "}"
+            elif i == len(messages) - 1:
                 m = "{" + m
             else:
                 m = "{" + m + "}"

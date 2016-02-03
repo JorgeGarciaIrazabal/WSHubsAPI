@@ -46,5 +46,7 @@ com_crashlytics_export_strings.xml
 crashlytics.properties
 crashlytics-build.properties
 fabric.properties
-dist/wshubsapi-0.5.0a6-py2.py3-none-any.whl
-dist/wshubsapi-0.5.0a6.zip
+dist/
+wshubsapi.egg-info
+build
+*.pyc
