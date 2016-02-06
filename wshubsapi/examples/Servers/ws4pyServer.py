@@ -17,8 +17,8 @@ if __name__ == '__main__':
     HubsInspector.inspectImplementedHubs()
     HubsInspector.constructPythonFile("../Clients/_static")
     HubsInspector.constructJSFile("../Clients/_static")
-    # Hub.constructJAVAFile("tornado.WSHubsApi", "../Clients/_static")
-    HubsInspector.constructCppFile("../Clients/_static")
+    # Hub.constructJAVAFile("tornado.WSHubsApi", "../Clients/_static") in beta
+    # HubsInspector.constructCppFile("../Clients/_static") in alpha
 
     server = make_server('127.0.0.1', 8888, server_class=WSGIServer,
                          handler_class=WebSocketWSGIRequestHandler,

@@ -21,8 +21,8 @@ class ConnectionHandler(tornado.websocket.WebSocketHandler):
         pass
 
     def writeMessage(self, message):
-        log.debug("message to %s:\n%s" % (self._connectedClient.ID, message))
         self.write_message(message)
+        log.debug("message to %s:\n%s" % (self._connectedClient.ID, message))
 
     def open(self, *args):
         try:

@@ -37,6 +37,7 @@ class SocketHandler(API_SocketServer):
 
     def onMessageReceived(self, client, message):
         connectedClient = self.clientConnectedClientHashMap[client]
+        # todo: use API_SEP instead of }{
         messages = message.split("}{")
         if len(messages) == 0:
             log.debug("Message received from ID: %s\n%s " % (str(connectedClient.ID), str(message)))

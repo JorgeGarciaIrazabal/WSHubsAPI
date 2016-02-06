@@ -16,8 +16,8 @@ class ConnectionHandler(WebSocket):
             ConnectionHandler.commEnvironment = CommEnvironment()
 
     def writeMessage(self, message):
-        log.debug("message to %s:\n%s" % (self._connectedClient.ID, message))
         self.send(message)
+        log.debug("message to %s:\n%s" % (self._connectedClient.ID, message))
 
     def opened(self, *args):
         self._connectedClient = self.commEnvironment.constructConnectedClient(self.writeMessage)

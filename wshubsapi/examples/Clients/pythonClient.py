@@ -13,6 +13,7 @@ from _static.WSHubsApi import HubsAPI
 if __name__ == '__main__':
     ws = HubsAPI('ws://127.0.0.1:8888/')
     ws.connect()
+    ws.defaultOnError = lambda m: sys.stdout.write("message could not be sent!!!!! {}\n".format(m))
 
     def printMessage(senderName, message):
         print(u"From {0}: {1}".format(senderName, message))
@@ -26,5 +27,4 @@ if __name__ == '__main__':
         message = input("")
         if sys.version_info[0] == 2:
             message = message.decode(sys.stdin.encoding)
-        ws.ChatHub.server.sendToAll(name, message).done(lambda m: sys.stdout.write("message sent to {} client(s)\n".format(m)),
-                                                        lambda m: sys.stdout.write("!!!!!message not sent!!!!! {}\n".format(m)))
+        ws.ChatHub.server.sendToAll(name, message).done(lambda m: sys.stdout.write("message sent to {} client(s)\n".format(m)))
