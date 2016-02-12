@@ -7,8 +7,8 @@ class UtilsAPIHub(Hub):
     def setId(self, clientId, _sender):
         connections = self._getClientsHolder().allConnectedClientsDict
         connections.pop(_sender[0].ID)
-        _sender.ID = clientId
-        connections[clientId] = _sender
+        _sender[0].ID = clientId
+        connections[clientId] = _sender[0]
         return True
 
     def getId(self, _sender):

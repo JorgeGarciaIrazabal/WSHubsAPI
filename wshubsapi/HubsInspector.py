@@ -16,18 +16,23 @@ class HubsInspector:
     HUBs_DICT = {}
 
     @classmethod
+    def ignoreHubImplementation(cls, hubClass):
+        return "__HubName__" in hubClass.__dict__ and hubClass.__HubName__ is None
+
+    @classmethod
     def inspectImplementedHubs(cls, forceReconstruction=False):
         if not cls.__hubsConstructed or forceReconstruction:
             cls.HUBs_DICT.clear()
             for hubClass in Hub.__subclasses__():
-                try:
-                    hubClass()
-                except TypeError as e:
-                    if "__init__()" in str(e):
-                        raise HubsInspectorException(
-                            "Hubs can not have a constructor with parameters. Check Hub: %s" % hubClass.__name__)
-                    else:
-                        raise e
+                if not cls.ignoreHubImplementation(hubClass):
+                    try:
+                        hubClass()
+                    except TypeError as e:
+                        if "__init__()" in str(e):
+                            raise HubsInspectorException(
+                                "Hubs can not have a constructor with parameters. Check Hub: %s" % hubClass.__name__)
+                        else:
+                            raise e
             cls.__hubsConstructed = True
 
     @classmethod

@@ -158,7 +158,7 @@ function HubsAPI(url, serverTimeout) {{
         onOpen: function () {{}},
         onReconnecting: function () {{}},
         onMessageError: function (error){{}},
-        onClientFunctionNotFound: function (hub, function {{}}
+        onClientFunctionNotFound: function (hub, func) {{}}
     }};
 
     this.defaultErrorHandler = null;
