@@ -1,29 +1,29 @@
-from wshubsapi import utils
+from wshubsapi.ClientInHub import ClientInHub
 
 
 class ConnectedClientsGroup(object):
     def __init__(self, connectedClientsInGroup, hubName):
         """
-        :type connectedClientsInGroup: list of ConnectedClient
+        :type connectedClientsInGroup: list of wshubsapi.ConnectedClient.ConnectedClient
         """
         self.hubName = hubName
-        self.connectedClients = connectedClientsInGroup
+        self.connectedClients = map(lambda c: ClientInHub(c, hubName), connectedClientsInGroup)
 
     def append(self, connectedClient):
         """
         :type connectedClient: ConnectedClient.ConnectedClient
         """
-        self.connectedClients.append(connectedClient)
+        self.connectedClients.append(ClientInHub(connectedClient, self.hubName))
 
     def __getattr__(self, item):
         """
         :param item: function name defined in the client side ("item" name keep because it is a magic function)
         """
-        if item.startswith("__") and item.endswith(__):
-            return super(ConnectedClientsGroup, self).__sizeof__()
+        if item.startswith("__") and item.endswith("__"):
+            return
         functions = []
         for c in self.connectedClients:
-            functions.append(self.__constructFunctionToSendMessageToClient(c, item))
+            functions.append(c.__getattr__(item))
 
         def connectionFunctions(*args):
             for f in functions:
@@ -39,14 +39,6 @@ class ConnectedClientsGroup(object):
 
     def __len__(self):
         return self.connectedClients.__len__()
-
-    def __constructFunctionToSendMessageToClient(self, connectedClient, functionName):
-        def connectionFunction(*args):
-            message = {"function": functionName, "args": list(args), "hub": self.hubName}
-            msgStr = utils.serializeMessage(connectedClient.pickler, message)
-            connectedClient.writeMessage(msgStr)
-
-        return connectionFunction
 
     def __iter__(self):
         for x in self.connectedClients:

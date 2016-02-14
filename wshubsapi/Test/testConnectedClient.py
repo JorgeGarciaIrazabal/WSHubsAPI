@@ -4,7 +4,9 @@ import unittest
 
 from jsonpickle.pickler import Pickler
 
+from wshubsapi.ClientInHub import ClientInHub
 from wshubsapi.CommEnvironment import CommEnvironment
+from wshubsapi.ConnectedClient import ConnectedClient
 from wshubsapi.ConnectedClientsHolder import ConnectedClientsHolder
 from wshubsapi.Hub import Hub
 from wshubsapi.HubsInspector import HubsInspector
@@ -37,8 +39,7 @@ class TestConnectedClient(unittest.TestCase):
         self.jsonPickler = Pickler(max_depth=3, max_iter=30, make_refs=False)
         self.commEnvironment = CommEnvironment(maxWorkers=0, unprovidedIdTemplate="unprovidedTest__{}")
         self.clientMock = ClientMock()
-        self.connectedClient = self.commEnvironment.constructConnectedClient(self.clientMock.writeMessage,
-                                                                             self.jsonPickler)
+        self.connectedClient = ConnectedClient(self.commEnvironment, self.clientMock.writeMessage)
         self.connectedClientsHolder = ConnectedClientsHolder(self.testHubClass.__HubName__)
 
     def tearDown(self):
@@ -50,22 +51,22 @@ class TestConnectedClient(unittest.TestCase):
     def test_onOpen_appendsClientInConnectedClientsHolderWithDefinedID(self):
         ID = 3
 
-        self.connectedClient.onOpen(ID)
+        self.commEnvironment.onOpen(self.connectedClient, ID)
 
-        self.assertTrue(len(self.connectedClientsHolder.getClient(ID)), 1)
+        self.assertIsInstance(self.connectedClientsHolder.getClient(ID), ClientInHub)
 
     def test_onOpen_appendsUndefinedIdIfNoIDIsDefine(self):
-        self.connectedClient.onOpen()
+        self.commEnvironment.onOpen(self.connectedClient)
 
-        self.assertTrue(len(self.connectedClientsHolder.getClient("unprovidedTest__0")), 1)
+        self.assertIsInstance(self.connectedClientsHolder.getClient("unprovidedTest__0"), ClientInHub)
 
     def test_onOpen_appendsUndefinedIdIfOpenAlreadyExistingClientId(self):
-        self.connectedClient.onOpen(3)
-        secondId = self.connectedClient.onOpen(3)
+        self.commEnvironment.onOpen(self.connectedClient, 3)
+        secondId = self.commEnvironment.onOpen(self.connectedClient, 3)
 
         self.assertEqual(secondId, "unprovidedTest__0")
-        self.assertTrue(len(self.connectedClientsHolder.getClient(3)), 1)
-        self.assertTrue(len(self.connectedClientsHolder.getClient(secondId)), 1)
+        self.assertIsInstance(self.connectedClientsHolder.getClient(3), ClientInHub)
+        self.assertIsInstance(self.connectedClientsHolder.getClient(secondId), ClientInHub)
 
     def __setUp_onMessage(self, functionStr, args, replay, success=True):
         message = MessageCreator.createOnMessageMessage(hub=self.testHubClass.__HubName__,
@@ -76,47 +77,47 @@ class TestConnectedClient(unittest.TestCase):
                                                            replay=replay,
                                                            success=success)
         messageStr = json.dumps(message)
-        self.connectedClient = flexmock(self.connectedClient)
+        self.commEnvironment = flexmock(self.commEnvironment)
 
         return messageStr, replayMessage
 
     def test_onMessage_callsReplayIfSuccess(self):
         messageStr, replayMessage = self.__setUp_onMessage("testFunctionReplayArg", [1], 1)
-        self.connectedClient.should_receive("replay").with_args(replayMessage, messageStr).once()
+        self.commEnvironment.should_receive("replay").with_args(self.connectedClient, replayMessage, messageStr).once()
 
-        self.connectedClient.onMessage(messageStr)
+        self.commEnvironment.onMessage(self.connectedClient, messageStr)
 
     def test_onMessage_callsOnErrorIfError(self):
         messageStr, replayMessage = self.__setUp_onMessage("testFunctionError", [], "Error", success=False)
-        self.connectedClient.should_receive("replay").with_args(replayMessage, messageStr).once()
+        self.commEnvironment.should_receive("replay").with_args(self.connectedClient, replayMessage, messageStr).once()
 
-        self.connectedClient.onMessage(messageStr)
+        self.commEnvironment.onMessage(self.connectedClient, messageStr)
 
     def test_onMessage_notCallsReplayIfFunctionReturnNone(self):
         messageStr, replayMessage = self.__setUp_onMessage("testFunctionReplayNone", [], None)
-        self.connectedClient.should_receive("replay").never()
+        self.commEnvironment.should_receive("replay").never()
 
-        self.connectedClient.onMessage(messageStr)
+        self.commEnvironment.onMessage(self.connectedClient, messageStr)
 
     def test_onMessage_onErrorIsCalledIfMessageCanNotBeParsed(self):
         messageStr, replayMessage = self.__setUp_onMessage("testFunctionReplayNone", [], None)
-        self.connectedClient.should_receive("replay").never()
-        self.connectedClient.should_receive("onError").once()
+        self.commEnvironment.should_receive("replay").never()
+        self.commEnvironment.should_receive("onError").once()
 
-        self.connectedClient.onMessage(messageStr + "breaking message")
+        self.commEnvironment.onMessage(self.connectedClient, messageStr + "breaking message")
 
     def test_onAsyncMessage_putsTheMessageAndTheConnectionInTheQueue(self):
         message = MessageCreator.createOnMessageMessage()
         self.commEnvironment.wsMessageReceivedQueue = flexmock(self.commEnvironment.wsMessageReceivedQueue)
         self.commEnvironment.wsMessageReceivedQueue.should_receive("put").with_args((message, self.connectedClient)).once()
 
-        self.connectedClient.onAsyncMessage(message)
+        self.commEnvironment.onAsyncMessage(self.connectedClient, message)
 
     def test_onClose_removeExistingConnectedClient(self):
         ID = 3
-        self.connectedClient.onOpen(ID)
+        self.commEnvironment.onOpen(self.connectedClient, ID)
 
-        self.connectedClient.onClosed()
+        self.commEnvironment.onClosed(self.connectedClient)
 
         self.assertRaises(KeyError, self.connectedClientsHolder.getClient, ID)
         self.assertEqual(len(self.connectedClientsHolder.allConnectedClientsDict), 0)
@@ -124,6 +125,6 @@ class TestConnectedClient(unittest.TestCase):
     def test_replay_writeMessageWithAString(self):
         replayMessage = MessageCreator.createReplayMessage()
         self.connectedClient = flexmock(self.connectedClient)
-        self.connectedClient.should_receive("writeMessage").with_args(str).once()
+        self.connectedClient.should_receive("api_writeMessage").with_args(str).once()
 
-        self.connectedClient.replay(replayMessage, "test")
+        self.commEnvironment.replay(self.connectedClient, replayMessage, "test")

@@ -29,19 +29,19 @@ class Hub(object):
         self.__class__._clientsHolder = ConnectedClientsHolder(hubName)
 
     def subscribeToHub(self, _sender):
-        if _sender[0] in self.__hubSubscribers:
+        if _sender in self.__hubSubscribers:
             return False
-        self.__hubSubscribers.append(_sender[0])
+        self.__hubSubscribers.append(_sender)
         return True
 
-    def unsubscribeToHub(self, _sender):
-        if _sender[0] in self.__hubSubscribers:
-            self.__hubSubscribers.remove(_sender[0])
+    def unsubscribeFromHub(self, _sender):
+        if _sender in self.__hubSubscribers:
+            self.__hubSubscribers.remove(_sender)
             return True
         return False
 
     def getSubscribedClientsToHub(self):
-        self.__hubSubscribers = list(filter(lambda x: not x.isClosed, self.__hubSubscribers))
+        self.__hubSubscribers = list(filter(lambda c: not c.api_isClosed, self.__hubSubscribers))
         return map(lambda x: x.ID, self.__hubSubscribers)
 
     @classmethod

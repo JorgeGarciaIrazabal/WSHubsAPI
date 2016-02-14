@@ -63,10 +63,14 @@ def getModulePath():
 
 # todo: move to different module
 class WSMessagesReceivedQueue(Queue):
-    DEFAULT_MAX_WORKERS = 20
+    DEFAULT_MAX_WORKERS = 50
 
-    def __init__(self, maxWorkers=DEFAULT_MAX_WORKERS):
+    def __init__(self, commEnvironment, maxWorkers=DEFAULT_MAX_WORKERS):
+        """
+        :type commEnvironment: wshubsapi.CommEnvironment.CommEnvironment
+        """
         Queue.__init__(self)
+        self.commEnvironment = commEnvironment
         self.maxWorkers = maxWorkers
         self.executor = ThreadPoolExecutor(max_workers=self.maxWorkers)
         self.keepAlive = True
@@ -80,10 +84,10 @@ class WSMessagesReceivedQueue(Queue):
             connectedClient = None
             try:
                 msg, connectedClient = self.get()
-                connectedClient.onMessage(msg)
+                self.commEnvironment.onMessage(connectedClient, msg)
             except Exception as e:
                 if connectedClient is not None:
-                    connectedClient.onError(e)
+                    self.commEnvironment.onError(connectedClient, e)
                 else:
                     print(str(e))  # todo: create a call back for this exception
 

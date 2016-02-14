@@ -20,21 +20,11 @@ class TestCommProtocol(unittest.TestCase):
         self.assertIsInstance(self.commEnvironment.lock, thread.LockType)
         self.assertIs(self.commEnvironment.allConnectedClients, ConnectedClientsHolder.allConnectedClientsDict)
 
-    def test_ConstructConnectedClient_returnsConnectedClient(self):
-        def w():
-            pass
-
-        serialization = "serialization"
-        connectedClient = self.commEnvironment.constructConnectedClient(w, serialization)
-
-        self.assertEqual(connectedClient.writeMessage, w)
-        self.assertEqual(connectedClient.pickler, serialization)
-
     def test_getUnprovidedID_returnsFirstAvailableUnprovidedID(self):
-        firstClient = ConnectedClient(None, self.commEnvironment, lambda x: x)
-        secondClient = ConnectedClient(None, self.commEnvironment, lambda x: x)
-        firstClient.onOpen()  # first UnprovidedID = unprovided_0
-        secondClient.onOpen()  # first UnprovidedID = unprovided_1
+        firstClient = ConnectedClient(self.commEnvironment, lambda x: x)
+        secondClient = ConnectedClient(self.commEnvironment, lambda x: x)
+        self.commEnvironment.onOpen(firstClient)  # first UnprovidedID = unprovided_0
+        self.commEnvironment.onOpen(secondClient)  # first UnprovidedID = unprovided_1
 
         unprovidedId = self.commEnvironment.getUnprovidedID()
 

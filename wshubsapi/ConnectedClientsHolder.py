@@ -12,14 +12,14 @@ class ConnectedClientsHolder:
         """
         :type sender: ConnectedClientsGroup
         """
-        connectedClients = [c for c in self.allConnectedClientsDict.values() if c.ID != sender[0].ID]
+        connectedClients = [c for c in self.allConnectedClientsDict.values() if c.ID != sender.ID]
         return ConnectedClientsGroup(connectedClients, self.hubName)
 
     def getClients(self, filterFunction):
         return ConnectedClientsGroup([c for c in self.allConnectedClientsDict.values() if filterFunction(c)], self.hubName)
 
     def getClient(self, clientId):
-        return ConnectedClientsGroup([self.allConnectedClientsDict[clientId]], self.hubName)
+        return ConnectedClientsGroup([self.allConnectedClientsDict[clientId]], self.hubName)[0]
 
     def getSubscribedClients(self):
         subscribedClients = HubsInspector.getHubInstance(self.hubName).getSubscribedClientsToHub()

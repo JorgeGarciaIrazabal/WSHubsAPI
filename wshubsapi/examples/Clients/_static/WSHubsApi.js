@@ -180,11 +180,6 @@ function HubsAPI(url, serverTimeout) {
             return constructMessage('ChatHub', 'classMethod', arguments);
         },
 
-        unsubscribeToHub : function (){
-            
-            return constructMessage('ChatHub', 'unsubscribeToHub', arguments);
-        },
-
         staticFunc : function (){
             
             return constructMessage('ChatHub', 'staticFunc', arguments);
@@ -200,6 +195,11 @@ function HubsAPI(url, serverTimeout) {
             return constructMessage('ChatHub', 'getSubscribedClientsToHub', arguments);
         },
 
+        unsubscribeFromHub : function (){
+            
+            return constructMessage('ChatHub', 'unsubscribeFromHub', arguments);
+        },
+
         subscribeToHub : function (){
             
             return constructMessage('ChatHub', 'subscribeToHub', arguments);
@@ -210,11 +210,6 @@ function HubsAPI(url, serverTimeout) {
     this.UtilsAPIHub.server = {
         __HUB_NAME : 'UtilsAPIHub',
         
-        unsubscribeToHub : function (){
-            
-            return constructMessage('UtilsAPIHub', 'unsubscribeToHub', arguments);
-        },
-
         getSubscribedClientsToHub : function (){
             
             return constructMessage('UtilsAPIHub', 'getSubscribedClientsToHub', arguments);
@@ -228,6 +223,11 @@ function HubsAPI(url, serverTimeout) {
         isClientConnected : function (clientId){
             
             return constructMessage('UtilsAPIHub', 'isClientConnected', arguments);
+        },
+
+        unsubscribeFromHub : function (){
+            
+            return constructMessage('UtilsAPIHub', 'unsubscribeFromHub', arguments);
         },
 
         subscribeToHub : function (){

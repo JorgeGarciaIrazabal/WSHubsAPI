@@ -1,6 +1,7 @@
 import json
 import logging
 
+from wshubsapi.ClientInHub import ClientInHub
 from wshubsapi.ConnectedClientsGroup import ConnectedClientsGroup
 from wshubsapi.ConnectedClientsHolder import ConnectedClientsHolder
 from wshubsapi.HubsInspector import HubsInspector
@@ -57,6 +58,6 @@ class FunctionMessage:
         methodArgs = getArgs(method, includeSender=True)
         try:
             senderIndex = methodArgs.index(SENDER_KEY_PARAMETER)
-            args.insert(senderIndex, ConnectedClientsGroup([self.connectedClient], self.hubName))
+            args.insert(senderIndex, ClientInHub(self.connectedClient, self.hubName))
         except ValueError:
             pass

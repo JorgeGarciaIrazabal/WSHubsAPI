@@ -2,6 +2,8 @@
 import json
 import unittest
 
+from wshubsapi.ClientInHub import ClientInHub
+from wshubsapi.ConnectedClient import ConnectedClient
 from wshubsapi.ConnectedClientsGroup import ConnectedClientsGroup
 from wshubsapi.FunctionMessage import FunctionMessage
 from wshubsapi.HubsInspector import HubsInspector
@@ -77,13 +79,14 @@ class TestFunctionMessage(unittest.TestCase):
         self.assertEqual(functionResult["ID"], 15)
 
     def test_CallFunction_IncludesSender(self):
-        fn = FunctionMessage(self.__constructMessageStr(args=["x"]), "_sender")
+        cc = ConnectedClient(None, None)
+        fn = FunctionMessage(self.__constructMessageStr(args=["x"]), cc)
 
         functionResult = fn.callFunction()
 
         self.assertEqual(functionResult["replay"][0], "x")
-        self.assertIsInstance(functionResult["replay"][1], ConnectedClientsGroup)
-        self.assertEqual(functionResult["replay"][1][0], "_sender")
+        self.assertIsInstance(functionResult["replay"][1], ClientInHub)
+        self.assertEqual(functionResult["replay"][1].api_getRealConnectedClient(), cc)
         self.assertEqual(functionResult["replay"][2], 1)
         self.assertEqual(functionResult["success"], True)
 

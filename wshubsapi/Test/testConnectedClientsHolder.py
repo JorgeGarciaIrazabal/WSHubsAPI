@@ -1,6 +1,10 @@
 # coding=utf-8
 import unittest
 
+from flexmock import flexmock
+from wshubsapi.CommEnvironment import CommEnvironment
+
+from wshubsapi.ConnectedClient import ConnectedClient
 from wshubsapi.ConnectedClientsGroup import ConnectedClientsGroup
 from wshubsapi.ConnectedClientsHolder import ConnectedClientsHolder
 
@@ -10,12 +14,10 @@ class TestConnectedClientsHolder(unittest.TestCase):
         self.testHubName = "testHubName"
         self.connectedClientsHolder = ConnectedClientsHolder(self.testHubName)
 
-        class ConnectedClientMock:
-            def __init__(self, ID):
-                self.ID = ID
+
 
         for i in range(10):
-            connectedClient = ConnectedClientMock(i)
+            connectedClient = flexmock(ConnectedClient(CommEnvironment(maxWorkers=0), None), ID=i)
             self.connectedClientsHolder.appendClient(connectedClient)
 
     def test_getAllClients_returns10ConnectedClientsWithDifferentIDs(self):
@@ -30,7 +32,6 @@ class TestConnectedClientsHolder(unittest.TestCase):
 
     def test_getOtherClients_returns9ConnectedClientsAndNotTheSender(self):
         sender = self.connectedClientsHolder.getClient(8)
-        sender = ConnectedClientsGroup(sender,'test')
 
         otherClients = self.connectedClientsHolder.getOtherClients(sender)
 
@@ -50,8 +51,8 @@ class TestConnectedClientsHolder(unittest.TestCase):
         client5 = self.connectedClientsHolder.getClient(5)
         client7 = self.connectedClientsHolder.getClient(7)
 
-        self.assertEqual(client3[0].ID, 3)
-        self.assertEqual(client5[0].ID, 5)
-        self.assertEqual(client7[0].ID, 7)
+        self.assertEqual(client3.ID, 3)
+        self.assertEqual(client5.ID, 5)
+        self.assertEqual(client7.ID, 7)
 
 
