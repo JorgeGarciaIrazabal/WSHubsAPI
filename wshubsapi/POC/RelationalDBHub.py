@@ -2,7 +2,6 @@ from datetime import datetime
 
 from sqlalchemy import DateTime, Date, Time
 from sqlalchemy.orm import sessionmaker
-
 from wshubsapi.Hub import Hub
 
 
@@ -12,10 +11,20 @@ class RelationalDBHub(Hub):
 
     def __init__(self):
         super(RelationalDBHub, self).__init__()
-        self.EntryTable = None  # defined in subclass
+        self._entryTable = None  # defined in plugging creation
+        self.__mainPrimaryKey = None
+
+    @property
+    def entryTable(self):
+        return self._entryTable
+
+    @entryTable.setter
+    def entryTable(self, value):
+        self.__mainPrimaryKey = self.entryTable.primary_key.columns[0].key
+        self._entryTable = value
 
     @classmethod
-    def getSession(cls):
+    def _getSession(cls):
         session = sessionmaker(bind=cls.engine, expire_on_commit=False)()
         session._model_changes = {}
         return session
@@ -26,16 +35,16 @@ class RelationalDBHub(Hub):
         :type entry: Base
         """
         for newEntryKey in newEntryDict:
-            if newEntryKey in entry.__table__.columns and not newEntryKey in entry.__dict__:
+            if newEntryKey in entry.__table__.columns and newEntryKey not in entry.__dict__:
                 if isinstance(cls.__dict__[newEntryKey].type, (DateTime, Date, Time,)):
                     entry.__dict__[newEntryKey] = datetime.utcfromtimestamp(newEntryDict[newEntryKey]/1e3)
                 else:
                     entry.__dict__[newEntryKey] = newEntryDict[newEntryKey]
 
     def insert(self, entry2Insert):
-        session = self.getSession()
+        session = self._getSession()
         try:
-            entry = self.EntryTable()
+            entry = self.entryTable()
             self.__updateValuesFormDict(entry, entry2Insert)
             session.add(entry)
             session.commit()
@@ -45,10 +54,10 @@ class RelationalDBHub(Hub):
             session.close()
 
     def update(self, entry2Update):
-        session = self.getSession()
+        session = self._getSession()
         try:
-            ID = entry2Update.pop("id")
-            entry = session.query(self.EntryTable).get(ID)
+            ID = entry2Update.pop(self.__mainPrimaryKey)
+            entry = session.query(self.entryTable).get(ID)
             self.__updateValuesFormDict(entry, entry2Update)
             session.add(entry)
             session.commit()

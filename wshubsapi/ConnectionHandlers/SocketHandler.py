@@ -1,53 +1,107 @@
-import socket
 import logging
+import SocketServer
+import threading
+from _socket import error
+import socket
 
-from wshubsapi.ConnectionHandlers.API_SocketServer import API_SocketServer
-
+from wshubsapi.ConnectedClient import ConnectedClient
 from wshubsapi.CommEnvironment import CommEnvironment
+from wshubsapi.utils import MessageSeparator
 
 log = logging.getLogger(__name__)
 log.addHandler(logging.NullHandler())
 
 
-class SocketHandler(API_SocketServer):
+
+class SocketHandler(SocketServer.BaseRequestHandler):
     commEnvironment = None
     API_SEP = "*API_SEP*"
 
-    def __init__(self, IP=socket.gethostbyname(socket.gethostname()), port=9999, *args, **kwargs):
-        super(SocketHandler, self).__init__(IP, port, *args, **kwargs)
+    def __init__(self, request, client_address, server):
+        SocketServer.BaseRequestHandler.__init__(self, request, client_address, server)
+        # never enter here :O
+        self.messageBuffer = ""
+        self.__connectedClient = None
+        self.__messageSeparator = None
+
+    def setup(self):
+        self.messageBuffer = ""
+        self.__connectedClient = None
+        self.__messageSeparator = MessageSeparator()
+
         if SocketHandler.commEnvironment is None:
             SocketHandler.commEnvironment = CommEnvironment()
+        self.__connectedClient = ConnectedClient(self.commEnvironment, self.writeMessage)
+        self.commEnvironment.onOpen(self.__connectedClient)
 
-        self.clientConnectedClientHashMap = dict()
-        """ :type : dict[SocketServer.ConnectedClient,wshubsapi.ConnectedClient.ConnectedClient]"""
+    def writeMessage(self, message):
+        self.request.sendall(message + self.API_SEP)
+        log.debug("message to %s:\n%s" % (self.__connectedClient.ID, message))
 
-    def onClientConnected(self, client):
-        connectedClient = self.commEnvironment.constructConnectedClient(
-            lambda m: client.socket.sendall(m + self.API_SEP))
-        connectedClient.onOpen()
-        self.clientConnectedClientHashMap[client] = connectedClient
-
-        def onClose():
-            log.debug("client closed %s" % connectedClient.__dict__.get("ID", "None"))
-            connectedClient.onClosed()
-            self.clientConnectedClientHashMap.pop(client, None)
-
-        client.onClose = onClose
-        log.debug("open new connection with ID: {} ".format(connectedClient.ID))
-
-    def onMessageReceived(self, client, message):
-        connectedClient = self.clientConnectedClientHashMap[client]
-        # todo: use API_SEP instead of }{
-        messages = message.split("}{")
-        if len(messages) == 0:
-            log.debug("Message received from ID: %s\n%s " % (str(connectedClient.ID), str(message)))
-            return connectedClient.onAsyncMessage(message)
-        for i, m in enumerate(messages):
-            if i == 0:
-                m += "}"
-            elif i == len(messages) - 1:
-                m = "{" + m
+    def handle(self):
+        while not self.__connectedClient.api_isClosed:
+            try:
+                data = self.request.recv(10240)
+            except error as e:
+                if e.errno == 10054:
+                    self.finish()
+            except:
+                log.exception("error receiving data")
             else:
-                m = "{" + m + "}"
-            log.debug("Message received from ID: %s\n%s " % (str(connectedClient.ID), str(m)))
-            connectedClient.onAsyncMessage(m)
+                for m in self.__messageSeparator.addData(data):
+                    log.debug("Message received from ID: %s\n%s " % (str(self.__connectedClient.ID), str(m)))
+                    self.commEnvironment.onAsyncMessage(self.__connectedClient, m)
+
+    def finish(self):
+        log.debug("client closed %s" % self.__connectedClient.__dict__.get("ID", "None"))
+        self.commEnvironment.onClosed(self.__connectedClient)
+
+
+class ThreadedTCPServer(SocketServer.ThreadingMixIn, SocketServer.TCPServer):
+    pass
+
+
+def createSocketServer(host, port, SocketHandlerClass=SocketHandler):
+    return ThreadedTCPServer((host, port), SocketHandlerClass)
+
+
+class SocketClient:
+    class Message:
+        def __init__(self, message):
+            self.data = message
+
+    def __init__(self, url):
+        """
+        :type url: str
+        """
+        url = url.split("//", 1)[-1]  # cleaning protocol
+        url = url.split("/", 1)[0]  # cleaning extra parameters
+        h, p = url.split(":")
+        self.host, self.port = h, int(p)
+        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.__messageSeparator = MessageSeparator()
+
+    def connect(self):
+        self.socket.connect((self.host, self.port))
+        server_thread = threading.Thread(target=self.receiveMessageThread)
+        # Exit the server thread when the main thread terminates
+        server_thread.daemon = True
+        server_thread.start()
+
+    def send(self, message):
+        # this will crash if not ascii
+        self.socket.sendall(message + SocketHandler.API_SEP)
+
+    def receiveMessageThread(self):
+        while True:
+            try:
+                data = self.socket.recv(1024)
+            except:
+                log.exception("Error receiving message")
+                break
+            if data != "":
+                for m in self.__messageSeparator.addData(data):
+                    self.received_message(self.Message(m))
+
+    def received_message(self, message):
+        raise NotImplemented

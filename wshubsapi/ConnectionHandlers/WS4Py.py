@@ -1,5 +1,7 @@
 import logging
 from ws4py.websocket import WebSocket
+from wshubsapi.ConnectedClient import ConnectedClient
+
 from wshubsapi.CommEnvironment import CommEnvironment
 
 __author__ = 'Jorge'
@@ -14,21 +16,24 @@ class ConnectionHandler(WebSocket):
         super(ConnectionHandler, self).__init__(sock, protocols, extensions, environ, heartbeat_freq)
         if ConnectionHandler.commEnvironment is None:
             ConnectionHandler.commEnvironment = CommEnvironment()
+        self._connectedClient = ConnectedClient(self.commEnvironment, self.writeMessage)
 
     def writeMessage(self, message):
         self.send(message)
         log.debug("message to %s:\n%s" % (self._connectedClient.ID, message))
 
     def opened(self, *args):
-        self._connectedClient = self.commEnvironment.constructConnectedClient(self.writeMessage)
-        clientId = int(args[0]) if len(args) > 0 else None
-        ID = self._connectedClient.onOpen(clientId)
-        log.debug("open new connection with ID: %s " % str(ID))
+        try:
+            clientId = int(args[0])
+        except:
+            clientId = None
+        ID = self.commEnvironment.onOpen(self._connectedClient, clientId)
+        log.debug("open new connection with ID: {} ".format(ID))
 
     def received_message(self, message):
         log.debug("Message received from ID: %s\n%s " % (str(self._connectedClient.ID), str(message)))
-        self._connectedClient.onAsyncMessage(message.data)
+        self.commEnvironment.onAsyncMessage(self._connectedClient, message.data)
 
     def closed(self, code, reason=None):
         log.debug("client closed %s" % self._connectedClient.__dict__.get("ID", "None"))
-        self._connectedClient.onClosed()
+        self.commEnvironment.onClosed(self._connectedClient)

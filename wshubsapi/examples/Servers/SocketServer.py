@@ -3,10 +3,8 @@ import json
 import logging
 import logging.config
 
-import time
-
 from wshubsapi.HubsInspector import HubsInspector
-from wshubsapi.ConnectionHandlers.SocketHandler import SocketHandler
+from wshubsapi.ConnectionHandlers.SocketHandler import createSocketServer
 
 logging.config.dictConfig(json.load(open('logging.json')))
 log = logging.getLogger(__name__)
@@ -16,10 +14,9 @@ if __name__ == '__main__':
     # construct the necessary client files in the specified path
     HubsInspector.inspectImplementedHubs()
     HubsInspector.constructPythonFile("../Clients/_static")
-    HubsInspector.constructJSFile("../Clients/_static")
 
-    server = SocketHandler("localhost", 8890)
+    server = createSocketServer("127.0.0.1", 8890)
 
-    while True:
-        time.sleep(0.1)
+    server.serve_forever()
+
 

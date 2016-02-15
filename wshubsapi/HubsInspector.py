@@ -6,7 +6,6 @@ from wshubsapi.ClientFileGenerator.JSClientFileGenerator import JSClientFileGene
 from wshubsapi.ClientFileGenerator.PythonClientFileGenerator import PythonClientFileGenerator
 from wshubsapi.utils import isFunctionForWSClient, getArgs, getDefaults
 
-
 class HubsInspectorException(Exception):
     pass
 
@@ -20,19 +19,27 @@ class HubsInspector:
         return "__HubName__" in hubClass.__dict__ and hubClass.__HubName__ is None
 
     @classmethod
+    def getAllHubsSubclasses(cls, hubClass2Inspect, currentHubClasses=list()):
+        for hubClass in hubClass2Inspect.__subclasses__():
+            if not cls.ignoreHubImplementation(hubClass):
+                currentHubClasses.append(hubClass)
+            else:
+                cls.getAllHubsSubclasses(hubClass, currentHubClasses)
+        return currentHubClasses
+
+    @classmethod
     def inspectImplementedHubs(cls, forceReconstruction=False):
         if not cls.__hubsConstructed or forceReconstruction:
             cls.HUBs_DICT.clear()
-            for hubClass in Hub.__subclasses__():
-                if not cls.ignoreHubImplementation(hubClass):
-                    try:
-                        hubClass()
-                    except TypeError as e:
-                        if "__init__()" in str(e):
-                            raise HubsInspectorException(
-                                "Hubs can not have a constructor with parameters. Check Hub: %s" % hubClass.__name__)
-                        else:
-                            raise e
+            for hubClass in cls.getAllHubsSubclasses(Hub):
+                try:
+                    hubClass()
+                except TypeError as e:
+                    if "__init__()" in str(e):
+                        raise HubsInspectorException(
+                            "Hubs can not have a constructor with parameters. Check Hub: %s" % hubClass.__name__)
+                    else:
+                        raise e
             cls.__hubsConstructed = True
 
     @classmethod

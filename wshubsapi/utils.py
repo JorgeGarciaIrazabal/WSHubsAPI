@@ -107,3 +107,16 @@ def setSerializerDateTimeHandler():
 
 def serializeMessage(serializationPickler, message):
     return jsonpickle.encode(serializationPickler.flatten(message))
+
+
+class MessageSeparator:
+    API_SEP = "*API_SEP*"
+
+    def __init__(self):
+        self.buffer = ""
+
+    def addData(self, data):
+        data = self.buffer + data
+        messages = data.split(self.API_SEP)
+        self.buffer = messages.pop(-1)
+        return messages

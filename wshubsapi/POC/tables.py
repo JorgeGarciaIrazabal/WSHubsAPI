@@ -2,7 +2,7 @@
 from datetime import datetime
 from jsonpickle import handlers
 from sqlalchemy import Column, DateTime, Enum, ForeignKey, Integer, Text, text, create_engine, Float
-from sqlalchemy.orm import relationship, sessionmaker, Session
+from sqlalchemy.orm import relationship, Session
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.ext.declarative import AbstractConcreteBase
 
@@ -154,12 +154,12 @@ class MyBaseObject(handlers.BaseHandler):
 
 handlers.register(Base, MyBaseObject, base=True)
 
-
-
-
 if __name__ == '__main__':
-    engine = create_engine("mysql://hinow:hinow123@localhost/HiNow?charset=utf8", echo=True)
-    SqlTableEntity.metadata.create_all(bind=engine)
+    pass
+    SqlTableEntity.metadata
+    # engine = create_engine("mysql://root@localhost/APITest?charset=utf8", echo=True)
+    # SqlTableEntity.metadata.create_all(bind=engine)
+    # SqlTableEntity.metadata
     # com = engine.connect()
     # s = select([User])
     # com.execute(s)
