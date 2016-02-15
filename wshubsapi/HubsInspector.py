@@ -19,7 +19,8 @@ class HubsInspector:
         return "__HubName__" in hubClass.__dict__ and hubClass.__HubName__ is None
 
     @classmethod
-    def getAllHubsSubclasses(cls, hubClass2Inspect, currentHubClasses=list()):
+    def getAllHubsSubclasses(cls, hubClass2Inspect, currentHubClasses=None):
+        currentHubClasses = currentHubClasses if currentHubClasses is not None else []
         for hubClass in hubClass2Inspect.__subclasses__():
             if not cls.ignoreHubImplementation(hubClass):
                 currentHubClasses.append(hubClass)

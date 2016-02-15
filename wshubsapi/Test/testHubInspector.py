@@ -67,7 +67,7 @@ class TestHubDetection(unittest.TestCase):
         self.assertRaises(HubException, HubsInspector.inspectImplementedHubs, forceReconstruction=True)
 
     def test_getHubInstance_returnsAnInstanceOfHubIfExists(self):
-        HubsInspector.getHubInstance(self.testHubClass)
+        self.assertIsInstance(HubsInspector.getHubInstance(self.testHubClass), Hub)
 
     def test_getHubInstance_RaisesErrorIfNotAHub(self):
         self.assertRaises(AttributeError, HubsInspector.getHubInstance, (str,))

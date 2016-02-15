@@ -9,7 +9,7 @@ class ClientInHub(object):
         :type client: wshubsapi.ConnectedClient.ConnectedClient
         :type hubName: str
         """
-        self.__hubName = hubName
+        self.__hubName = str(hubName)
         self.__client = client
         self.__comEnvironment = client.api_getCommEnvironment()
 
@@ -22,18 +22,20 @@ class ClientInHub(object):
         else:
             if item.startswith("__") and item.endswith("__"):
                 return
+            if "_ClientInHub" + item in self.__dict__:
+                return self.__dict__["_ClientInHub" + item]
             return self.__constructFunctionToSendMessageToClient(item)
 
     def __constructFunctionToSendMessageToClient(self, functionName):
         def connectionFunction(*args):
-            message = {"function": functionName, "args": list(args), "hub": self.hubName}
+            message = {"function": functionName, "args": list(args), "hub": self.__hubName}
             msgStr = utils.serializeMessage(self.__comEnvironment.pickler, message)
             self.api_writeMessage(msgStr)
 
         return connectionFunction
 
     def __setattr__(self, key, value):
-        if key.startswith("_ClientInHub__"):
+        if key.startswith("_ClientInHub__") or key.startswith("__"):
             super(ClientInHub, self).__setattr__(key, value)
             return
         self.__client.__dict__[key] = value
