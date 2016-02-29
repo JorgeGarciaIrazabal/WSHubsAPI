@@ -24,7 +24,7 @@ setup(
         # Versions should comply with PEP440.  For a discussion on single-sourcing
         # the version across setup.py and the project code, see
         # https://packaging.python.org/en/latest/single_source_version.html
-        version='0.6.3a2',
+        version='0.6.4',
 
         description='function protocol to communicate backend and frontend in a intuitive way like signalR in C#',
         long_description=long_description,
@@ -67,7 +67,7 @@ setup(
         ],
 
         # What does your project relate to?
-        keywords='communication protocol tornado sockets signalR websockets Android Java javascript',
+        keywords='communication protocol tornado sockets signalR websockets Android Java javascript API',
 
         # You can just specify the packages manually here if your project is
         # simple. Or you can use find_packages().

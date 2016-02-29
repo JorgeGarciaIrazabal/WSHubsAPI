@@ -28,9 +28,13 @@
         $('#discussion').append('<li><strong> Me'
                     + '</strong>: ' + message + '</li>');
         hubsApi.ChatHub.server.sendToAll(name, message).done(function (numOfMessagesSent){
+          throw 1;
           console.log("message sent to " + numOfMessagesSent + " client(s)");
         },function (message){
+          throw 1;
           console.log("message not sent" +message);
+        }).finally(function () {
+            console.log("I am in finnally");
         });
         $('#message').val('').focus();
     }
