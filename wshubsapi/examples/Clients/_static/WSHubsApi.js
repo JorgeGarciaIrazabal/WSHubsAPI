@@ -194,19 +194,29 @@ function HubsAPI(url, serverTimeout) {
     this.ChatHub.server = {
         __HUB_NAME : 'ChatHub',
         
-        unsubscribeFromHub : function (){
+        classMethod : function (){
             
-            return constructMessage('ChatHub', 'unsubscribeFromHub', arguments);
+            return constructMessage('ChatHub', 'classMethod', arguments);
+        },
+
+        staticFunc : function (){
+            
+            return constructMessage('ChatHub', 'staticFunc', arguments);
         },
 
         sendToAll : function (name, message){
-            
+            arguments[0] = name === undefined ? "hello" : name;
             return constructMessage('ChatHub', 'sendToAll', arguments);
         },
 
         getSubscribedClientsToHub : function (){
             
             return constructMessage('ChatHub', 'getSubscribedClientsToHub', arguments);
+        },
+
+        unsubscribeFromHub : function (){
+            
+            return constructMessage('ChatHub', 'unsubscribeFromHub', arguments);
         },
 
         subscribeToHub : function (){

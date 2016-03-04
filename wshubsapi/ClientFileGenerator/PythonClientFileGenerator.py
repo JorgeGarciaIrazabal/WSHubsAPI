@@ -74,6 +74,7 @@ class WSReturnObject:
         def __init__(self, onSuccess=None, onError=None):
             self.onSuccess = onSuccess
             self.onError = onError
+            self.onFinally = lambda: None
 
     def done(self, onSuccess, onError=None):
         pass
@@ -130,10 +131,14 @@ def constructAPIClientClass(clientClass):
                 return
             if "replay" in msgObj:
                 f = self.__returnFunctions.get(msgObj["ID"], None)
-                if f and msgObj["success"]:
-                    f.onSuccess(msgObj["replay"])
-                elif f and f.onError:
-                    f.onError(msgObj["replay"])
+                try:
+                    if f and msgObj["success"]:
+                        f.onSuccess(msgObj["replay"])
+                    elif f and f.onError:
+                        f.onError(msgObj["replay"])
+                finally:
+                    if f:
+                        f.onFinally()
             else:
                 try:
                     clientFunction = self.api.__getattribute__(msgObj["hub"]).client.__dict__[msgObj["function"]]
@@ -170,6 +175,7 @@ def constructAPIClientClass(clientClass):
                 timeOut = timeOut if timeOut is not None else self.serverTimeout
                 r = Timer(timeOut, self.onTimeOut, (ID,))
                 r.start()
+                return callBacks
 
             retObject = WSReturnObject()
             retObject.done = returnFunction

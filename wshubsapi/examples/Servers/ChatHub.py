@@ -11,7 +11,6 @@ class ChatHub(Hub):
         ### call function from all clients but the sender
         otherClients = self._getClientsHolder().getOtherClients(_sender)
         otherClients.onMessage(name, message)
-        _sender.onMessage("sender", message)
         ### or call function from a selection of clients
         # self.getClients(lambda x:x.ID > 4).onMessage(name,message)
         return len(otherClients)

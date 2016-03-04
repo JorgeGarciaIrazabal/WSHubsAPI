@@ -28,6 +28,8 @@ class CommEnvironment(object):
         self.wsMessageReceivedQueue.startThreads()
         self.allConnectedClients = ConnectedClientsHolder.allConnectedClientsDict
         self.pickler = pickler
+        self.__lastClientMessageID = 0
+        self.__newClientMessageIDLock = threading.Lock()
 
     def getUnprovidedID(self):
         if len(self.availableUnprovidedIds) > 0:
@@ -72,3 +74,8 @@ class CommEnvironment(object):
         :param originMessage: Message received (provided for overridden functions)
         """
         client.api_writeMessage(serializeMessage(self.pickler, replay))
+
+    def getNewMessageID(self):
+        with self.__newClientMessageIDLock:
+            self.__lastClientMessageID += 1
+            return self.__lastClientMessageID

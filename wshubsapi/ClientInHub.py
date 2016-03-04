@@ -3,6 +3,8 @@ from wshubsapi import utils
 """
 Class that wraps a client but includes de hubName to be able to construct the message to call client function
 """
+
+
 class ClientInHub(object):
     def __init__(self, client, hubName):
         """
@@ -28,7 +30,8 @@ class ClientInHub(object):
 
     def __constructFunctionToSendMessageToClient(self, functionName):
         def connectionFunction(*args):
-            message = {"function": functionName, "args": list(args), "hub": self.__hubName}
+            message = dict(function=functionName, args=list(args), hub=self.__hubName,
+                           ID=self.__comEnvironment.getNewMessageID())
             msgStr = utils.serializeMessage(self.__comEnvironment.pickler, message)
             self.api_writeMessage(msgStr)
 

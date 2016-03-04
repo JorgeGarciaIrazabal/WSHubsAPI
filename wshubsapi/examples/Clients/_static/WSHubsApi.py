@@ -14,18 +14,15 @@ class WSSimpleObject(object):
     def __setattr__(self, key, value):
         return super(WSSimpleObject, self).__setattr__(key, value)
 
-class WSCallbacks:
-    def __init__(self, onSuccess=None, onError=None):
-        self.onSuccess = onSuccess
-        self.onError = onError
-        self.onFinally = lambda: None
 
 class WSReturnObject:
+    class WSCallbacks:
+        def __init__(self, onSuccess=None, onError=None):
+            self.onSuccess = onSuccess
+            self.onError = onError
+            self.onFinally = lambda: None
 
     def done(self, onSuccess, onError=None):
-        """
-        :rtype: WSCallbacks
-        """
         pass
 
 
@@ -59,7 +56,6 @@ def constructAPIClientClass(clientClass):
         def __init__(self, api, url, serverTimeout):
             clientClass.__init__(self, url)
             self.__returnFunctions = dict()
-            """:type : Dict from int to WSCallbacks"""
             self.isOpened = False
             self.serverTimeout = serverTimeout
             self.api = api
@@ -81,13 +77,13 @@ def constructAPIClientClass(clientClass):
                 return
             if "replay" in msgObj:
                 f = self.__returnFunctions.get(msgObj["ID"], None)
-                if f is not None:
-                    try:
-                        if msgObj["success"]:
-                            f.onSuccess(msgObj["replay"])
-                        elif f.onError:
-                            f.onError(msgObj["replay"])
-                    finally:
+                try:
+                    if f and msgObj["success"]:
+                        f.onSuccess(msgObj["replay"])
+                    elif f and f.onError:
+                        f.onError(msgObj["replay"])
+                finally:
+                    if f:
                         f.onFinally()
             else:
                 try:
@@ -104,7 +100,7 @@ def constructAPIClientClass(clientClass):
             """
 
             def returnFunction(onSuccess, onError=None, timeOut=None):
-                callBacks = self.__returnFunctions.get(ID, WSCallbacks())
+                callBacks = self.__returnFunctions.get(ID, WSReturnObject.WSCallbacks())
                 onError = onError if onError is not None else self.defaultOnError
 
                 def onSuccessWrapper(*args, **kwargs):
@@ -138,12 +134,8 @@ def constructAPIClientClass(clientClass):
 
         def onTimeOut(self, messageId):
             f = self.__returnFunctions.pop(messageId, None)
-            if f is not None:
-                try:
-                    if f.onError:
-                        f.onError("timeOut Error")
-                finally:
-                    f.onFinally()
+            if f and f.onError:
+                f.onError("timeOut Error")
 
         def defaultOnError(self, error):
             pass
@@ -180,6 +172,18 @@ class HubsAPI(object):
 
         class __Server(GenericServer):
             
+            def classMethod(self, ):
+                """
+                :rtype : WSReturnObject
+                """
+                args = list()
+                
+                id = self._getNextMessageID()
+                body = {"hub": self.hubName, "function": "classMethod", "args": args, "ID": id}
+                retFunction = self.wsClient.getReturnFunction(id)
+                self.wsClient.send(self._serializeObject(body))
+                return retFunction
+        
             def getSubscribedClientsToHub(self, ):
                 """
                 :rtype : WSReturnObject
@@ -192,7 +196,7 @@ class HubsAPI(object):
                 self.wsClient.send(self._serializeObject(body))
                 return retFunction
         
-            def sendToAll(self, name, message):
+            def sendToAll(self, name, message="hello"):
                 """
                 :rtype : WSReturnObject
                 """
@@ -201,6 +205,18 @@ class HubsAPI(object):
                 args.append(message)
                 id = self._getNextMessageID()
                 body = {"hub": self.hubName, "function": "sendToAll", "args": args, "ID": id}
+                retFunction = self.wsClient.getReturnFunction(id)
+                self.wsClient.send(self._serializeObject(body))
+                return retFunction
+        
+            def staticFunc(self, ):
+                """
+                :rtype : WSReturnObject
+                """
+                args = list()
+                
+                id = self._getNextMessageID()
+                body = {"hub": self.hubName, "function": "staticFunc", "args": args, "ID": id}
                 retFunction = self.wsClient.getReturnFunction(id)
                 self.wsClient.send(self._serializeObject(body))
                 return retFunction
