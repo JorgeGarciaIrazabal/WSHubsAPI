@@ -30,10 +30,12 @@ class ClientInHub(object):
 
     def __constructFunctionToSendMessageToClient(self, functionName):
         def connectionFunction(*args):
+            future, ID = self.__comEnvironment.getNewClientsFuture()
             message = dict(function=functionName, args=list(args), hub=self.__hubName,
-                           ID=self.__comEnvironment.getNewMessageID())
+                           ID=ID)
             msgStr = utils.serializeMessage(self.__comEnvironment.pickler, message)
             self.api_writeMessage(msgStr)
+            return future
 
         return connectionFunction
 

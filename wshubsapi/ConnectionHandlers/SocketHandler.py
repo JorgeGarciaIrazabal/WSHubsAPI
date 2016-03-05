@@ -12,7 +12,6 @@ log = logging.getLogger(__name__)
 log.addHandler(logging.NullHandler())
 
 
-
 class SocketHandler(SocketServer.BaseRequestHandler):
     commEnvironment = None
     API_SEP = "*API_SEP*"

@@ -8,7 +8,7 @@ import unittest
 from wshubsapi.ConnectedClient import ConnectedClient
 from wshubsapi.CommEnvironment import CommEnvironment
 from wshubsapi.ConnectedClientsHolder import ConnectedClientsHolder
-from wshubsapi.utils import WSMessagesReceivedQueue
+from wshubsapi.MessagesReceivedQueue import MessagesReceivedQueue
 
 
 class TestCommProtocol(unittest.TestCase):
@@ -16,7 +16,7 @@ class TestCommProtocol(unittest.TestCase):
         self.commEnvironment = CommEnvironment(maxWorkers=0, unprovidedIdTemplate="unprovided_{}")
 
     def test_construct_initializeMandatoryAttributes(self):
-        self.assertIsInstance(self.commEnvironment.wsMessageReceivedQueue, WSMessagesReceivedQueue)
+        self.assertIsInstance(self.commEnvironment.wsMessageReceivedQueue, MessagesReceivedQueue)
         self.assertIsInstance(self.commEnvironment.lock, thread.LockType)
         self.assertIs(self.commEnvironment.allConnectedClients, ConnectedClientsHolder.allConnectedClientsDict)
 

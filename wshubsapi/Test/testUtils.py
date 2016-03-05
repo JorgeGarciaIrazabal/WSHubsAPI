@@ -1,14 +1,14 @@
 # coding=utf-8
-import unittest
 import time
+import unittest
+
+from flexmock import flexmock
 
 from wshubsapi.CommEnvironment import CommEnvironment
-
 from wshubsapi.ConnectedClient import ConnectedClient
-from wshubsapi.Hub import Hub
 from wshubsapi.HubsInspector import HubsInspector
+from wshubsapi.MessagesReceivedQueue import MessagesReceivedQueue
 from wshubsapi.utils import *
-from flexmock import flexmock
 
 
 class TestUtils(unittest.TestCase):
@@ -82,7 +82,7 @@ class TestUtils(unittest.TestCase):
         self.assertIn("wshubsapi" + os.sep + "Test", getModulePath())
 
     def setUp_WSMessagesReceivedQueue(self, commEnvironment, MAX_WORKERS):
-        queue = WSMessagesReceivedQueue(commEnvironment, MAX_WORKERS)
+        queue = MessagesReceivedQueue(commEnvironment, MAX_WORKERS)
         return queue
 
     def test_WSMessagesReceivedQueue_Creates__MAX_WORKERS__WORKERS(self):

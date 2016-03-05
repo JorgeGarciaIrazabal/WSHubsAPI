@@ -1,17 +1,10 @@
 import jsonpickle
-
-try:
-    from Queue import Queue
-except:
-    from queue import Queue
-
 import datetime
 import inspect
 import os
 import string
 import sys
 from inspect import getargspec
-from concurrent.futures import ThreadPoolExecutor
 from jsonpickle import handlers
 
 SENDER_KEY_PARAMETER = "_sender"
@@ -59,37 +52,6 @@ def getModulePath():
     info = inspect.getframeinfo(frame)
     fileName = info.filename
     return os.path.dirname(os.path.abspath(fileName))
-
-
-# todo: move to different module
-class WSMessagesReceivedQueue(Queue):
-    DEFAULT_MAX_WORKERS = 50
-
-    def __init__(self, commEnvironment, maxWorkers=DEFAULT_MAX_WORKERS):
-        """
-        :type commEnvironment: wshubsapi.CommEnvironment.CommEnvironment
-        """
-        Queue.__init__(self)
-        self.commEnvironment = commEnvironment
-        self.maxWorkers = maxWorkers
-        self.executor = ThreadPoolExecutor(max_workers=self.maxWorkers)
-        self.keepAlive = True
-
-    def startThreads(self):
-        for i in range(self.DEFAULT_MAX_WORKERS):
-            self.executor.submit(self.__infiniteOnMessageHandlerLoop)
-
-    def __infiniteOnMessageHandlerLoop(self):
-        while self.keepAlive:
-            connectedClient = None
-            try:
-                msg, connectedClient = self.get()
-                self.commEnvironment.onMessage(connectedClient, msg)
-            except Exception as e:
-                if connectedClient is not None:
-                    self.commEnvironment.onError(connectedClient, e)
-                else:
-                    print(str(e))  # todo: create a call back for this exception
 
 
 def setSerializerDateTimeHandler():

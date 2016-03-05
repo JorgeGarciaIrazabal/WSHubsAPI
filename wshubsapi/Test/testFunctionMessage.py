@@ -42,7 +42,7 @@ class TestFunctionMessage(unittest.TestCase):
             "args": args,
             "ID": ID
         }
-        return json.dumps(message)
+        return message
 
     def test_FunctionMessageConstruction_InitializeNecessaryAttributes(self):
         fn = FunctionMessage(self.__constructMessageStr(), "connectedClient")

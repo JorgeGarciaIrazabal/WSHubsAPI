@@ -108,6 +108,9 @@ def constructAPIClientClass(clientClass):
         clientClass = WebSocketClient
     class WSHubsAPIClient(clientClass):
         def __init__(self, api, url, serverTimeout):
+            """
+            :type api: HubsAPI
+            """
             clientClass.__init__(self, url)
             self.__returnFunctions = dict()
             self.isOpened = False
@@ -142,7 +145,16 @@ def constructAPIClientClass(clientClass):
             else:
                 try:
                     clientFunction = self.api.__getattribute__(msgObj["hub"]).client.__dict__[msgObj["function"]]
-                    clientFunction(*msgObj["args"])
+                    replayMessage = dict(ID=msgObj["ID"])
+                    try:
+                        replay = clientFunction(*msgObj["args"])
+                        replayMessage["replay"] = replay
+                        replayMessage["success"] = True
+                    except Exception as e:
+                        replayMessage["replay"] = str(e)
+                        replayMessage["success"] = False
+                    finally:
+                        self.api.wsClient.send(self.api.serializeObject(replayMessage))
                 except:
                     pass
 
@@ -215,6 +227,9 @@ class HubsAPI(object):
 
     def connect(self):
         self.wsClient.connect()
+
+    def serializeObject(self, obj2ser):
+        return jsonpickle.encode(self.pickler.flatten(obj2ser))
 
 {Hubs}'''
 

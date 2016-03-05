@@ -17,17 +17,20 @@ class ConnectedClientsGroup(object):
 
     def __getattr__(self, item):
         """
+        :rtype: list[Future]
         :param item: function name defined in the client side ("item" name keep because it is a magic function)
         """
         if item.startswith("__") and item.endswith("__"):
             return
         functions = []
+        futures = []
         for c in self.connectedClients:
             functions.append(c.__getattr__(item))
 
         def connectionFunctions(*args):
             for f in functions:
-                f(*args)
+                futures.append(f(*args))
+            return futures
 
         return connectionFunctions
 
