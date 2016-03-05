@@ -29,11 +29,11 @@ setSerializerDateTimeHandler()  # todo move this
 class HubsApiException(Exception):
     pass
 
-count = 0
+
 class CommEnvironment(object):
     def __init__(self, maxWorkers=MessagesReceivedQueue.DEFAULT_MAX_WORKERS,
                  unprovidedIdTemplate="UNPROVIDED__{}", pickler=_DEFAULT_PICKER,
-                 clientFunctionTimeout=10):
+                 clientFunctionTimeout=5):
         self.lock = threading.Lock()
         self.availableUnprovidedIds = list()
         self.unprovidedIdTemplate = unprovidedIdTemplate
@@ -66,14 +66,11 @@ class CommEnvironment(object):
             return client.ID
 
     def onMessage(self, client, messageStr):
-        global count
         try:
             messageStr = messageStr if isinstance(messageStr, str) else messageStr.decode("utf-8")
             msgObj = json.loads(messageStr)
             if "replay" not in msgObj:
                 self.__onReplay(client, messageStr, msgObj)
-                count += 1
-                print count
             else:
                 self.__onReplayed(msgObj)
 
@@ -118,7 +115,7 @@ class CommEnvironment(object):
     def __onTimeOut(self, ID):
         with self.__newClientMessageIDLock:
             if ID in self.__futuresBuffer:
-                future = self.__futuresBuffer.pop(ID)
+                future = self.__futuresBuffer.pop(ID)[0]
                 future.set_exception(HubsApiException("Timeout exception"))
 
     def __onReplay(self, client, messageStr, msgObj):

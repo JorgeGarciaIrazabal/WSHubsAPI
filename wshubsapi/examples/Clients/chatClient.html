@@ -46,6 +46,7 @@
         hubsApi.ChatHub.client.onMessage = function(from, message){
             $('#discussion').append('<li><strong>' + from
                     + '</strong>: ' + message + '</li>');
+            return "received"
         }
 
         //sending message
