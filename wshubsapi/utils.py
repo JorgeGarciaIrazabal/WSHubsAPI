@@ -72,13 +72,14 @@ def serializeMessage(serializationPickler, message):
 
 
 class MessageSeparator:
-    API_SEP = "*API_SEP*"
+    DEFAULT_API_SEP = "*API_SEP*"
 
-    def __init__(self):
+    def __init__(self, messageSeparator=DEFAULT_API_SEP):
         self.buffer = ""
+        self.sep = messageSeparator
 
     def addData(self, data):
         data = self.buffer + data
-        messages = data.split(self.API_SEP)
+        messages = data.split(self.sep)
         self.buffer = messages.pop(-1)
         return messages

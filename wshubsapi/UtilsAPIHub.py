@@ -12,7 +12,7 @@ class UtilsAPIHub(Hub):
         return True
 
     def getId(self, _sender):
-        return _sender[0].ID
+        return _sender.ID
 
     def isClientConnected(self, clientId):
         return clientId in self._getClientsHolder().allConnectedClientsDict

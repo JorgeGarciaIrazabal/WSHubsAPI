@@ -14,17 +14,15 @@ log.addHandler(logging.NullHandler())
 
 class SocketHandler(SocketServer.BaseRequestHandler):
     commEnvironment = None
-    API_SEP = "*API_SEP*"
 
     def __init__(self, request, client_address, server):
         SocketServer.BaseRequestHandler.__init__(self, request, client_address, server)
         # never enter here :O
-        self.messageBuffer = ""
         self.__connectedClient = None
         self.__messageSeparator = None
+        """:type : MessageSeparator"""
 
     def setup(self):
-        self.messageBuffer = ""
         self.__connectedClient = None
         self.__messageSeparator = MessageSeparator()
 
@@ -34,7 +32,7 @@ class SocketHandler(SocketServer.BaseRequestHandler):
         self.commEnvironment.onOpen(self.__connectedClient)
 
     def writeMessage(self, message):
-        self.request.sendall(message + self.API_SEP)
+        self.request.sendall(message + self.__messageSeparator.sep)
         log.debug("message to %s:\n%s" % (self.__connectedClient.ID, message))
 
     def handle(self):
@@ -89,7 +87,7 @@ class SocketClient:
 
     def send(self, message):
         # this will crash if not ascii
-        self.socket.sendall(message + SocketHandler.API_SEP)
+        self.socket.sendall(message + self.__messageSeparator.sep)
 
     def receiveMessageThread(self):
         while True:

@@ -49,7 +49,7 @@ class JSClientFileGenerator:
 
     WRAPPER = """/* jshint ignore:start */
 /* ignore jslint start */
-function HubsAPI(url, serverTimeout) {{
+function HubsAPI(url, serverTimeout, wsClientClass) {{
     'use strict';
 
     var messageID = 0,
@@ -69,7 +69,15 @@ function HubsAPI(url, serverTimeout) {{
         reconnectTimeout = reconnectTimeout || -1;
         var openPromise = {{
             onSuccess : function() {{}},
-            onError : function(error) {{}}
+            onError : function(error) {{}},
+            _connectError: false,
+            done: function (onSuccess, onError) {{
+                openPromise.onSuccess = onSuccess;
+                openPromise.onError = onError;
+                if (openPromise._connectError !== false){{
+                    openPromise.onError(openPromise._connectError);
+                }}
+            }}
         }};
         function reconnect(error) {{
             if (reconnectTimeout !== -1) {{
@@ -81,10 +89,11 @@ function HubsAPI(url, serverTimeout) {{
         }}
 
         try {{
-            this.wsClient = new WebSocket(url);
+            this.wsClient = wsClientClass === undefined ? new WebSocket(url) : new wsClientClass(url);
         }} catch (error) {{
             reconnect(error);
-            return;
+            openPromise._connectError = error;
+            return openPromise;
         }}
 
         this.wsClient.onopen = function () {{
@@ -156,11 +165,7 @@ function HubsAPI(url, serverTimeout) {{
             thisApi.callbacks.onMessageError(error);
         }};
 
-        return {{ done: function (onSuccess, onError) {{
-                openPromise.onSuccess = onSuccess;
-                openPromise.onError = onError;
-            }}
-        }};
+        return openPromise;
     }};
 
     this.callbacks = {{
@@ -222,7 +227,7 @@ function HubsAPI(url, serverTimeout) {{
                             onError.apply(onError, arguments);
                         }} else if (thisApi.defaultErrorHandler !== null){{
                             var argumentsArray = [callInfo].concat(arguments);
-                            thisApi.defaultErrorHandler.apply(thisApi.defaultErrorHandler.apply, argumentsArray);
+                            thisApi.defaultErrorHandler.apply(thisApi.defaultErrorHandler, argumentsArray);
                         }}
                     }} finally {{
                         delete returnFunctions[ID];
