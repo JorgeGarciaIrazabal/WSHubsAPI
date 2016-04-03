@@ -1,12 +1,10 @@
-import json
 import logging
+import traceback
 
 from wshubsapi.ClientInHub import ClientInHub
-from wshubsapi.ConnectedClientsGroup import ConnectedClientsGroup
-from wshubsapi.ConnectedClientsHolder import ConnectedClientsHolder
+from wshubsapi.Hub import UnsuccessfulReplay
 from wshubsapi.HubsInspector import HubsInspector
 from wshubsapi.utils import getArgs, SENDER_KEY_PARAMETER
-from wshubsapi.Hub import Hub, UnsuccessfulReplay
 
 log = logging.getLogger(__name__)
 
@@ -31,7 +29,7 @@ class FunctionMessage:
             return True, self.method(*self.args)
         except Exception as e:
             log.exception("Error calling hub function with: {}".format(str(self)))
-            return False, str(e)
+            return False, dict(error=str(e), type=str(type(e)), trace=traceback.format_exc())
 
     def callFunction(self):
         success, replay = self.__executeFunction()
