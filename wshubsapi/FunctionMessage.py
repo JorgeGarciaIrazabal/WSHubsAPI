@@ -35,8 +35,7 @@ class FunctionMessage:
         success, replay = self.__executeFunction()
         if isinstance(replay, UnsuccessfulReplay):
             return self.constructReplayDict(False, replay.replay)
-        if replay is not None:
-            return self.constructReplayDict(success, replay)
+        return self.constructReplayDict(success, replay)
 
     def constructReplayDict(self, success=None, replay=None):
         return {
