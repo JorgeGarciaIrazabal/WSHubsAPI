@@ -70,42 +70,48 @@ works like:
     </ul>
 </div>
     <script>
-    hubsApi = new HubsAPI('ws://127.0.0.1:8888/');
-    function sendToAll(){
-        var name = $('#name').val(),
-            message = $('#message').val()
-        $('#discussion').append('<li><strong> Me'
-                    + '</strong>: ' + message + '</li>');
-        hubsApi.ChatHub.server.sendToAll(name, message).done(function (numOfMessagesSent){
-          console.log("message sent to " + numOfMessagesSent + " client(s)");
-        },function (message){
-          console.log("message not sent" +message);
-        });
-        $('#message').val('').focus();
-    }
+    var hubsApi = new HubsAPI('ws://127.0.0.1:8888/');
+        function sendToAll() {
+            var name = $('#name').val(),
+                message = $('#message').val();
+            $('#discussion').append('<li><strong> Me'
+                + '</strong>: ' + message + '</li>');
 
-    hubsApi.connect().done(function(){
-        $('#status').text("Connected")
 
-        //function to be called from server
-        hubsApi.ChatHub.client.onMessage = function(from, message){
-            $('#discussion').append('<li><strong>' + from
-                    + '</strong>: ' + message + '</li>');
+            hubsApi.ChatHub.server.sendToAll(name, message)
+                .then(function (numOfMessagesSent) {
+                    console.log("message sent to " + numOfMessagesSent + " client(s)");
+                }, function (err) {
+                    console.log("message not sent " + err);
+                }).finally(function () {
+                    console.log("I am in finnally");
+                });
+            $('#message').val('').focus();
         }
 
-        //sending message
-        $('#sendmessage').click(sendToAll);
-        $('#message').keypress(function(e){
-            if (e.which == 13)
-                sendToAll()
-        });
-    }, function (error) {
-        console.error(error);
-    });
+        hubsApi.connect().then(function () {
+            $('#status').text("Connected")
 
-    hubsApi.wsClient.onerror = function(ev){
-        console.log(ev.reason);
-    };
+            //function to be called from server
+            hubsApi.ChatHub.client.onMessage = function (from, message) {
+                $('#discussion').append('<li><strong>' + from
+                    + '</strong>: ' + message + '</li>');
+                return "received"
+            }
+
+            //sending message
+            $('#sendmessage').click(sendToAll);
+            $('#message').keypress(function (e) {
+                if (e.which == 13)
+                    sendToAll()
+            });
+        }, function (error) {
+            console.error(error);
+        });
+
+        hubsApi.wsClient.onerror = function (ev) {
+            console.error(ev.reason);
+        };
 </script>
 </body>
 </html>
