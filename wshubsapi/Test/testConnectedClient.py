@@ -88,8 +88,8 @@ class TestConnectedClient(unittest.TestCase):
         self.commEnvironment.onMessage(self.connectedClient, messageStr)
 
     def test_onMessage_callsOnErrorIfError(self):
-        messageStr, replayMessage = self.__setUp_onMessage("testFunctionError", [], "Error", success=False)
-        self.commEnvironment.should_receive("replay").with_args(self.connectedClient, replayMessage, messageStr).once()
+        messageStr, replayMessage = self.__setUp_onMessage("testFunctionError", [], dict, success=False)
+        self.commEnvironment.should_receive("replay").with_args(self.connectedClient, dict, messageStr).once()
 
         self.commEnvironment.onMessage(self.connectedClient, messageStr)
 

@@ -104,7 +104,7 @@ class TestFunctionMessage(unittest.TestCase):
         functionResult = fn.callFunction()
 
         self.assertEqual(functionResult["success"], False)
-        self.assertEqual(functionResult["replay"], "MyException")
+        self.assertEqual(functionResult["replay"]["error"], "MyException")
 
     def test_CallFunction_ReplaysSuccessFalseIfReturnsUnsuccessfulReplayObject(self):
         fn = FunctionMessage(self.__constructMessageStr(function="testReplayUnsuccessful", args=["x"]), "_sender")
