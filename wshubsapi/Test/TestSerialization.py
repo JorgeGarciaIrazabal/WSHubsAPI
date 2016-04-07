@@ -13,12 +13,12 @@ class TestSerialization(unittest.TestCase):
                                                commEnvironment=None,
                                                writeMessageFunction=lambda x: x,
                                                closeFunction=lambda y: y)
-        utils.setSerializerDateTimeHandler()
+        utils.set_serializer_date_time_handler()
 
     def test_basicObjectSerialization(self):
-        serialization = utils.serializeMessage(self.connectedClient.pickler, 5)
+        serialization = utils.serialize_message(self.connectedClient.pickler, 5)
         self.assertTrue(serialization == '5', 'number serialization')
-        serialization = utils.serializeMessage(self.connectedClient.pickler, "hi")
+        serialization = utils.serialize_message(self.connectedClient.pickler, "hi")
         self.assertTrue(serialization == '"hi"', 'str serialization')
 
     def test_simpleObjects(self):
@@ -27,7 +27,7 @@ class TestSerialization(unittest.TestCase):
                 self.a = 1
                 self.b = "hi"
 
-        serialization = utils.serializeMessage(self.connectedClient.pickler, SimpleObject())
+        serialization = utils.serialize_message(self.connectedClient.pickler, SimpleObject())
         self.assertTrue(json.loads(serialization)["a"] == 1)
         self.assertTrue(json.loads(serialization)["b"] == "hi")
 
@@ -37,7 +37,7 @@ class TestSerialization(unittest.TestCase):
                 self.a = {"a": 10, 1: 15}
                 self.b = [1, 2, "hola"]
 
-        serialization = utils.serializeMessage(self.connectedClient.pickler, ComplexObject())
+        serialization = utils.serialize_message(self.connectedClient.pickler, ComplexObject())
         serObject = json.loads(serialization)
         self.assertTrue(isinstance(serObject["a"], dict))
         self.assertTrue(serObject["a"]["a"] == 10)
@@ -49,23 +49,23 @@ class TestSerialization(unittest.TestCase):
             def __init__(self):
                 self.a = self
 
-        serialization = utils.serializeMessage(self.connectedClient.pickler, ComplexObject())
+        serialization = utils.serialize_message(self.connectedClient.pickler, ComplexObject())
         serObject = json.loads(serialization)
         self.assertTrue("ComplexObject" in serObject["a"])
 
     def test_dateTimeObjects(self):
         date = datetime.datetime.now()
-        serialization = utils.serializeMessage(self.connectedClient.pickler, {"datetime": date})
+        serialization = utils.serialize_message(self.connectedClient.pickler, {"datetime": date})
         self.assertTrue(json.loads(serialization)["datetime"] == date.strftime(utils.DATE_TIME_FORMAT),
                         'datetime serialization')
 
         date = datetime.date(2001, 1, 1)
-        serialization = utils.serializeMessage(self.connectedClient.pickler, {"datetime": date})
+        serialization = utils.serialize_message(self.connectedClient.pickler, {"datetime": date})
         self.assertTrue(json.loads(serialization)["datetime"] == date.strftime(utils.DATE_TIME_FORMAT),
                         'datetime serialization')
 
         date = datetime.time()
-        serialization = utils.serializeMessage(self.connectedClient.pickler, {"datetime": date})
+        serialization = utils.serialize_message(self.connectedClient.pickler, {"datetime": date})
         self.assertTrue(json.loads(serialization)["datetime"] == date.strftime(utils.DATE_TIME_FORMAT),
                         'datetime serialization')
 

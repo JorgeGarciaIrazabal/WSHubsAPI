@@ -44,7 +44,7 @@ class TestUtils(unittest.TestCase):
             {"method": AuxClass.auxClassMethod, "expected": ["x", "y"]}
         ]
         for case in testCases:
-            returnedFromFunction = getArgs(case["method"])
+            returnedFromFunction = get_args(case["method"])
 
             self.assertEqual(returnedFromFunction, case["expected"])
 
@@ -55,7 +55,7 @@ class TestUtils(unittest.TestCase):
             {"method": lambda x, y=4, z="ñoño": 1, "expected": [4, '"ñoño"']},
         ]
         for case in testCases:
-            returnedFromFunction = getDefaults(case["method"])
+            returnedFromFunction = get_defaults(case["method"])
 
             self.assertEqual(returnedFromFunction, case["expected"])
 
@@ -63,7 +63,7 @@ class TestUtils(unittest.TestCase):
         def thisIsANewFunction(test):
             print(test)
 
-        self.assertTrue(isFunctionForWSClient(thisIsANewFunction), "new function is detected")
+        self.assertTrue(is_function_for_ws_client(thisIsANewFunction), "new function is detected")
 
     def test_isFunctionForWSClient_ExcludesProtectedAndPrivateFunctions(self):
         def _thisIsAProtectedFunction(test):
@@ -72,14 +72,14 @@ class TestUtils(unittest.TestCase):
         def __thisIsAPrivateFunction(test):
             print(test)
 
-        self.assertFalse(isFunctionForWSClient(_thisIsAProtectedFunction), "protected function is excluded")
-        self.assertFalse(isFunctionForWSClient(__thisIsAPrivateFunction), "private function is excluded")
+        self.assertFalse(is_function_for_ws_client(_thisIsAProtectedFunction), "protected function is excluded")
+        self.assertFalse(is_function_for_ws_client(__thisIsAPrivateFunction), "private function is excluded")
 
     def test_isFunctionForWSClient_ExcludesAlreadyExistingFunctions(self):
-        self.assertFalse(isFunctionForWSClient(HubsInspector.HUBs_DICT), "excludes existing functions")
+        self.assertFalse(is_function_for_ws_client(HubsInspector.HUBs_DICT), "excludes existing functions")
 
     def test_getModulePath_ReturnsTestUtilsPyModulePath(self):
-        self.assertIn("wshubsapi" + os.sep + "Test", getModulePath())
+        self.assertIn("wshubsapi" + os.sep + "Test", get_module_path())
 
     def setUp_WSMessagesReceivedQueue(self, commEnvironment, MAX_WORKERS):
         queue = MessagesReceivedQueue(commEnvironment, MAX_WORKERS)

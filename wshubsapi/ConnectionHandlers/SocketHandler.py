@@ -32,7 +32,7 @@ class SocketHandler(SocketServer.BaseRequestHandler):
         self.commEnvironment.onOpen(self.__connectedClient)
 
     def writeMessage(self, message):
-        self.request.sendall(message + self.__messageSeparator.sep)
+        self.request.sendall(message + self.__messageSeparator.separator)
         log.debug("message to %s:\n%s" % (self.__connectedClient.ID, message))
 
     def handle(self):
@@ -45,7 +45,7 @@ class SocketHandler(SocketServer.BaseRequestHandler):
             except:
                 log.exception("error receiving data")
             else:
-                for m in self.__messageSeparator.addData(data):
+                for m in self.__messageSeparator.add_data(data):
                     log.debug("Message received from ID: %s\n%s " % (str(self.__connectedClient.ID), str(m)))
                     self.commEnvironment.onAsyncMessage(self.__connectedClient, m)
 
@@ -87,7 +87,7 @@ class SocketClient:
 
     def send(self, message):
         # this will crash if not ascii
-        self.socket.sendall(message + self.__messageSeparator.sep)
+        self.socket.sendall(message + self.__messageSeparator.separator)
 
     def receiveMessageThread(self):
         while True:
@@ -97,7 +97,7 @@ class SocketClient:
                 log.exception("Error receiving message")
                 break
             if data != "":
-                for m in self.__messageSeparator.addData(data):
+                for m in self.__messageSeparator.add_data(data):
                     self.received_message(self.Message(m))
 
     def received_message(self, message):

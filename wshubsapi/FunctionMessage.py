@@ -4,7 +4,7 @@ import traceback
 from wshubsapi.ClientInHub import ClientInHub
 from wshubsapi.Hub import UnsuccessfulReplay
 from wshubsapi.HubsInspector import HubsInspector
-from wshubsapi.utils import getArgs, SENDER_KEY_PARAMETER
+from wshubsapi.utils import get_args, SENDER_KEY_PARAMETER
 
 log = logging.getLogger(__name__)
 
@@ -50,7 +50,7 @@ class FunctionMessage:
         """
         :type args: list
         """
-        methodArgs = getArgs(method, includeSender=True)
+        methodArgs = get_args(method, include_sender=True)
         try:
             senderIndex = methodArgs.index(SENDER_KEY_PARAMETER)
             args.insert(senderIndex, ClientInHub(self.connectedClient, self.hubName))

@@ -33,7 +33,7 @@ class ClientInHub(object):
             future, ID = self.__comEnvironment.getNewClientsFuture()
             message = dict(function=functionName, args=list(args), hub=self.__hubName,
                            ID=ID)
-            msgStr = utils.serializeMessage(self.__comEnvironment.pickler, message)
+            msgStr = utils.serialize_message(self.__comEnvironment.pickler, message)
             self.api_writeMessage(msgStr)
             return future
 

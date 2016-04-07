@@ -14,7 +14,7 @@ if __name__ == '__main__':
     ws = HubsAPI('ws://127.0.0.1:8888/')
     ws.connect()
     ws.defaultOnError = lambda m: sys.stdout.write("message could not be sent!!!!! {}\n".format(m))
-    ws.UtilsAPIHub.server.setId("testing")
+    ws.UtilsAPIHub.server.set_id("testing")
 
     def printMessage(senderName, message):
         print(u"From {0}: {1}".format(senderName, message))

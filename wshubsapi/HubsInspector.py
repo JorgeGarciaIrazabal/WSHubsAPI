@@ -4,7 +4,7 @@ from wshubsapi.ClientFileGenerator.CppFileGenerator import CppFileGenerator
 from wshubsapi.ClientFileGenerator.JAVAFileGenerator import JAVAFileGenerator
 from wshubsapi.ClientFileGenerator.JSClientFileGenerator import JSClientFileGenerator
 from wshubsapi.ClientFileGenerator.PythonClientFileGenerator import PythonClientFileGenerator
-from wshubsapi.utils import isFunctionForWSClient, getArgs, getDefaults
+from wshubsapi.utils import is_function_for_ws_client, get_args, get_defaults
 
 class HubsInspectorException(Exception):
     pass
@@ -79,16 +79,16 @@ class HubsInspector:
         infoReport = {}
         hubs = cls.HUBs_DICT.values()
         for hub in hubs:
-            functions = inspect.getmembers(hub, predicate=isFunctionForWSClient)
+            functions = inspect.getmembers(hub, predicate=is_function_for_ws_client)
             serverMethods = {}
             for name, method in functions:
-                argsDict = dict(args=getArgs(method),
-                                defaults = getDefaults(method))
+                argsDict = dict(args=get_args(method),
+                                defaults = get_defaults(method))
                 serverMethods[name] = argsDict
             clientMethods = {}
             for name, method in hub.clientFunctions.items():
-                argsDict = dict(args=getArgs(method),
-                                defaults = getDefaults(method))
+                argsDict = dict(args=get_args(method),
+                                defaults = get_defaults(method))
                 clientMethods[name] = argsDict
 
             infoReport[hub.__HubName__] = dict(serverMethods=serverMethods,

@@ -13,7 +13,7 @@ from concurrent.futures import Future
 
 from wshubsapi.ConnectedClientsHolder import ConnectedClientsHolder
 from wshubsapi.FunctionMessage import FunctionMessage
-from wshubsapi.utils import setSerializerDateTimeHandler, serializeMessage
+from wshubsapi.utils import set_serializer_date_time_handler, serialize_message
 from wshubsapi.MessagesReceivedQueue import MessagesReceivedQueue
 # do not remove this line (hubs inspector needs to find it)
 from wshubsapi import UtilsAPIHub, Asynchronous
@@ -23,7 +23,7 @@ __author__ = 'Jorge Garcia Irazabal'
 
 _DEFAULT_PICKER = Pickler(max_depth=5, max_iter=80, make_refs=False)
 
-setSerializerDateTimeHandler()  # todo move this
+set_serializer_date_time_handler()  # todo move this
 
 
 class HubsApiException(Exception):
@@ -95,7 +95,7 @@ class CommEnvironment(object):
         :param replay: serialized object to be sent as a replay of a message received
         :param originMessage: Message received (provided for overridden functions)
         """
-        client.api_writeMessage(serializeMessage(self.pickler, replay))
+        client.api_writeMessage(serialize_message(self.pickler, replay))
 
     def getNewClientsFuture(self):
         with self.__newClientMessageIDLock:

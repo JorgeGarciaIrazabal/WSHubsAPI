@@ -4,7 +4,7 @@ import os
 from os import listdir
 from os.path import isfile
 
-from wshubsapi.utils import isFunctionForWSClient, getArgs, ASCII_UpperCase, getModulePath
+from wshubsapi.utils import is_function_for_ws_client, get_args, ASCII_UpperCase, get_module_path
 
 __author__ = 'jgarc'
 log = logging.getLogger(__name__)
@@ -24,9 +24,9 @@ class JAVAFileGenerator:
     @classmethod
     def __getJSFunctionsStr(cls, class_):
         funcStrings = []
-        functions = inspect.getmembers(class_, predicate=isFunctionForWSClient)
+        functions = inspect.getmembers(class_, predicate=is_function_for_ws_client)
         for name, method in functions:
-            args = getArgs(method)
+            args = get_args(method)
             types = ["TYPE_" + l for l in ASCII_UpperCase[:len(args)]]
             argsTypes = [types[i] + " " + arg for i, arg in enumerate(args)]
             types = "<" + ", ".join(types) + ">" if len(types) > 0 else ""
@@ -73,7 +73,7 @@ class JAVAFileGenerator:
 
     @classmethod
     def __copyExtraFiles(cls, dstPath, package):
-        filesPath = os.path.join(getModulePath(), cls.EXTRA_FILES_FOLDER)
+        filesPath = os.path.join(get_module_path(), cls.EXTRA_FILES_FOLDER)
         files = [f for f in listdir(filesPath) if isfile(os.path.join(filesPath, f)) and f.endswith(".java")]
         for f in files:
             if not isfile(os.path.join(dstPath, f)):

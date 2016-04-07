@@ -1,6 +1,6 @@
 import inspect
 import os
-from wshubsapi.utils import isFunctionForWSClient, getDefaults, getArgs
+from wshubsapi.utils import is_function_for_ws_client, get_defaults, get_args
 
 __author__ = 'jgarc'
 
@@ -16,10 +16,10 @@ class PythonClientFileGenerator():
     @classmethod
     def __getFunctionStr(cls, class_):
         funcStrings = []
-        functions = inspect.getmembers(class_, predicate=isFunctionForWSClient)
+        functions = inspect.getmembers(class_, predicate=is_function_for_ws_client)
         for name, method in functions:
-            args = getArgs(method)
-            defaults = getDefaults(method)
+            args = get_args(method)
+            defaults = get_defaults(method)
             formattedArgs = []
             for i, arg in enumerate(reversed(args)):
                 if i >= len(defaults):
