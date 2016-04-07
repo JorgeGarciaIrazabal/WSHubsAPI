@@ -68,12 +68,11 @@ class CommEnvironment(object):
     def on_message(self, client, msg_str):
         try:
             msg_str = msg_str if isinstance(msg_str, str) else msg_str.decode("utf-8")
-            msgObj = json.loads(msg_str)
-            if "replay" not in msgObj:
-                self.__on_replay(client, msg_str, msgObj)
+            msg_obj = json.loads(msg_str)
+            if "replay" not in msg_obj:
+                self.__on_replay(client, msg_str, msg_obj)
             else:
-                self.__on_replayed(msgObj)
-
+                self.__on_replayed(msg_obj)
 
         except Exception as e:
             self.on_error(client, e)
@@ -84,7 +83,7 @@ class CommEnvironment(object):
     def on_closed(self, client):
         """:type client: wshubsapi.ConnectedClient.ConnectedClient"""
         ConnectedClientsHolder.pop_client(client.ID)
-        client.api_isClosed = True
+        client.api_is_closed = True
 
     def on_error(self, client, exception):
         log.exception("Error parsing message")
@@ -95,7 +94,7 @@ class CommEnvironment(object):
         :param replay: serialized object to be sent as a replay of a message received
         :param origin_message: Message received (provided for overridden functions)
         """
-        client.api_writeMessage(serialize_message(self.pickler, replay))
+        client.api_write_message(serialize_message(self.pickler, replay))
 
     def get_new_clients_future(self):
         with self.__new_client_message_id_lock:

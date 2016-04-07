@@ -15,12 +15,9 @@ class ConnectedClient(object):
         """
         self.ID = None
         """:type : int|None|str"""
-        self.api_writeMessage = write_message_function
-        self.api_isClosed = False
+        self.api_write_message = write_message_function
+        self.api_is_closed = False
         self.__communication_environment = communication_environment
-
-    def api_write_message(self, message):
-        raise NotImplementedError
 
     def api_get_comm_environment(self):
         return self.__communication_environment

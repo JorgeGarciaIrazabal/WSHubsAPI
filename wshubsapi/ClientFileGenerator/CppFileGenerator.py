@@ -25,8 +25,8 @@ class CppFileGenerator:
         HUB_NAME = hub_name
 
         methods = []
-        for methodName, arguments in methods_info["serverMethods"].items():
-            methods.append(cls.__get_function_string(methodName, **arguments))
+        for method_name, arguments in methods_info["serverMethods"].items():
+            methods.append(cls.__get_function_string(method_name, **arguments))
         METHODS = "\n\t\t\t".join(methods)
         HUB_OBJECT_DECLARATION = "{0} {1}".format(hub_name, cls.__get_hub_object_name(hub_name))
         return cls.HUB_TEMPLATE.format(**locals())
@@ -48,24 +48,24 @@ class CppFileGenerator:
 
     @classmethod
     def create_file(cls, path, hubs_info):
-        clientFolder = os.path.abspath(os.path.join(path, cls.FILE_NAME))
+        client_folder = os.path.abspath(os.path.join(path, cls.FILE_NAME))
         if not os.path.exists(path):
             os.makedirs(path)
         hubs = []
         CONSTRUCTOR = cls.__get_constructor(hubs_info)
-        for hubName, methods in hubs_info.items():
-            hubs.append(cls.__get_hub_class_str(hubName, methods))
+        for hub_name, methods in hubs_info.items():
+            hubs.append(cls.__get_hub_class_str(hub_name, methods))
         HUBS = "\n\t".join(hubs)
 
-        with open(clientFolder, "w") as f:
+        with open(client_folder, "w") as f:
             f.write(cls.MAIN.format(**locals()))
 
     @classmethod
     def __get_constructor(cls, hubs_info):
         constructors = []
         initializations = []
-        for hubName in hubs_info:
-            hub_obj_name = cls.__get_hub_object_name(hubName)
+        for hub_name in hubs_info:
+            hub_obj_name = cls.__get_hub_object_name(hub_name)
             constructors.append("{}()".format(hub_obj_name))
             initializations.append("{}.server.hubsAPI = this;".format(hub_obj_name))
         HUBS_CONSTRUCTORS = ", ".join(constructors)

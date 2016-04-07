@@ -36,7 +36,7 @@ class SocketHandler(SocketServer.BaseRequestHandler):
         log.debug("message to %s:\n%s" % (self.__connected_client.ID, message))
 
     def handle(self):
-        while not self.__connected_client.api_isClosed:
+        while not self.__connected_client.api_is_closed:
             try:
                 data = self.request.recv(10240)
             except error as e:

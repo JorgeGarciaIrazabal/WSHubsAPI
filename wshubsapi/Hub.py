@@ -26,7 +26,7 @@ class Hub(object):
 
         self._client_functions = dict()
         self._define_client_functions()
-        self.__class__._clients_holder = ConnectedClientsHolder(hub_name)
+        self._clients_holder = ConnectedClientsHolder(hub_name)
 
     def subscribe_to_hub(self, _sender):
         if _sender in self.__hubSubscribers:
@@ -41,17 +41,15 @@ class Hub(object):
         return False
 
     def get_subscribed_clients_to_hub(self):
-        self.__hubSubscribers = list(filter(lambda c: not c.api_isClosed, self.__hubSubscribers))
+        self.__hubSubscribers = list(filter(lambda c: not c.api_is_closed, self.__hubSubscribers))
         return map(lambda x: x.ID, self.__hubSubscribers)
 
-    @classmethod
-    def _get_clients_holder(cls):
+    def _get_clients_holder(self):
         """
         :rtype: ConnectedClientsHolder
         """
-        # clientsHolder is defined while inspecting hubs
-        # can not be initialized in Hub because it is independent in each subHub
-        return cls._clients_holder
+        # _clients_holder is defined while inspecting hubs
+        return self._clients_holder
 
     @property
     def client_functions(self):

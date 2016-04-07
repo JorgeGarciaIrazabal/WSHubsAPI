@@ -11,22 +11,22 @@ class AsynchronousNotDone(Exception):
     pass
 
 
-# todo, return a Future object and not a Result
-class Result(object):
+# todo, return a Future object and not a Promise
+class Promise(object):
     def __init__(self, future):
         """
         @type future: concurrent.futures._base.Future
         """
         self.result = None
         self.future = future
-        self.startTime = datetime.now()
+        self.start_time = datetime.now()
 
     def is_done(self):
         return self.future.done()
 
     def get(self, join_timeout=None):
         if join_timeout is not None:
-            join_timeout = max([0, join_timeout - (datetime.now() - self.startTime).seconds])
+            join_timeout = max([0, join_timeout - (datetime.now() - self.start_time).seconds])
             self.result = self.future.result(join_timeout)
         result = self.future.result(join_timeout)
         if isinstance(result, Exception):
@@ -49,7 +49,7 @@ def asynchronous():
         def wrapper(*args, **kwargs):
             kwargs.update({"__func__": fun})
             future = __executor.submit(over_function, *args, **kwargs)
-            result_object = Result(future)
+            result_object = Promise(future)
             kwargs.update({"__ResultObject__": result_object})
             return result_object
 

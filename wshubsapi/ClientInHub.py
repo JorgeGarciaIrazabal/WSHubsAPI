@@ -11,9 +11,9 @@ class ClientInHub(object):
         :type client: wshubsapi.ConnectedClient.ConnectedClient
         :type hub_name: str
         """
-        self.__hubName = str(hub_name)
+        self.__hub_name = str(hub_name)
         self.__client = client
-        self.__comEnvironment = client.api_get_comm_environment()
+        self.__com_environment = client.api_get_comm_environment()
 
     def __getattr__(self, item):
         """
@@ -30,11 +30,10 @@ class ClientInHub(object):
 
     def __construct_function_for_client(self, function_name):
         def connection_function(*args):
-            future, id_ = self.__comEnvironment.get_new_clients_future()
-            message = dict(function=function_name, args=list(args), hub=self.__hubName,
-                           ID=id_)
-            msg_str = utils.serialize_message(self.__comEnvironment.pickler, message)
-            self.api_writeMessage(msg_str)
+            future, id_ = self.__com_environment.get_new_clients_future()
+            message = dict(function=function_name, args=list(args), hub=self.__hub_name, ID=id_)
+            msg_str = utils.serialize_message(self.__com_environment.pickler, message)
+            self.api_write_message(msg_str)
             return future
 
         return connection_function

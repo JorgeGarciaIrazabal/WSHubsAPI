@@ -30,19 +30,19 @@ class JSClientFileGenerator:
         pickler = Pickler(max_depth=4, max_iter=50, make_refs=False)
         func_strings = []
 
-        for methodName, methodInfo in hub_info["serverMethods"].items():
-            defaults = methodInfo["defaults"]
+        for method_name, method_info in hub_info["serverMethods"].items():
+            defaults = method_info["defaults"]
             for i, default in enumerate(defaults):
                 if not isinstance(default, basestring) or not default.startswith("\""):
                     defaults[i] = jsonpickle.encode(pickler.flatten(default))
-            args = [inflection.camelize(arg, False) for arg in methodInfo["args"]]
+            args = [inflection.camelize(arg, False) for arg in method_info["args"]]
             defaults_array = []
             for i, d in reversed(list(enumerate(defaults))):
                 defaults_array.insert(0, cls.ARGS_COOK_TEMPLATE.format(iter=i, name=args[i], default=d))
             defaults_str = "\n\t\t\t".join(defaults_array)
-            func_strings.append(cls.FUNCTION_TEMPLATE.format(name=methodName, args=", ".join(args),
+            func_strings.append(cls.FUNCTION_TEMPLATE.format(name=method_name, args=", ".join(args),
                                                              cook=defaults_str, hubName=hub_name,
-                                                             camelCaseName=inflection.camelize(methodName, False)))
+                                                             camelCaseName=inflection.camelize(method_name, False)))
         return func_strings
 
     @classmethod
