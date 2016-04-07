@@ -59,10 +59,10 @@ class Hub(object):
 
     @client_functions.setter
     def client_functions(self, client_functions):
-        assert (isinstance(client_functions, dict))
+        assert isinstance(client_functions, dict)
         for functionName, function in client_functions.items():
-            assert (isinstance(functionName, basestring))
-            assert (hasattr(function, '__call__'))
+            assert isinstance(functionName, basestring)
+            assert hasattr(function, '__call__')
         self._client_functions = client_functions
 
     @staticmethod

@@ -86,7 +86,7 @@ class TestFunctionMessage(unittest.TestCase):
 
         self.assertEqual(functionResult["replay"][0], "x")
         self.assertIsInstance(functionResult["replay"][1], ClientInHub)
-        self.assertEqual(functionResult["replay"][1].api_getRealConnectedClient(), cc)
+        self.assertEqual(functionResult["replay"][1].api_get_real_connected_client(), cc)
         self.assertEqual(functionResult["replay"][2], 1)
         self.assertEqual(functionResult["success"], True)
 

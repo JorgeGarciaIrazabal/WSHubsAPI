@@ -8,7 +8,7 @@ class UtilsAPIHub(Hub):
         connections = self._get_clients_holder().all_connected_clients
         connections.pop(_sender.ID)
         _sender.ID = client_id
-        connections[client_id] = _sender.api_getRealConnectedClient()
+        connections[client_id] = _sender.api_get_real_connected_client()
         return True
 
     @staticmethod

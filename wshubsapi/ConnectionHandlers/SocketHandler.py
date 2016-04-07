@@ -76,7 +76,7 @@ class SocketClient:
         h, p = url.split(":")
         self.host, self.port = h, int(p)
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.__messageSeparator = MessageSeparator()
+        self.__message_separator = MessageSeparator()
 
     def connect(self):
         self.socket.connect((self.host, self.port))
@@ -87,7 +87,7 @@ class SocketClient:
 
     def send(self, message):
         # this will crash if not ascii
-        self.socket.sendall(message + self.__messageSeparator.separator)
+        self.socket.sendall(message + self.__message_separator.separator)
 
     def receive_message_thread(self):
         while True:
@@ -97,7 +97,7 @@ class SocketClient:
                 log.exception("Error receiving message")
                 raise
             if data != "":
-                for m in self.__messageSeparator.add_data(data):
+                for m in self.__message_separator.add_data(data):
                     self.received_message(self.Message(m))
 
     def received_message(self, message):

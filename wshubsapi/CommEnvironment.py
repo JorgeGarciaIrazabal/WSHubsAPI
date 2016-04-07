@@ -13,7 +13,7 @@ from concurrent.futures import Future
 
 from wshubsapi.ConnectedClientsHolder import ConnectedClientsHolder
 from wshubsapi.FunctionMessage import FunctionMessage
-from wshubsapi.utils import set_serializer_date_time_handler, serialize_message
+from wshubsapi.utils import set_serializer_date_handler, serialize_message
 from wshubsapi.MessagesReceivedQueue import MessagesReceivedQueue
 # do not remove this line (hubs inspector needs to find it)
 from wshubsapi import UtilsAPIHub, Asynchronous
@@ -23,7 +23,7 @@ __author__ = 'Jorge Garcia Irazabal'
 
 _DEFAULT_PICKER = Pickler(max_depth=5, max_iter=80, make_refs=False)
 
-set_serializer_date_time_handler()  # todo move this
+set_serializer_date_handler()  # todo move this
 
 
 class HubsApiException(Exception):

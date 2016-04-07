@@ -7,7 +7,7 @@ from jsonpickle.pickler import Pickler
 from ws4py.client.threadedclient import WebSocketClient
 from wshubsapi import utils
 
-utils.set_serializer_date_time_handler()
+utils.set_serializer_date_handler()
 
 class WSSimpleObject(object):
     def __setattr__(self, key, value):

@@ -41,11 +41,8 @@ def get_defaults(method):
 
 
 def is_function_for_ws_client(method):
-    # from wshubsapi.Hub import Hub
     def is_function():
         return inspect.ismethod(method) or inspect.isfunction(method)
-    # BaseHubFunctions = inspect.getmembers(Hub, predicate=isFunction)
-    # BaseHubFunctionsNames = [f[0] for f in BaseHubFunctions]
 
     return is_function() and not method.__name__.startswith("_") and method.__name__
 
@@ -57,7 +54,7 @@ def get_module_path():
     return os.path.dirname(os.path.abspath(file_name))
 
 
-def set_serializer_date_time_handler():
+def set_serializer_date_handler():
     class WSDateTimeObjects(handlers.BaseHandler):
         def restore(self, obj):
             pass

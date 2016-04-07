@@ -13,7 +13,7 @@ class TestSerialization(unittest.TestCase):
                                                communication_environment=None,
                                                write_message_function=lambda x: x,
                                                closeFunction=lambda y: y)
-        utils.set_serializer_date_time_handler()
+        utils.set_serializer_date_handler()
 
     def test_basicObjectSerialization(self):
         serialization = utils.serialize_message(self.connectedClient.pickler, 5)
