@@ -65,7 +65,7 @@ import jsonpickle
 from jsonpickle.pickler import Pickler
 from wshubsapi import utils
 
-utils.setSerializerDateTimeHandler()
+utils.set_serializer_date_time_handler()
 _defaultPickler = Pickler(max_depth=4, max_iter=100, make_refs=False)
 
 

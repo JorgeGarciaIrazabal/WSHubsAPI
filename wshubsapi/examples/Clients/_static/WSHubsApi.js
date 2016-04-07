@@ -177,32 +177,32 @@ function HubsAPI(url, serverTimeout, wsClientClass, PromiseClass) {
         
         classMethod : function (){
             
-            return constructMessage('ChatHub', 'classMethod', arguments);
+            return constructMessage('ChatHub', 'class_method', arguments);
         },
 
         staticFunc : function (){
             
-            return constructMessage('ChatHub', 'staticFunc', arguments);
-        },
-
-        sendToAll : function (name, message){
-            arguments[0] = name === undefined ? "hello" : name;
-            return constructMessage('ChatHub', 'sendToAll', arguments);
+            return constructMessage('ChatHub', 'static_func', arguments);
         },
 
         getSubscribedClientsToHub : function (){
             
-            return constructMessage('ChatHub', 'getSubscribedClientsToHub', arguments);
-        },
-
-        unsubscribeFromHub : function (){
-            
-            return constructMessage('ChatHub', 'unsubscribeFromHub', arguments);
+            return constructMessage('ChatHub', 'get_subscribed_clients_to_hub', arguments);
         },
 
         subscribeToHub : function (){
             
-            return constructMessage('ChatHub', 'subscribeToHub', arguments);
+            return constructMessage('ChatHub', 'subscribe_to_hub', arguments);
+        },
+
+        sendToAll : function (name, message){
+            arguments[0] = name === undefined ? "hello" : name;
+            return constructMessage('ChatHub', 'send_to_all', arguments);
+        },
+
+        unsubscribeFromHub : function (){
+            
+            return constructMessage('ChatHub', 'unsubscribe_from_hub', arguments);
         }
     };
     this.ChatHub.client = {};
@@ -210,39 +210,39 @@ function HubsAPI(url, serverTimeout, wsClientClass, PromiseClass) {
     this.UtilsAPIHub.server = {
         __HUB_NAME : 'UtilsAPIHub',
         
-        getSubscribedClientsToHub : function (){
+        getHubsStructure : function (){
             
-            return constructMessage('UtilsAPIHub', 'getSubscribedClientsToHub', arguments);
-        },
-
-        getId : function (){
-            
-            return constructMessage('UtilsAPIHub', 'getId', arguments);
+            return constructMessage('UtilsAPIHub', 'get_hubs_structure', arguments);
         },
 
         isClientConnected : function (clientId){
             
-            return constructMessage('UtilsAPIHub', 'isClientConnected', arguments);
+            return constructMessage('UtilsAPIHub', 'is_client_connected', arguments);
+        },
+
+        getId : function (){
+            
+            return constructMessage('UtilsAPIHub', 'get_id', arguments);
+        },
+
+        getSubscribedClientsToHub : function (){
+            
+            return constructMessage('UtilsAPIHub', 'get_subscribed_clients_to_hub', arguments);
         },
 
         unsubscribeFromHub : function (){
             
-            return constructMessage('UtilsAPIHub', 'unsubscribeFromHub', arguments);
+            return constructMessage('UtilsAPIHub', 'unsubscribe_from_hub', arguments);
         },
 
         subscribeToHub : function (){
             
-            return constructMessage('UtilsAPIHub', 'subscribeToHub', arguments);
+            return constructMessage('UtilsAPIHub', 'subscribe_to_hub', arguments);
         },
 
         setId : function (clientId){
             
-            return constructMessage('UtilsAPIHub', 'setId', arguments);
-        },
-
-        getHubsStructure : function (){
-            
-            return constructMessage('UtilsAPIHub', 'getHubsStructure', arguments);
+            return constructMessage('UtilsAPIHub', 'set_id', arguments);
         }
     };
     this.UtilsAPIHub.client = {};

@@ -48,7 +48,7 @@ class RelationalDBHub(Hub):
             self.__updateValuesFormDict(entry, entry2Insert)
             session.add(entry)
             session.commit()
-            self._get_clients_holder().getSubscribedClients().inserted(entry)
+            self._get_clients_holder().get_subscribed_clients().inserted(entry)
             return entry.id
         finally:
             session.close()
@@ -61,7 +61,7 @@ class RelationalDBHub(Hub):
             self.__updateValuesFormDict(entry, entry2Update)
             session.add(entry)
             session.commit()
-            self._get_clients_holder().getSubscribedClients().updated(entry)
+            self._get_clients_holder().get_subscribed_clients().updated(entry)
             return True
         finally:
             session.close()

@@ -18,7 +18,7 @@ class TestCommProtocol(unittest.TestCase):
     def test_construct_initializeMandatoryAttributes(self):
         self.assertIsInstance(self.commEnvironment.message_received_queue, MessagesReceivedQueue)
         self.assertIsInstance(self.commEnvironment.lock, thread.LockType)
-        self.assertIs(self.commEnvironment.all_connected_clients, ConnectedClientsHolder.allConnectedClientsDict)
+        self.assertIs(self.commEnvironment.all_connected_clients, ConnectedClientsHolder.all_connected_clients)
 
     def test_getUnprovidedID_returnsFirstAvailableUnprovidedID(self):
         firstClient = ConnectedClient(self.commEnvironment, lambda x: x)

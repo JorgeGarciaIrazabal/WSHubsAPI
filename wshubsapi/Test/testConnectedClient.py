@@ -43,7 +43,7 @@ class TestConnectedClient(unittest.TestCase):
         self.connectedClientsHolder = ConnectedClientsHolder(self.testHubClass.__HubName__)
 
     def tearDown(self):
-        self.connectedClientsHolder.allConnectedClientsDict.clear()
+        self.connectedClientsHolder.all_connected_clients.clear()
         del self.testHubClass
         del self.testHubInstance
         removeHubsSubclasses()
@@ -53,20 +53,20 @@ class TestConnectedClient(unittest.TestCase):
 
         self.commEnvironment.on_opened(self.connectedClient, ID)
 
-        self.assertIsInstance(self.connectedClientsHolder.getClient(ID), ClientInHub)
+        self.assertIsInstance(self.connectedClientsHolder.get_client(ID), ClientInHub)
 
     def test_onOpen_appendsUndefinedIdIfNoIDIsDefine(self):
         self.commEnvironment.on_opened(self.connectedClient)
 
-        self.assertIsInstance(self.connectedClientsHolder.getClient("unprovidedTest__0"), ClientInHub)
+        self.assertIsInstance(self.connectedClientsHolder.get_client("unprovidedTest__0"), ClientInHub)
 
     def test_onOpen_appendsUndefinedIdIfOpenAlreadyExistingClientId(self):
         self.commEnvironment.on_opened(self.connectedClient, 3)
         secondId = self.commEnvironment.on_opened(self.connectedClient, 3)
 
         self.assertEqual(secondId, "unprovidedTest__0")
-        self.assertIsInstance(self.connectedClientsHolder.getClient(3), ClientInHub)
-        self.assertIsInstance(self.connectedClientsHolder.getClient(secondId), ClientInHub)
+        self.assertIsInstance(self.connectedClientsHolder.get_client(3), ClientInHub)
+        self.assertIsInstance(self.connectedClientsHolder.get_client(secondId), ClientInHub)
 
     def __setUp_onMessage(self, functionStr, args, replay, success=True):
         message = MessageCreator.createOnMessageMessage(hub=self.testHubClass.__HubName__,
@@ -119,8 +119,8 @@ class TestConnectedClient(unittest.TestCase):
 
         self.commEnvironment.on_closed(self.connectedClient)
 
-        self.assertRaises(KeyError, self.connectedClientsHolder.getClient, ID)
-        self.assertEqual(len(self.connectedClientsHolder.allConnectedClientsDict), 0)
+        self.assertRaises(KeyError, self.connectedClientsHolder.get_client, ID)
+        self.assertEqual(len(self.connectedClientsHolder.all_connected_clients), 0)
 
     def test_replay_writeMessageWithAString(self):
         replayMessage = MessageCreator.createReplayMessage()

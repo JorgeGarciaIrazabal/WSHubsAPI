@@ -8,7 +8,7 @@ if __name__ == '__main__':
 
     class ChatHub(Hub):
         def sendToAll(self, name, message):
-            allConnectedClients = self._get_clients_holder().getAllClients()
+            allConnectedClients = self._get_clients_holder().get_all_clients()
             #onMessage function has to be defined in the client side
             allConnectedClients.on_message(name, message)
             return "Sent to %d clients" % len(allConnectedClients)

@@ -26,7 +26,7 @@ class Hub(object):
 
         self._client_functions = dict()
         self._define_client_functions()
-        self.__class__._clientsHolder = ConnectedClientsHolder(hub_name)
+        self.__class__._clients_holder = ConnectedClientsHolder(hub_name)
 
     def subscribe_to_hub(self, _sender):
         if _sender in self.__hubSubscribers:

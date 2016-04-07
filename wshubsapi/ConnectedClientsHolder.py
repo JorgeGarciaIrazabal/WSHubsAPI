@@ -1,40 +1,40 @@
 
 class ConnectedClientsHolder:
-    allConnectedClientsDict = dict()
+    all_connected_clients = dict()
 
-    def __init__(self, hubName):
-        self.hubName = hubName
+    def __init__(self, hub_name):
+        self.hub_name = hub_name
 
-    def getAllClients(self):
-        return ConnectedClientsGroup(list(self.allConnectedClientsDict.values()), self.hubName)
+    def get_all_clients(self):
+        return ConnectedClientsGroup(list(self.all_connected_clients.values()), self.hub_name)
 
-    def getOtherClients(self, sender):
+    def get_other_clients(self, sender):
         """
         :type sender: ConnectedClientsGroup
         """
-        connectedClients = [c for c in self.allConnectedClientsDict.values() if c.ID != sender.ID]
-        return ConnectedClientsGroup(connectedClients, self.hubName)
+        connected_clients = [c for c in self.all_connected_clients.values() if c.ID != sender.ID]
+        return ConnectedClientsGroup(connected_clients, self.hub_name)
 
-    def getClients(self, filterFunction):
-        return ConnectedClientsGroup([c for c in self.allConnectedClientsDict.values() if filterFunction(c)], self.hubName)
+    def get_clients(self, filter_function):
+        return ConnectedClientsGroup(filter(filter_function, self.all_connected_clients.values()), self.hub_name)
 
-    def getClient(self, clientId):
-        return ConnectedClientsGroup([self.allConnectedClientsDict[clientId]], self.hubName)[0]
+    def get_client(self, client_id):
+        return ConnectedClientsGroup([self.all_connected_clients[client_id]], self.hub_name)[0]
 
-    def getSubscribedClients(self):
-        subscribedClients = HubsInspector.get_hub_instance(self.hubName).get_subscribed_clients_to_hub()
-        return ConnectedClientsGroup([self.allConnectedClientsDict[ID] for ID in subscribedClients], self.hubName)
-
-    @classmethod
-    def appendClient(cls, client):
-        cls.allConnectedClientsDict[client.ID] = client
+    def get_subscribed_clients(self):
+        subscribed_clients = HubsInspector.get_hub_instance(self.hub_name).get_subscribed_clients_to_hub()
+        return ConnectedClientsGroup([self.all_connected_clients[ID] for ID in subscribed_clients], self.hub_name)
 
     @classmethod
-    def popClient(cls, clientId):
+    def append_client(cls, client):
+        cls.all_connected_clients[client.ID] = client
+
+    @classmethod
+    def pop_client(cls, client_id):
         """
-        :type clientId: str|int
+        :type client_id: str|int
         """
-        return cls.allConnectedClientsDict.pop(clientId, None)
+        return cls.all_connected_clients.pop(client_id, None)
 
 
 from wshubsapi.ConnectedClientsGroup import ConnectedClientsGroup

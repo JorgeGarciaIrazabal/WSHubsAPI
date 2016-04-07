@@ -3,17 +3,16 @@ from wshubsapi.Hub import Hub
 
 
 class ChatHub(Hub):
-    def sendToAll(self, name, _sender, message="hello"):  # _sender is an automatically passed argument
-        otherClients = self._get_clients_holder().getOtherClients(_sender)
-        if len(otherClients) > 0:
-            futures = otherClients.on_message(name, message)
-            print futures[0].result()
-        return len(otherClients)
+    def send_to_all(self, name, _sender, message="hello"):  # _sender is an automatically passed argument
+        other_clients = self._get_clients_holder().get_other_clients(_sender)
+        if len(other_clients) > 0:
+            other_clients.on_message(name, message)
+        return len(other_clients)
 
     @staticmethod
-    def staticFunc():
+    def static_func():
         pass
 
     @classmethod
-    def classMethod(cls):
+    def class_method(cls):
         pass

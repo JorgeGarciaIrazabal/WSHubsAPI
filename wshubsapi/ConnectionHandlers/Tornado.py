@@ -17,7 +17,7 @@ class ConnectionHandler(tornado.websocket.WebSocketHandler):
         super(ConnectionHandler, self).__init__(application, request, **kwargs)
         if ConnectionHandler.comm_environment is None:
             ConnectionHandler.comm_environment = CommEnvironment()
-        self._connectedClient = ConnectedClient(self.comm_environment, self.writeMessage)
+        self._connectedClient = ConnectedClient(self.comm_environment, self.write_message)
 
     def data_received(self, chunk):
         pass

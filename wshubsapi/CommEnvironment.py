@@ -40,7 +40,7 @@ class CommEnvironment(object):
         self.last_provided_id = 0
         self.message_received_queue = MessagesReceivedQueue(self, max_workers)
         self.message_received_queue.start_threads()
-        self.all_connected_clients = ConnectedClientsHolder.allConnectedClientsDict
+        self.all_connected_clients = ConnectedClientsHolder.all_connected_clients
         self.pickler = pickler
         self.client_function_timeout = client_function_timeout
         self.__last_client_message_id = 0
@@ -62,7 +62,7 @@ class CommEnvironment(object):
                 client.ID = self.get_unprovided_id()
             else:
                 client.ID = id_
-            ConnectedClientsHolder.appendClient(client)
+            ConnectedClientsHolder.append_client(client)
             return client.ID
 
     def on_message(self, client, msg_str):
@@ -83,7 +83,7 @@ class CommEnvironment(object):
 
     def on_closed(self, client):
         """:type client: wshubsapi.ConnectedClient.ConnectedClient"""
-        ConnectedClientsHolder.popClient(client.ID)
+        ConnectedClientsHolder.pop_client(client.ID)
         client.api_isClosed = True
 
     def on_error(self, client, exception):
