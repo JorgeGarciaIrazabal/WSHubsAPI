@@ -15,21 +15,20 @@ class AsynchronousNotDone(Exception):
 class Result(object):
     def __init__(self, future):
         """
-        @type thread: Thread
+        @type future: concurrent.futures._base.Future
         """
         self.result = None
         self.future = future
-        """:type: concurrent.futures._base.Future"""
         self.startTime = datetime.now()
 
-    def isDone(self):
+    def is_done(self):
         return self.future.done()
 
-    def get(self, joinTimeout=None):
-        if joinTimeout is not None:
-            joinTimeout = max([0, joinTimeout - (datetime.now() - self.startTime).seconds])
-            self.result = self.future.result(joinTimeout)
-        result = self.future.result(joinTimeout)
+    def get(self, join_timeout=None):
+        if join_timeout is not None:
+            join_timeout = max([0, join_timeout - (datetime.now() - self.startTime).seconds])
+            self.result = self.future.result(join_timeout)
+        result = self.future.result(join_timeout)
         if isinstance(result, Exception):
             raise result
         else:
@@ -37,8 +36,8 @@ class Result(object):
 
 
 def asynchronous():
-    def realWrapper(fun):
-        def overFunction(*args, **kwargs):
+    def real_wrapper(fun):
+        def over_function(*args, **kwargs):
             func = kwargs.pop("__func__")
             try:
                 result = func(*args, **kwargs)
@@ -49,11 +48,11 @@ def asynchronous():
 
         def wrapper(*args, **kwargs):
             kwargs.update({"__func__": fun})
-            future = __executor.submit(overFunction, *args, **kwargs)
-            resultObject = Result(future)
-            kwargs.update({"__ResultObject__": resultObject})
-            return resultObject
+            future = __executor.submit(over_function, *args, **kwargs)
+            result_object = Result(future)
+            kwargs.update({"__ResultObject__": result_object})
+            return result_object
 
         return wrapper
 
-    return realWrapper
+    return real_wrapper

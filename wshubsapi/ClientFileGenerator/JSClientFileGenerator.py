@@ -1,5 +1,6 @@
 import os
 
+import inflection
 import jsonpickle
 from jsonpickle.pickler import Pickler
 
@@ -9,43 +10,48 @@ __author__ = 'jgarc'
 class JSClientFileGenerator:
     FILE_NAME = "WSHubsApi.js"
 
-    @classmethod
-    def __getClassStrings(cls, hubsInfo):
-        classStrings = []
-        for hubName, hubInfo in hubsInfo.items():
-            classStrings.append(cls.__getHubClassStr(hubName, hubInfo))
-        return classStrings
+    def __init__(self):
+        raise Exception("static class, do not create an instance of it")
 
     @classmethod
-    def __getHubClassStr(cls, hubName, hubInfo):
-        funcStrings = ",\n".join(cls.__getJSFunctionsStr(hubName, hubInfo))
-        return cls.CLASS_TEMPLATE.format(name=hubName, functions=funcStrings)
+    def __get_class_strs(cls, hubs_info):
+        class_strings = []
+        for hub_name, hub_info in hubs_info.items():
+            class_strings.append(cls.__get_hub_class_str(hub_name, hub_info))
+        return class_strings
 
     @classmethod
-    def __getJSFunctionsStr(cls, hubName, hubInfo):
+    def __get_hub_class_str(cls, hub_name, hub_info):
+        func_strings = ",\n".join(cls.__get_js_functions_str(hub_name, hub_info))
+        return cls.CLASS_TEMPLATE.format(name=hub_name, functions=func_strings)
+
+    @classmethod
+    def __get_js_functions_str(cls, hub_name, hub_info):
         pickler = Pickler(max_depth=4, max_iter=50, make_refs=False)
-        funcStrings = []
+        func_strings = []
 
-        for methodName, methodInfo in hubInfo["serverMethods"].items():
+        for methodName, methodInfo in hub_info["serverMethods"].items():
             defaults = methodInfo["defaults"]
             for i, default in enumerate(defaults):
                 if not isinstance(default, basestring) or not default.startswith("\""):
                     defaults[i] = jsonpickle.encode(pickler.flatten(default))
-            args = methodInfo["args"]
-            defaultsArray = []
+            args = [inflection.camelize(arg, False) for arg in methodInfo["args"]]
+            defaults_array = []
             for i, d in reversed(list(enumerate(defaults))):
-                defaultsArray.insert(0, cls.ARGS_COOK_TEMPLATE.format(iter=i, name=args[i], default=d))
-            defaultsStr = "\n\t\t\t".join(defaultsArray)
-            funcStrings.append(cls.FUNCTION_TEMPLATE.format(name=methodName, args=", ".join(args), cook=defaultsStr,
-                                                            hubName=hubName))
-        return funcStrings
+                defaults_array.insert(0, cls.ARGS_COOK_TEMPLATE.format(iter=i, name=args[i], default=d))
+            defaults_str = "\n\t\t\t".join(defaults_array)
+            func_strings.append(cls.FUNCTION_TEMPLATE.format(name=methodName, args=", ".join(args),
+                                                             cook=defaults_str, hubName=hub_name,
+                                                             camelCaseName=inflection.camelize(methodName, False)))
+        return func_strings
 
     @classmethod
-    def createFile(cls, path, hubsInfo):
-        if not os.path.exists(path): os.makedirs(path)
+    def create_file(cls, path, hubs_info):
+        if not os.path.exists(path):
+            os.makedirs(path)
         with open(os.path.join(path, cls.FILE_NAME), "w") as f:
-            classStrings = "".join(cls.__getClassStrings(hubsInfo))
-            f.write(cls.WRAPPER.format(main=classStrings))
+            class_strings = "".join(cls.__get_class_strs(hubs_info))
+            f.write(cls.WRAPPER.format(main=class_strings))
 
     WRAPPER = """/* jshint ignore:start */
 /* ignore jslint start */
@@ -233,7 +239,7 @@ function HubsAPI(url, serverTimeout, wsClientClass, PromiseClass) {{
     this.{name}.client = {{}};"""
 
     FUNCTION_TEMPLATE = """
-        {name} : function ({args}){{
+        {camelCaseName} : function ({args}){{
             {cook}
             return constructMessage('{hubName}', '{name}', arguments);
         }}"""

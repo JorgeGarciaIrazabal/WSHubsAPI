@@ -4,53 +4,58 @@ from wshubsapi.utils import is_function_for_ws_client, get_defaults, get_args
 
 __author__ = 'jgarc'
 
+
 class PythonClientFileGenerator():
     FILE_NAME = "WSHubsApi.py"
     TAB = "    "
 
-    @classmethod
-    def __getHubClassStr(cls, class_):
-        funcStrings = ("\n" + cls.TAB * 2).join(cls.__getFunctionStr(class_))
-        return cls.CLASS_TEMPLATE.format(name=class_.__HubName__, functions=funcStrings)
+    def __init__(self):
+        raise Exception("static class, do not create an instance of it")
 
     @classmethod
-    def __getFunctionStr(cls, class_):
-        funcStrings = []
+    def __get_hub_class_str(cls, class_):
+        func_strings = ("\n" + cls.TAB * 2).join(cls.__get_function_str(class_))
+        return cls.CLASS_TEMPLATE.format(name=class_.__HubName__, functions=func_strings)
+
+    @classmethod
+    def __get_function_str(cls, class_):
+        func_strings = []
         functions = inspect.getmembers(class_, predicate=is_function_for_ws_client)
         for name, method in functions:
             args = get_args(method)
             defaults = get_defaults(method)
-            formattedArgs = []
+            formatted_args = []
             for i, arg in enumerate(reversed(args)):
                 if i >= len(defaults):
-                    formattedArgs.insert(0, arg)
+                    formatted_args.insert(0, arg)
                 else:
-                    formattedArgs.insert(0, arg + "=" + str(defaults[-i - 1]))
-            appendInArgs = ("\n" + cls.TAB * 4).join([cls.ARGS_COOK_TEMPLATE.format(name=arg) for arg in args])
-            funcStrings.append(
-                cls.FUNCTION_TEMPLATE.format(name=name, args=", ".join(formattedArgs), cook=appendInArgs))
-        return funcStrings
+                    formatted_args.insert(0, arg + "=" + str(defaults[-i - 1]))
+            append_in_args = ("\n" + cls.TAB * 4).join([cls.ARGS_COOK_TEMPLATE.format(name=arg) for arg in args])
+            func_strings.append(
+                cls.FUNCTION_TEMPLATE.format(name=name, args=", ".join(formatted_args), cook=append_in_args))
+        return func_strings
 
     @classmethod
-    def __getAttributesHub(cls, hubs):
+    def __get_attributes_hub(cls, hubs):
         return [cls.ATTRIBUTE_HUB_TEMPLATE.format(name=h.__HubName__) for h in hubs]
 
     @classmethod
-    def createFile(cls, path, hubs):
-        if not os.path.exists(path): os.makedirs(path)
-        with open(os.path.join(path,"__init__.py"),'w'): #creating __init__.py if not exist
+    def create_file(cls, path, hubs):
+        if not os.path.exists(path):
+            os.makedirs(path)
+        with open(os.path.join(path, "__init__.py"), 'w'):  # creating __init__.py if not exist
             pass
         with open(os.path.join(path, cls.FILE_NAME), "w") as f:
-            classStrings = "".join(cls.__getClassStrings(hubs))
-            attributesHubs = "\n".join(cls.__getAttributesHub(hubs))
-            f.write(cls.WRAPPER.format(Hubs=classStrings, attributesHubs=attributesHubs))
+            class_strings = "".join(cls.__get_class_strings(hubs))
+            attributes_hubs = "\n".join(cls.__get_attributes_hub(hubs))
+            f.write(cls.WRAPPER.format(Hubs=class_strings, attributesHubs=attributes_hubs))
 
     @classmethod
-    def __getClassStrings(cls, hubs):
-        classStrings = []
+    def __get_class_strings(cls, hubs):
+        class_strings = []
         for h in hubs:
-            classStrings.append(cls.__getHubClassStr(h))
-        return classStrings
+            class_strings.append(cls.__get_hub_class_str(h))
+        return class_strings
 
     WRAPPER = '''import json
 import logging

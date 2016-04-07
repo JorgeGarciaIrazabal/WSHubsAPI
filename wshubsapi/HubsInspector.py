@@ -50,24 +50,24 @@ class HubsInspector:
     @classmethod
     def construct_js_file(cls, path="."):
         cls.inspect_implemented_hubs()
-        JSClientFileGenerator.createFile(path, cls.get_hubs_information())
+        JSClientFileGenerator.create_file(path, cls.get_hubs_information())
 
     @classmethod
     def construct_java_file(cls, package, path="."):
         cls.inspect_implemented_hubs()
         hubs = cls.HUBs_DICT.values()
-        JAVAFileGenerator.createFile(path, package, hubs)
-        JAVAFileGenerator.createClientTemplate(path, package, hubs)
+        JAVAFileGenerator.create_file(path, package, hubs)
+        JAVAFileGenerator.create_client_template(path, package, hubs)
 
     @classmethod
     def construct_python_file(cls, path="."):
         cls.inspect_implemented_hubs()
-        PythonClientFileGenerator.createFile(path, cls.HUBs_DICT.values())
+        PythonClientFileGenerator.create_file(path, cls.HUBs_DICT.values())
 
     @classmethod
     def construct_cpp_file(cls, path="."):
         cls.inspect_implemented_hubs()
-        CppFileGenerator.createFile(path, cls.get_hubs_information())
+        CppFileGenerator.create_file(path, cls.get_hubs_information())
 
     @classmethod
     def get_hub_instance(cls, hub):

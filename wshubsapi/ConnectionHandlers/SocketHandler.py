@@ -13,30 +13,30 @@ log.addHandler(logging.NullHandler())
 
 
 class SocketHandler(SocketServer.BaseRequestHandler):
-    commEnvironment = None
+    comm_environment = None
 
     def __init__(self, request, client_address, server):
         SocketServer.BaseRequestHandler.__init__(self, request, client_address, server)
         # never enter here :O
-        self.__connectedClient = None
-        self.__messageSeparator = None
+        self.__connected_client = None
+        self.__message_separator = None
         """:type : MessageSeparator"""
 
     def setup(self):
-        self.__connectedClient = None
-        self.__messageSeparator = MessageSeparator()
+        self.__connected_client = None
+        self.__message_separator = MessageSeparator()
 
-        if SocketHandler.commEnvironment is None:
-            SocketHandler.commEnvironment = CommEnvironment()
-        self.__connectedClient = ConnectedClient(self.commEnvironment, self.writeMessage)
-        self.commEnvironment.on_opened(self.__connectedClient)
+        if SocketHandler.comm_environment is None:
+            SocketHandler.comm_environment = CommEnvironment()
+        self.__connected_client = ConnectedClient(self.comm_environment, self.write_message)
+        self.comm_environment.on_opened(self.__connected_client)
 
-    def writeMessage(self, message):
-        self.request.sendall(message + self.__messageSeparator.separator)
-        log.debug("message to %s:\n%s" % (self.__connectedClient.ID, message))
+    def write_message(self, message):
+        self.request.sendall(message + self.__message_separator.separator)
+        log.debug("message to %s:\n%s" % (self.__connected_client.ID, message))
 
     def handle(self):
-        while not self.__connectedClient.api_isClosed:
+        while not self.__connected_client.api_isClosed:
             try:
                 data = self.request.recv(10240)
             except error as e:
@@ -45,21 +45,21 @@ class SocketHandler(SocketServer.BaseRequestHandler):
             except:
                 log.exception("error receiving data")
             else:
-                for m in self.__messageSeparator.add_data(data):
-                    log.debug("Message received from ID: %s\n%s " % (str(self.__connectedClient.ID), str(m)))
-                    self.commEnvironment.on_async_message(self.__connectedClient, m)
+                for m in self.__message_separator.add_data(data):
+                    log.debug("Message received from ID: %s\n%s " % (str(self.__connected_client.ID), str(m)))
+                    self.comm_environment.on_async_message(self.__connected_client, m)
 
     def finish(self):
-        log.debug("client closed %s" % self.__connectedClient.__dict__.get("ID", "None"))
-        self.commEnvironment.on_closed(self.__connectedClient)
+        log.debug("client closed %s" % self.__connected_client.__dict__.get("ID", "None"))
+        self.comm_environment.on_closed(self.__connected_client)
 
 
 class ThreadedTCPServer(SocketServer.ThreadingMixIn, SocketServer.TCPServer):
     pass
 
 
-def createSocketServer(host, port, SocketHandlerClass=SocketHandler):
-    return ThreadedTCPServer((host, port), SocketHandlerClass)
+def create_socket_server(host, port, socket_handler_class=SocketHandler):
+    return ThreadedTCPServer((host, port), socket_handler_class)
 
 
 class SocketClient:
@@ -80,7 +80,7 @@ class SocketClient:
 
     def connect(self):
         self.socket.connect((self.host, self.port))
-        server_thread = threading.Thread(target=self.receiveMessageThread)
+        server_thread = threading.Thread(target=self.receive_message_thread)
         # Exit the server thread when the main thread terminates
         server_thread.daemon = True
         server_thread.start()
@@ -89,13 +89,13 @@ class SocketClient:
         # this will crash if not ascii
         self.socket.sendall(message + self.__messageSeparator.separator)
 
-    def receiveMessageThread(self):
+    def receive_message_thread(self):
         while True:
             try:
                 data = self.socket.recv(1024)
             except:
                 log.exception("Error receiving message")
-                break
+                raise
             if data != "":
                 for m in self.__messageSeparator.add_data(data):
                     self.received_message(self.Message(m))

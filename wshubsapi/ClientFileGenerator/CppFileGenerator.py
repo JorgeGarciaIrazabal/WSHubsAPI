@@ -6,72 +6,71 @@ from os.path import isfile
 
 from wshubsapi.utils import is_function_for_ws_client, get_args, ASCII_UpperCase, get_module_path
 
-__author__ = 'jgarc'
+__author__ = 'JorgeGarciaIrazabal'
 log = logging.getLogger(__name__)
 
 
 class CppFileGenerator:
+    def __init__(self):
+        raise Exception("static class, do not create an instance of it")
+
     FILE_NAME = "HubsApi.hpp"
 
     @staticmethod
-    def __getHubObjectName(hubName):
-        return hubName[0].lower() + hubName[1:]
+    def __get_hub_object_name(hub_name):
+        return hub_name[0].lower() + hub_name[1:]
 
     @classmethod
-    def __getHubClassStr(cls, hubName, methodsInfo):
-        HUB_NAME = hubName
+    def __get_hub_class_str(cls, hub_name, methods_info):
+        HUB_NAME = hub_name
 
         methods = []
-        for methodName, arguments in methodsInfo["serverMethods"].items():
-            methods.append(cls.__getFunctionString(methodName, **arguments))
+        for methodName, arguments in methods_info["serverMethods"].items():
+            methods.append(cls.__get_function_string(methodName, **arguments))
         METHODS = "\n\t\t\t".join(methods)
-        HUB_OBJECT_DECLARATION = "{0} {1}".format(hubName, cls.__getHubObjectName(hubName))
+        HUB_OBJECT_DECLARATION = "{0} {1}".format(hub_name, cls.__get_hub_object_name(hub_name))
         return cls.HUB_TEMPLATE.format(**locals())
 
     @classmethod
-    def __getFunctionString(cls, methodName, args, defaults):
+    def __get_function_string(cls, method_name, args, defaults):
         types = ["TYPE_" + l for l in ASCII_UpperCase[:len(args)]]
-        METHOD_NAME = methodName
+        METHOD_NAME = method_name
         if len(args) == 0:
             TEMPLATE_TYPES = ""
         else:
             TEMPLATE_TYPES = "\n\t\t\ttemplate<{}>".format(", ".join(["class " + t for t in types]))
-        fArgs = [types[i] + " " + arg for i, arg in enumerate(args)]
-        if len(defaults)>0:
-            fArgs = fArgs[:-len(defaults)] + [f + " = " + defaults[i] for i, f in enumerate(fArgs[-len(defaults):])]
-        FUNCTION_ARGS = ", ".join(fArgs)
+        f_args = [types[i] + " " + arg for i, arg in enumerate(args)]
+        if len(defaults) > 0:
+            f_args = f_args[:-len(defaults)] + [f + " = " + defaults[i] for i, f in enumerate(f_args[-len(defaults):])]
+        FUNCTION_ARGS = ", ".join(f_args)
         MESSAGE_ARGS = "\n\t\t\t\t".join([cls.ARGS_COOK_TEMPLATE.format(arg=arg) for arg in args])
         return cls.METHOD_TEMPLATE.format(**locals())
 
     @classmethod
-    def createFile(cls, path, hubsInfo):
+    def create_file(cls, path, hubs_info):
         clientFolder = os.path.abspath(os.path.join(path, cls.FILE_NAME))
         if not os.path.exists(path):
             os.makedirs(path)
         hubs = []
-        CONSTRUCTOR = cls.__getConstructor(hubsInfo)
-        for hubName, methods in hubsInfo.items():
-            hubs.append(cls.__getHubClassStr(hubName, methods))
+        CONSTRUCTOR = cls.__get_constructor(hubs_info)
+        for hubName, methods in hubs_info.items():
+            hubs.append(cls.__get_hub_class_str(hubName, methods))
         HUBS = "\n\t".join(hubs)
 
         with open(clientFolder, "w") as f:
             f.write(cls.MAIN.format(**locals()))
 
     @classmethod
-    def __getConstructor(cls, hubsInfo):
+    def __get_constructor(cls, hubs_info):
         constructors = []
         initializations = []
-        for hubName in hubsInfo:
-            hubObjName = cls.__getHubObjectName(hubName)
-            constructors.append("{}()".format(hubObjName))
-            initializations.append("{}.server.hubsAPI = this;".format(hubObjName))
+        for hubName in hubs_info:
+            hub_obj_name = cls.__get_hub_object_name(hubName)
+            constructors.append("{}()".format(hub_obj_name))
+            initializations.append("{}.server.hubsAPI = this;".format(hub_obj_name))
         HUBS_CONSTRUCTORS = ", ".join(constructors)
         HUBS_INITIALIZATION = "\n\t\t".join(initializations)
         return cls.CONSTRUCTOR.format(**locals())
-
-    @classmethod
-    def __getAttributesHubs(cls, hubs):
-        return "\n".join([cls.ATTRIBUTE_HUB_TEMPLATE.format(name=hub.__HubName__) for hub in hubs])
 
     CONSTRUCTOR = """
     HubsAPI() : {HUBS_CONSTRUCTORS}{{
@@ -181,4 +180,3 @@ public:
     {CONSTRUCTOR}
 }};
 #endif //HUBAPI_H"""
-

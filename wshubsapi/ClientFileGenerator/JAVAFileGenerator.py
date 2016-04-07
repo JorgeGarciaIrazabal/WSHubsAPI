@@ -16,75 +16,80 @@ class JAVAFileGenerator:
     EXTRA_FILES_FOLDER = "JavaExtraFiles"
     CLIENT_HUB_PREFIX = "Client_"
 
-    @classmethod
-    def __getHubClassStr(cls, class_):
-        funcStrings = "\n".join(cls.__getJSFunctionsStr(class_))
-        return cls.CLASS_TEMPLATE.format(name=class_.__HubName__, functions=funcStrings, prefix=cls.CLIENT_HUB_PREFIX)
+    def __init__(self):
+        raise Exception("static class, do not create an instance of it")
 
     @classmethod
-    def __getJSFunctionsStr(cls, class_):
-        funcStrings = []
+    def __get_hub_class_str(cls, class_):
+        func_str = "\n".join(cls.__get_js_functions_str(class_))
+        return cls.CLASS_TEMPLATE.format(name=class_.__HubName__, functions=func_str, prefix=cls.CLIENT_HUB_PREFIX)
+
+    @classmethod
+    def __get_js_functions_str(cls, class_):
+        func_str = []
         functions = inspect.getmembers(class_, predicate=is_function_for_ws_client)
         for name, method in functions:
             args = get_args(method)
             types = ["TYPE_" + l for l in ASCII_UpperCase[:len(args)]]
-            argsTypes = [types[i] + " " + arg for i, arg in enumerate(args)]
+            args_types = [types[i] + " " + arg for i, arg in enumerate(args)]
             types = "<" + ", ".join(types) + ">" if len(types) > 0 else ""
-            toJson = "\n\t\t\t\t".join([cls.ARGS_COOK_TEMPLATE.format(arg=a) for a in args])
-            argsTypes = ", ".join(argsTypes)
-            funcStrings.append(cls.FUNCTION_TEMPLATE.format(name=name, args=argsTypes, types=types, cook=toJson))
-        return funcStrings
+            to_json = "\n\t\t\t\t".join([cls.ARGS_COOK_TEMPLATE.format(arg=a) for a in args])
+            args_types = ", ".join(args_types)
+            func_str.append(cls.FUNCTION_TEMPLATE.format(name=name, args=args_types, types=types, cook=to_json))
+        return func_str
 
     @classmethod
-    def createFile(cls, path, package, hubs):
-        if not os.path.exists(path): os.makedirs(path)
-        attributesHubs = cls.__getAttributesHubs(hubs)
+    def create_file(cls, path, package, hubs):
+        if not os.path.exists(path):
+            os.makedirs(path)
+        attributes_hubs = cls.__get_attributes_hubs(hubs)
         with open(os.path.join(path, cls.SERVER_FILE_NAME), "w") as f:
-            classStrings = "".join(cls.__getClassStrings(hubs))
-            f.write(cls.WRAPPER.format(main=classStrings,
-                                         package=package,
-                                         clientPackage=cls.CLIENT_PACKAGE_NAME,
-                                         attributesHubs=attributesHubs))
-        cls.__copyExtraFiles(path, package)
+            class_str = "".join(cls.__get_class_strings(hubs))
+            f.write(cls.WRAPPER.format(main=class_str,
+                                       package=package,
+                                       clientPackage=cls.CLIENT_PACKAGE_NAME,
+                                       attributesHubs=attributes_hubs))
+        cls.__copy_extra_files(path, package)
 
     @classmethod
-    def createClientTemplate(cls, path, package, hubs):  # todo: dynamically get client function names
-        clientFolder = os.path.join(path, cls.CLIENT_PACKAGE_NAME)
-        if not os.path.exists(clientFolder): os.makedirs(clientFolder)
+    def create_client_template(cls, path, package, hubs):  # todo: dynamically get client function names
+        client_folder = os.path.join(path, cls.CLIENT_PACKAGE_NAME)
+        if not os.path.exists(client_folder):
+            os.makedirs(client_folder)
         for hub in hubs:
-            clientHubFile = os.path.join(clientFolder, cls.CLIENT_HUB_PREFIX + hub.__HubName__) + '.java'
-            if not os.path.exists(clientHubFile):
-                with open(clientHubFile, "w") as f:
-                    classString = cls.CLIENT_CLASS_TEMPLATE.format(package=package,
-                                                                   name=hub.__HubName__,
-                                                                   prefix=cls.CLIENT_HUB_PREFIX)
-                    f.write(classString)
+            client_hub_file = os.path.join(client_folder, cls.CLIENT_HUB_PREFIX + hub.__HubName__) + '.java'
+            if not os.path.exists(client_hub_file):
+                with open(client_hub_file, "w") as f:
+                    class_str = cls.CLIENT_CLASS_TEMPLATE.format(package=package,
+                                                                 name=hub.__HubName__,
+                                                                 prefix=cls.CLIENT_HUB_PREFIX)
+                    f.write(class_str)
 
     @classmethod
-    def __getClassStrings(cls, hubs):
-        classStrings = []
+    def __get_class_strings(cls, hubs):
+        class_str = []
         for h in hubs:
-            classStrings.append(cls.__getHubClassStr(h))
-        return classStrings
+            class_str.append(cls.__get_hub_class_str(h))
+        return class_str
 
     @classmethod
-    def __getAttributesHubs(cls, hubs):
+    def __get_attributes_hubs(cls, hubs):
         return "\n".join([cls.ATTRIBUTE_HUB_TEMPLATE.format(name=hub.__HubName__) for hub in hubs])
 
     @classmethod
-    def __copyExtraFiles(cls, dstPath, package):
-        filesPath = os.path.join(get_module_path(), cls.EXTRA_FILES_FOLDER)
-        files = [f for f in listdir(filesPath) if isfile(os.path.join(filesPath, f)) and f.endswith(".java")]
+    def __copy_extra_files(cls, dst_path, package):
+        files_path = os.path.join(get_module_path(), cls.EXTRA_FILES_FOLDER)
+        files = [f for f in listdir(files_path) if isfile(os.path.join(files_path, f)) and f.endswith(".java")]
         for f in files:
-            if not isfile(os.path.join(dstPath, f)):
-                absDstPath = os.path.join(dstPath, f)
-                absOriPath = os.path.join(filesPath, f)
-                with open(absOriPath) as oriFile:
-                    with open(absDstPath, 'w') as dstFile:
-                        oriStr = oriFile.read()
-                        dstStr = "package %s;\n" % package + oriStr
-                        dstFile.write(dstStr)
-                log.info("Created file: %s", absDstPath)
+            if not isfile(os.path.join(dst_path, f)):
+                abs_dst_path = os.path.join(dst_path, f)
+                abs_ori_path = os.path.join(files_path, f)
+                with open(abs_ori_path) as oriFile:
+                    with open(abs_dst_path, 'w') as dstFile:
+                        ori_str = oriFile.read()
+                        dst_str = "package %s;\n" % package + ori_str
+                        dstFile.write(dst_str)
+                log.info("Created file: %s", abs_dst_path)
 
     CLASS_TEMPLATE = """
     public class {name} {{
@@ -164,5 +169,5 @@ public class {prefix}{name} extends ClientBase {{
         super(wsHubsApi);
     }}
     // Todo: create client side functions
-}}"""%CLIENT_PACKAGE_NAME
+}}""" % CLIENT_PACKAGE_NAME
     ATTRIBUTE_HUB_TEMPLATE = "    public {name} {name} = new {name}();"

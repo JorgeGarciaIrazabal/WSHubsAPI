@@ -4,7 +4,7 @@ import logging
 import logging.config
 
 from wshubsapi.HubsInspector import HubsInspector
-from wshubsapi.ConnectionHandlers.SocketHandler import createSocketServer
+from wshubsapi.ConnectionHandlers.SocketHandler import create_socket_server
 
 logging.config.dictConfig(json.load(open('logging.json')))
 log = logging.getLogger(__name__)
@@ -15,7 +15,7 @@ if __name__ == '__main__':
     HubsInspector.inspect_implemented_hubs()
     HubsInspector.construct_python_file("../Clients/_static")
 
-    server = createSocketServer("127.0.0.1", 8890)
+    server = create_socket_server("127.0.0.1", 8890)
 
     server.serve_forever()
 
