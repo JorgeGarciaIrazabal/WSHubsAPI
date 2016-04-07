@@ -17,7 +17,7 @@ class TestConnectedClientsHolder(unittest.TestCase):
 
 
         for i in range(10):
-            connectedClient = flexmock(ConnectedClient(CommEnvironment(maxWorkers=0), None), ID=i)
+            connectedClient = flexmock(ConnectedClient(CommEnvironment(max_workers=0), None), ID=i)
             self.connectedClientsHolder.appendClient(connectedClient)
 
     def test_getAllClients_returns10ConnectedClientsWithDifferentIDs(self):

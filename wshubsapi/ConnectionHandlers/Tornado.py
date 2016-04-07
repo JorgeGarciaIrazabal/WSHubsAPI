@@ -31,16 +31,16 @@ class ConnectionHandler(tornado.websocket.WebSocketHandler):
             clientId = int(args[0])
         except:
             clientId = None
-        ID = self.commEnvironment.onOpen(self._connectedClient, clientId)
+        ID = self.commEnvironment.on_opened(self._connectedClient, clientId)
         log.debug("open new connection with ID: {} ".format(ID))
 
     def on_message(self, message):
         log.debug("Message received from ID: {}\n{} ".format(self._connectedClient.ID, message))
-        self.commEnvironment.onAsyncMessage(self._connectedClient, message)
+        self.commEnvironment.on_async_message(self._connectedClient, message)
 
     def on_close(self):
         log.debug("client closed %s" % self._connectedClient.__dict__.get("ID", "None"))
-        self.commEnvironment.onClosed(self._connectedClient)
+        self.commEnvironment.on_closed(self._connectedClient)
 
     def check_origin(self, origin):
         return True

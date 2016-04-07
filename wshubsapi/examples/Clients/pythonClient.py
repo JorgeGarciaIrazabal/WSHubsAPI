@@ -19,8 +19,8 @@ if __name__ == '__main__':
     def printMessage(senderName, message):
         print(u"From {0}: {1}".format(senderName, message))
 
-    ws.ChatHub.client.onMessage = printMessage
-    future = ws.ChatHub.server.subscribeToHub().done(lambda x: ws.ChatHub.server.getSubscribedClientsToHub())
+    ws.ChatHub.client.on_message = printMessage
+    future = ws.ChatHub.server.subscribe_to_hub().done(lambda x: ws.ChatHub.server.get_subscribed_clients_to_hub())
     future.onFinally = lambda: sys.stdout.write("I am from finally")
     name = input("Enter your name:")
     #ws.server.ChatHub.getNumOfClientsConnected().done(lambda x: sys.stdout.write(x[1]+"\n"), lambda x: sys.stdout.write("Error:%s\n"%x))

@@ -13,7 +13,7 @@ class ClientInHub(object):
         """
         self.__hubName = str(hubName)
         self.__client = client
-        self.__comEnvironment = client.api_getCommEnvironment()
+        self.__comEnvironment = client.api_get_comm_environment()
 
     def __getattr__(self, item):
         """
@@ -30,7 +30,7 @@ class ClientInHub(object):
 
     def __constructFunctionToSendMessageToClient(self, functionName):
         def connectionFunction(*args):
-            future, ID = self.__comEnvironment.getNewClientsFuture()
+            future, ID = self.__comEnvironment.get_new_clients_future()
             message = dict(function=functionName, args=list(args), hub=self.__hubName,
                            ID=ID)
             msgStr = utils.serialize_message(self.__comEnvironment.pickler, message)

@@ -9,28 +9,28 @@ from concurrent.futures import ThreadPoolExecutor
 class MessagesReceivedQueue(Queue):
     DEFAULT_MAX_WORKERS = 151
 
-    def __init__(self, commEnvironment, maxWorkers=DEFAULT_MAX_WORKERS):
+    def __init__(self, comm_environment, max_workers=DEFAULT_MAX_WORKERS):
         """
-        :type commEnvironment: wshubsapi.CommEnvironment.CommEnvironment
+        :type comm_environment: wshubsapi.CommEnvironment.CommEnvironment
         """
         Queue.__init__(self)
-        self.commEnvironment = commEnvironment
-        self.maxWorkers = maxWorkers
+        self.comm_environment = comm_environment
+        self.maxWorkers = max_workers
         self.executor = ThreadPoolExecutor(max_workers=self.maxWorkers)
         self.keepAlive = True
 
-    def startThreads(self):
+    def start_threads(self):
         for i in range(self.DEFAULT_MAX_WORKERS):
-            self.executor.submit(self.__infiniteOnMessageHandlerLoop)
+            self.executor.submit(self.__on_message_handler_loop)
 
-    def __infiniteOnMessageHandlerLoop(self):
+    def __on_message_handler_loop(self):
         while self.keepAlive:
-            connectedClient = None
+            connected_client = None
             try:
-                msg, connectedClient = self.get()
-                self.commEnvironment.onMessage(connectedClient, msg)
+                msg, connected_client = self.get()
+                self.comm_environment.on_message(connected_client, msg)
             except Exception as e:
-                if connectedClient is not None:
-                    self.commEnvironment.onError(connectedClient, e)
+                if connected_client is not None:
+                    self.comm_environment.on_error(connected_client, e)
                 else:
                     print(str(e))  # todo: create a call back for this exception

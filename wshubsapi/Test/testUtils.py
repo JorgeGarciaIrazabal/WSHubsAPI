@@ -89,7 +89,7 @@ class TestUtils(unittest.TestCase):
         queue = self.setUp_WSMessagesReceivedQueue(CommEnvironment(), 3)
         queue.executor.submit = flexmock()
 
-        queue.startThreads()
+        queue.start_threads()
 
     def setUp_WSMessagesReceivedQueue_infiniteOnMessageHandlerLoop(self, MAX_WORKERS, message):
         commEnvironment = flexmock(CommEnvironment())
@@ -100,16 +100,16 @@ class TestUtils(unittest.TestCase):
 
     def test_WSMessagesReceivedQueue_infiniteOnMessageHandlerLoop_CallsClientOnMessage(self):
         queue, cc, commEnvironment = self.setUp_WSMessagesReceivedQueue_infiniteOnMessageHandlerLoop(1, "message")
-        commEnvironment.should_receive("onMessage").with_args(cc, "message").once()
-        queue.startThreads()
+        commEnvironment.should_receive("on_message").with_args(cc, "message").once()
+        queue.start_threads()
         time.sleep(0.02)
         queue.keepAlive = False
 
     def test_WSMessagesReceivedQueue_infiniteOnMessageHandlerLoop_CallsOnErrorIfRaisesException(self):
         queue, cc, commEnvironment = self.setUp_WSMessagesReceivedQueue_infiniteOnMessageHandlerLoop(1, "message")
-        commEnvironment.should_receive("onMessage").and_raise(cc, Exception, "test").once()
-        commEnvironment.should_receive("onError").with_args(cc, Exception).once()
-        queue.startThreads()
+        commEnvironment.should_receive("on_message").and_raise(cc, Exception, "test").once()
+        commEnvironment.should_receive("on_error").with_args(cc, Exception).once()
+        queue.start_threads()
         time.sleep(0.02)
         queue.keepAlive = False
 
@@ -117,9 +117,9 @@ class TestUtils(unittest.TestCase):
             self):
         queue, cc, commEnvironment = self.setUp_WSMessagesReceivedQueue_infiniteOnMessageHandlerLoop(1, "message")
         queue.should_receive("get").and_return(["message", None]).once()
-        commEnvironment.should_receive("onMessage").never()
-        commEnvironment.should_receive("onError").never()
+        commEnvironment.should_receive("on_message").never()
+        commEnvironment.should_receive("on_error").never()
 
-        queue.startThreads()
+        queue.start_threads()
         time.sleep(0.02)
         queue.keepAlive = False

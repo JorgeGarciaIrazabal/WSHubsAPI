@@ -5,7 +5,7 @@ from wshubsapi.HubsInspector import HubsInspector
 
 class UtilsAPIHub(Hub):
     def set_id(self, client_id, _sender):
-        connections = self._getClientsHolder().allConnectedClientsDict
+        connections = self._get_clients_holder().allConnectedClientsDict
         connections.pop(_sender.ID)
         _sender.ID = client_id
         connections[client_id] = _sender.api_getRealConnectedClient()
@@ -16,8 +16,8 @@ class UtilsAPIHub(Hub):
         return _sender.ID
 
     def is_client_connected(self, client_id):
-        return client_id in self._getClientsHolder().allConnectedClientsDict
+        return client_id in self._get_clients_holder().allConnectedClientsDict
 
     @staticmethod
     def get_hubs_structure():
-        return HubsInspector.getHubsInformation()
+        return HubsInspector.get_hubs_information()

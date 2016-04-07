@@ -6,67 +6,71 @@ from wshubsapi.ClientFileGenerator.JSClientFileGenerator import JSClientFileGene
 from wshubsapi.ClientFileGenerator.PythonClientFileGenerator import PythonClientFileGenerator
 from wshubsapi.utils import is_function_for_ws_client, get_args, get_defaults
 
-class HubsInspectorException(Exception):
+
+class HubsInspectorError(Exception):
     pass
 
 
 class HubsInspector:
-    __hubsConstructed = False
+    __hubs_constructed = False
     HUBs_DICT = {}
 
-    @classmethod
-    def ignoreHubImplementation(cls, hubClass):
-        return "__HubName__" in hubClass.__dict__ and hubClass.__HubName__ is None
+    def __init__(self):
+        raise HubsInspectorError("Static class, do not create an instance of HubsInspector")
 
     @classmethod
-    def getAllHubsSubclasses(cls, hubClass2Inspect, currentHubClasses=None):
-        currentHubClasses = currentHubClasses if currentHubClasses is not None else []
-        for hubClass in hubClass2Inspect.__subclasses__():
-            if not cls.ignoreHubImplementation(hubClass):
-                currentHubClasses.append(hubClass)
+    def ignore_hub_implementation(cls, hub_class):
+        return "__HubName__" in hub_class.__dict__ and hub_class.__HubName__ is None
+
+    @classmethod
+    def get_all_hubs_subclasses(cls, hub_class_to_inspect, current_hub_classes=None):
+        current_hub_classes = current_hub_classes if current_hub_classes is not None else []
+        for hubClass in hub_class_to_inspect.__subclasses__():
+            if not cls.ignore_hub_implementation(hubClass):
+                current_hub_classes.append(hubClass)
             else:
-                cls.getAllHubsSubclasses(hubClass, currentHubClasses)
-        return currentHubClasses
+                cls.get_all_hubs_subclasses(hubClass, current_hub_classes)
+        return current_hub_classes
 
     @classmethod
-    def inspectImplementedHubs(cls, forceReconstruction=False):
-        if not cls.__hubsConstructed or forceReconstruction:
+    def inspect_implemented_hubs(cls, force_reconstruction=False):
+        if not cls.__hubs_constructed or force_reconstruction:
             cls.HUBs_DICT.clear()
-            for hubClass in cls.getAllHubsSubclasses(Hub):
+            for hub_class in cls.get_all_hubs_subclasses(Hub):
                 try:
-                    hubClass()
+                    hub_class()
                 except TypeError as e:
                     if "__init__()" in str(e):
-                        raise HubsInspectorException(
-                            "Hubs can not have a constructor with parameters. Check Hub: %s" % hubClass.__name__)
+                        raise HubsInspectorError(
+                            "Hubs can't have a constructor with parameters. Check Hub: %s" % hub_class.__name__)
                     else:
                         raise e
-            cls.__hubsConstructed = True
+            cls.__hubs_constructed = True
 
     @classmethod
-    def constructJSFile(cls, path="."):
-        cls.inspectImplementedHubs()
-        JSClientFileGenerator.createFile(path, cls.getHubsInformation())
+    def construct_js_file(cls, path="."):
+        cls.inspect_implemented_hubs()
+        JSClientFileGenerator.createFile(path, cls.get_hubs_information())
 
     @classmethod
-    def constructJAVAFile(cls, package, path="."):
-        cls.inspectImplementedHubs()
+    def construct_java_file(cls, package, path="."):
+        cls.inspect_implemented_hubs()
         hubs = cls.HUBs_DICT.values()
         JAVAFileGenerator.createFile(path, package, hubs)
         JAVAFileGenerator.createClientTemplate(path, package, hubs)
 
     @classmethod
-    def constructPythonFile(cls, path="."):
-        cls.inspectImplementedHubs()
+    def construct_python_file(cls, path="."):
+        cls.inspect_implemented_hubs()
         PythonClientFileGenerator.createFile(path, cls.HUBs_DICT.values())
 
     @classmethod
-    def constructCppFile(cls, path="."):
-        cls.inspectImplementedHubs()
-        CppFileGenerator.createFile(path, cls.getHubsInformation())
+    def construct_cpp_file(cls, path="."):
+        cls.inspect_implemented_hubs()
+        CppFileGenerator.createFile(path, cls.get_hubs_information())
 
     @classmethod
-    def getHubInstance(cls, hub):
+    def get_hub_instance(cls, hub):
         """
         :rtype: Hub
         """
@@ -75,25 +79,22 @@ class HubsInspector:
         return cls.HUBs_DICT[hub]
 
     @classmethod
-    def getHubsInformation(cls):
-        infoReport = {}
+    def get_hubs_information(cls):
+        info_report = {}
         hubs = cls.HUBs_DICT.values()
         for hub in hubs:
             functions = inspect.getmembers(hub, predicate=is_function_for_ws_client)
-            serverMethods = {}
+            server_methods = {}
             for name, method in functions:
-                argsDict = dict(args=get_args(method),
-                                defaults = get_defaults(method))
-                serverMethods[name] = argsDict
-            clientMethods = {}
-            for name, method in hub.clientFunctions.items():
-                argsDict = dict(args=get_args(method),
-                                defaults = get_defaults(method))
-                clientMethods[name] = argsDict
+                args_dict = dict(args=get_args(method), defaults=get_defaults(method))
+                server_methods[name] = args_dict
+            client_methods = {}
+            for name, method in hub.client_functions.items():
+                args_dict = dict(args=get_args(method), defaults=get_defaults(method))
+                client_methods[name] = args_dict
 
-            infoReport[hub.__HubName__] = dict(serverMethods=serverMethods,
-                                               clientMethods=clientMethods)
-        return infoReport
+            info_report[hub.__HubName__] = dict(serverMethods=server_methods, clientMethods=client_methods)
+        return info_report
 
 
 from wshubsapi.Hub import Hub

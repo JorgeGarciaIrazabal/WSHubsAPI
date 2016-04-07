@@ -29,7 +29,7 @@ class SocketHandler(SocketServer.BaseRequestHandler):
         if SocketHandler.commEnvironment is None:
             SocketHandler.commEnvironment = CommEnvironment()
         self.__connectedClient = ConnectedClient(self.commEnvironment, self.writeMessage)
-        self.commEnvironment.onOpen(self.__connectedClient)
+        self.commEnvironment.on_opened(self.__connectedClient)
 
     def writeMessage(self, message):
         self.request.sendall(message + self.__messageSeparator.separator)
@@ -47,11 +47,11 @@ class SocketHandler(SocketServer.BaseRequestHandler):
             else:
                 for m in self.__messageSeparator.add_data(data):
                     log.debug("Message received from ID: %s\n%s " % (str(self.__connectedClient.ID), str(m)))
-                    self.commEnvironment.onAsyncMessage(self.__connectedClient, m)
+                    self.commEnvironment.on_async_message(self.__connectedClient, m)
 
     def finish(self):
         log.debug("client closed %s" % self.__connectedClient.__dict__.get("ID", "None"))
-        self.commEnvironment.onClosed(self.__connectedClient)
+        self.commEnvironment.on_closed(self.__connectedClient)
 
 
 class ThreadedTCPServer(SocketServer.ThreadingMixIn, SocketServer.TCPServer):

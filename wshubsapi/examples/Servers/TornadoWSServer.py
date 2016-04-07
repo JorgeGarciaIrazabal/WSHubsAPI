@@ -19,9 +19,9 @@ app = web.Application([
 
 if __name__ == '__main__':
     importlib.import_module("ChatHub")  # necessary to add this import for code inspection
-    HubsInspector.inspectImplementedHubs()
-    HubsInspector.constructJSFile(settings["static_path"])
-    HubsInspector.constructPythonFile(settings["static_path"])
+    HubsInspector.inspect_implemented_hubs()
+    HubsInspector.construct_js_file(settings["static_path"])
+    HubsInspector.construct_python_file(settings["static_path"])
     log.debug("starting...")
     app.listen(8888)
 

@@ -33,7 +33,7 @@ def singleAction(index):
     ws = HubsAPI('ws://127.0.0.1:8888/')
     ws.connect()
 
-    ws.ChatHub.client.onMessage = printMessage
+    ws.ChatHub.client.on_message = printMessage
     name = "jorge {}".format(index)
     for i in range(3):
         time.sleep(0.03)
@@ -60,7 +60,7 @@ if __name__ == '__main__':
     for i in range(5):
         connections.append(HubsAPI('ws://127.0.0.1:8888/'))
         connections[-1].connect()
-        connections[-1].ChatHub.client.onMessage = printMessage
+        connections[-1].ChatHub.client.on_message = printMessage
     print("starting...")
     for j in range(1000):
         for i, conn in enumerate(connections):

@@ -10,34 +10,34 @@ log = logging.getLogger(__name__)
 
 
 class FunctionMessage:
-    def __init__(self, msgObj, connectedClient):
+    def __init__(self, msg_obj, connected_client):
         """
         :type messageStr: bytes|str
         """
-        self.hubInstance = HubsInspector.HUBs_DICT[msgObj["hub"]]
-        self.hubName = msgObj["hub"]
-        self.args = msgObj["args"]
-        self.connectedClient = connectedClient
+        self.hubInstance = HubsInspector.HUBs_DICT[msg_obj["hub"]]
+        self.hubName = msg_obj["hub"]
+        self.args = msg_obj["args"]
+        self.connectedClient = connected_client
 
-        self.functionName = msgObj["function"]
+        self.functionName = msg_obj["function"]
         self.method = getattr(self.hubInstance, self.functionName)
-        self.messageID = msgObj.get("ID", -1)
+        self.messageID = msg_obj.get("ID", -1)
 
-    def __executeFunction(self):
+    def __execute_function(self):
         try:
-            self.__includeSenderInArgs(self.method, self.args)
+            self.__include_sender_in_args(self.method, self.args)
             return True, self.method(*self.args)
         except Exception as e:
             log.exception("Error calling hub function with: {}".format(str(self)))
             return False, dict(error=str(e), type=str(type(e)), trace=traceback.format_exc())
 
-    def callFunction(self):
-        success, replay = self.__executeFunction()
+    def call_function(self):
+        success, replay = self.__execute_function()
         if isinstance(replay, UnsuccessfulReplay):
-            return self.constructReplayDict(False, replay.replay)
-        return self.constructReplayDict(success, replay)
+            return self.construct_replay_dict(False, replay.replay)
+        return self.construct_replay_dict(success, replay)
 
-    def constructReplayDict(self, success=None, replay=None):
+    def construct_replay_dict(self, success=None, replay=None):
         return {
             "success": success,
             "replay": replay,
@@ -46,14 +46,14 @@ class FunctionMessage:
             "ID": self.messageID
         }
 
-    def __includeSenderInArgs(self, method, args):
+    def __include_sender_in_args(self, method, args):
         """
         :type args: list
         """
-        methodArgs = get_args(method, include_sender=True)
+        method_args = get_args(method, include_sender=True)
         try:
-            senderIndex = methodArgs.index(SENDER_KEY_PARAMETER)
-            args.insert(senderIndex, ClientInHub(self.connectedClient, self.hubName))
+            sender_index = method_args.index(SENDER_KEY_PARAMETER)
+            args.insert(sender_index, ClientInHub(self.connectedClient, self.hubName))
         except ValueError:
             pass
 

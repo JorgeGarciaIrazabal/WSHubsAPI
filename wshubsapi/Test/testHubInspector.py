@@ -6,9 +6,9 @@ from wshubsapi.ClientFileGenerator.JAVAFileGenerator import JAVAFileGenerator
 from wshubsapi.ClientFileGenerator.JSClientFileGenerator import JSClientFileGenerator
 from wshubsapi.ClientFileGenerator.PythonClientFileGenerator import PythonClientFileGenerator
 from wshubsapi.Hub import Hub
-from wshubsapi.Hub import HubException
+from wshubsapi.Hub import HubError
 from wshubsapi.HubsInspector import HubsInspector
-from wshubsapi.HubsInspector import HubsInspectorException
+from wshubsapi.HubsInspector import HubsInspectorError
 from wshubsapi.Test.utils.HubsUtils import removeHubsSubclasses
 
 
@@ -24,7 +24,7 @@ class TestHubDetection(unittest.TestCase):
 
         self.testHubClass = TestHub
         self.testHub2Class = TestHub2
-        HubsInspector.inspectImplementedHubs(forceReconstruction=True)
+        HubsInspector.inspect_implemented_hubs(force_reconstruction=True)
 
     def tearDown(self):
         del self.testHubClass
@@ -44,36 +44,36 @@ class TestHubDetection(unittest.TestCase):
         class TestHubLimitation2(Hub):
             __HubName__ = "TestHubLimitation"
 
-        self.assertRaises(HubException, HubsInspector.inspectImplementedHubs, forceReconstruction=True)
+        self.assertRaises(HubError, HubsInspector.inspect_implemented_hubs, force_reconstruction=True)
         TestHubLimitation2.__HubName__ = "TestHubLimitation2"
 
         class TestHubLimitation3(Hub):
             def __init__(self, aux):
                 super(TestHubLimitation3, self).__init__()
 
-        self.assertRaises(HubsInspectorException, HubsInspector.inspectImplementedHubs, forceReconstruction=True)
+        self.assertRaises(HubsInspectorError, HubsInspector.inspect_implemented_hubs, force_reconstruction=True)
         TestHubLimitation3.__init__ = lambda: 1 + 1
 
     def test_hubsLimitations_startWithUnderscores(self):
         class __TestHubLimitation(Hub):
             pass
 
-        self.assertRaises(HubException, HubsInspector.inspectImplementedHubs, forceReconstruction=True)
+        self.assertRaises(HubError, HubsInspector.inspect_implemented_hubs, force_reconstruction=True)
 
-    def test_hubsLimitations_wsClient(self):
+    def test_hubsLimitations_cant_be_named_wsClient(self):
         class wsClient(Hub):
             pass
 
-        self.assertRaises(HubException, HubsInspector.inspectImplementedHubs, forceReconstruction=True)
+        self.assertRaises(HubError, HubsInspector.inspect_implemented_hubs, force_reconstruction=True)
 
     def test_getHubInstance_returnsAnInstanceOfHubIfExists(self):
-        self.assertIsInstance(HubsInspector.getHubInstance(self.testHubClass), Hub)
+        self.assertIsInstance(HubsInspector.get_hub_instance(self.testHubClass), Hub)
 
     def test_getHubInstance_RaisesErrorIfNotAHub(self):
-        self.assertRaises(AttributeError, HubsInspector.getHubInstance, (str,))
+        self.assertRaises(AttributeError, HubsInspector.get_hub_instance, (str,))
 
     def test_getHubsInformation_ReturnsDictionaryWithNoClientFunctions(self):
-        infoReport = HubsInspector.getHubsInformation()
+        infoReport = HubsInspector.get_hubs_information()
 
         self.assertIn("TestHub2", infoReport)
         self.assertIn("getData", infoReport["TestHub"]["serverMethods"])
@@ -83,14 +83,14 @@ class TestHubDetection(unittest.TestCase):
             def getData(self):
                 pass
 
-            def _defineClientFunctions(self):
-                self.clientFunctions = dict(client1=lambda x, y: None,
-                                            client2=lambda x, y=1: None,
-                                            client3=lambda x=0, y=1: None)
+            def _define_client_functions(self):
+                self.client_functions = dict(client1=lambda x, y: None,
+                                             client2=lambda x, y=1: None,
+                                             client3=lambda x=0, y=1: None)
 
-        HubsInspector.inspectImplementedHubs(forceReconstruction=True)
+        HubsInspector.inspect_implemented_hubs(force_reconstruction=True)
 
-        infoReport = HubsInspector.getHubsInformation()
+        infoReport = HubsInspector.get_hubs_information()
 
         self.assertIn("TestHubWithClient", infoReport)
         client1Method = infoReport["TestHubWithClient"]["clientMethods"]["client1"]
@@ -111,7 +111,7 @@ class TestClientFileConstructor(unittest.TestCase):
             def getData(self):
                 pass
 
-        HubsInspector.inspectImplementedHubs(forceReconstruction=True)
+        HubsInspector.inspect_implemented_hubs(force_reconstruction=True)
 
     def tearDown(self):
         removeHubsSubclasses()
@@ -136,21 +136,21 @@ class TestClientFileConstructor(unittest.TestCase):
             pass
 
     def test_JSCreation(self):
-        HubsInspector.constructJSFile()
+        HubsInspector.construct_js_file()
 
         self.assertTrue(os.path.exists(JSClientFileGenerator.FILE_NAME))
         os.remove(JSClientFileGenerator.FILE_NAME)
 
         otherPath = "onTest"
         fullPath = os.path.join(otherPath, JSClientFileGenerator.FILE_NAME)
-        HubsInspector.constructJSFile(otherPath)
+        HubsInspector.construct_js_file(otherPath)
 
         self.assertTrue(os.path.exists(fullPath))
 
     def test_JAVACreation(self):
         path = "onTest"
         try:
-            HubsInspector.constructJAVAFile("test", path)
+            HubsInspector.construct_java_file("test", path)
             self.assertTrue(os.path.exists(os.path.join(path, JAVAFileGenerator.SERVER_FILE_NAME)))
             self.assertTrue(os.path.exists(os.path.join(path, JAVAFileGenerator.CLIENT_PACKAGE_NAME)))
         finally:
@@ -159,7 +159,7 @@ class TestClientFileConstructor(unittest.TestCase):
                 os.remove(fullPath) if os.path.isfile(fullPath) else shutil.rmtree(fullPath)
 
     def test_PythonCreation(self):
-        HubsInspector.constructPythonFile()
+        HubsInspector.construct_python_file()
         self.assertTrue(os.path.exists(PythonClientFileGenerator.FILE_NAME))
         self.assertTrue(os.path.exists("__init__.py"), "Check if python package is created")
         os.remove(PythonClientFileGenerator.FILE_NAME)
@@ -167,6 +167,6 @@ class TestClientFileConstructor(unittest.TestCase):
         otherPath = "onTest"
         fullPath = os.path.join(otherPath, PythonClientFileGenerator.FILE_NAME)
         packageFilePath = os.path.join(otherPath, "__init__.py")
-        HubsInspector.constructPythonFile(otherPath)
+        HubsInspector.construct_python_file(otherPath)
         self.assertTrue(os.path.exists(fullPath))
         self.assertTrue(os.path.exists(packageFilePath), "Check if python package is created")

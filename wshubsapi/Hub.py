@@ -6,7 +6,7 @@ class UnsuccessfulReplay:
         self.replay = replay
 
 
-class HubException(Exception):
+class HubError(Exception):
     pass
 
 
@@ -14,61 +14,62 @@ class Hub(object):
     __hubSubscribers = []
 
     def __init__(self):
-        hubName = self.__class__.__dict__.get("__HubName__", self.__class__.__name__)
-        if hubName in HubsInspector.HUBs_DICT:
-            raise HubException("Hub's name must be unique")
-        if hubName.startswith("__"):
-            raise HubException("Hub's name can not start with '__'")
-        if hubName == "wsClient":
-            raise HubException("Hub's name can not be 'wsClient', it is a  reserved name")
-        setattr(self.__class__, "__HubName__", hubName)
-        HubsInspector.HUBs_DICT[hubName] = self
+        hub_name = self.__class__.__dict__.get("__HubName__", self.__class__.__name__)
+        if hub_name in HubsInspector.HUBs_DICT:
+            raise HubError("Hub's name must be unique")
+        if hub_name.startswith("__"):
+            raise HubError("Hub's name can not start with '__'")
+        if hub_name == "wsClient":
+            raise HubError("Hub's name can not be 'wsClient', it is a  reserved name")
+        setattr(self.__class__, "__HubName__", hub_name)
+        HubsInspector.HUBs_DICT[hub_name] = self
 
-        self._clientFunctions = dict()
-        self._defineClientFunctions()
-        self.__class__._clientsHolder = ConnectedClientsHolder(hubName)
+        self._client_functions = dict()
+        self._define_client_functions()
+        self.__class__._clientsHolder = ConnectedClientsHolder(hub_name)
 
-    def subscribeToHub(self, _sender):
+    def subscribe_to_hub(self, _sender):
         if _sender in self.__hubSubscribers:
             return False
         self.__hubSubscribers.append(_sender)
         return True
 
-    def unsubscribeFromHub(self, _sender):
+    def unsubscribe_from_hub(self, _sender):
         if _sender in self.__hubSubscribers:
             self.__hubSubscribers.remove(_sender)
             return True
         return False
 
-    def getSubscribedClientsToHub(self):
+    def get_subscribed_clients_to_hub(self):
         self.__hubSubscribers = list(filter(lambda c: not c.api_isClosed, self.__hubSubscribers))
         return map(lambda x: x.ID, self.__hubSubscribers)
 
     @classmethod
-    def _getClientsHolder(cls):
+    def _get_clients_holder(cls):
         """
         :rtype: ConnectedClientsHolder
         """
         # clientsHolder is defined while inspecting hubs
         # can not be initialized in Hub because it is independent in each subHub
-        return cls._clientsHolder
+        return cls._clients_holder
 
     @property
-    def clientFunctions(self):
-        return self._clientFunctions
+    def client_functions(self):
+        return self._client_functions
 
-    @clientFunctions.setter
-    def clientFunctions(self, clientFunctions):
-        assert (isinstance(clientFunctions, dict))
-        for functionName, function in clientFunctions.items():
+    @client_functions.setter
+    def client_functions(self, client_functions):
+        assert (isinstance(client_functions, dict))
+        for functionName, function in client_functions.items():
             assert (isinstance(functionName, basestring))
             assert (hasattr(function, '__call__'))
-        self._clientFunctions = clientFunctions
+        self._client_functions = client_functions
 
-    def _constructUnsuccessfulReplay(self, replay):
+    @staticmethod
+    def _construct_unsuccessful_replay(replay):
         return UnsuccessfulReplay(replay)
 
-    def _defineClientFunctions(self):
+    def _define_client_functions(self):
         pass
 
 

@@ -13,33 +13,33 @@ from wshubsapi.MessagesReceivedQueue import MessagesReceivedQueue
 
 class TestCommProtocol(unittest.TestCase):
     def setUp(self):
-        self.commEnvironment = CommEnvironment(maxWorkers=0, unprovidedIdTemplate="unprovided_{}")
+        self.commEnvironment = CommEnvironment(max_workers=0, unprovided_id_template="unprovided_{}")
 
     def test_construct_initializeMandatoryAttributes(self):
-        self.assertIsInstance(self.commEnvironment.wsMessageReceivedQueue, MessagesReceivedQueue)
+        self.assertIsInstance(self.commEnvironment.message_received_queue, MessagesReceivedQueue)
         self.assertIsInstance(self.commEnvironment.lock, thread.LockType)
-        self.assertIs(self.commEnvironment.allConnectedClients, ConnectedClientsHolder.allConnectedClientsDict)
+        self.assertIs(self.commEnvironment.all_connected_clients, ConnectedClientsHolder.allConnectedClientsDict)
 
     def test_getUnprovidedID_returnsFirstAvailableUnprovidedID(self):
         firstClient = ConnectedClient(self.commEnvironment, lambda x: x)
         secondClient = ConnectedClient(self.commEnvironment, lambda x: x)
-        self.commEnvironment.onOpen(firstClient)  # first UnprovidedID = unprovided_0
-        self.commEnvironment.onOpen(secondClient)  # first UnprovidedID = unprovided_1
+        self.commEnvironment.on_opened(firstClient)  # first UnprovidedID = unprovided_0
+        self.commEnvironment.on_opened(secondClient)  # first UnprovidedID = unprovided_1
 
-        unprovidedId = self.commEnvironment.getUnprovidedID()
+        unprovidedId = self.commEnvironment.get_unprovided_id()
 
         self.assertEqual(unprovidedId, "unprovided_2")
 
     def test_getUnprovidedID_returnAvailableUnprovidedIdsIfExist(self):
-        self.commEnvironment.availableUnprovidedIds.append("availableId_1")
+        self.commEnvironment.available_unprovided_ids.append("availableId_1")
 
-        unprovidedId = self.commEnvironment.getUnprovidedID()
+        unprovidedId = self.commEnvironment.get_unprovided_id()
 
         self.assertEqual(unprovidedId, "availableId_1")
 
     def test_getUnprovidedID_availableIdsAreRemovedWhenUsed(self):
-        self.commEnvironment.availableUnprovidedIds.append("availableId_1")
-        unprovidedId1 = self.commEnvironment.getUnprovidedID()
-        unprovidedId2 = self.commEnvironment.getUnprovidedID()
+        self.commEnvironment.available_unprovided_ids.append("availableId_1")
+        unprovidedId1 = self.commEnvironment.get_unprovided_id()
+        unprovidedId2 = self.commEnvironment.get_unprovided_id()
 
         self.assertEqual(unprovidedId2, "unprovided_0")

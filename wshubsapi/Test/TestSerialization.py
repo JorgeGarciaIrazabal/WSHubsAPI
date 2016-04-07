@@ -10,8 +10,8 @@ import unittest
 class TestSerialization(unittest.TestCase):
     def setUp(self):
         self.connectedClient = ConnectedClient(serializationPickler=Pickler(max_depth=5, max_iter=80, make_refs=False),
-                                               commEnvironment=None,
-                                               writeMessageFunction=lambda x: x,
+                                               communication_environment=None,
+                                               write_message_function=lambda x: x,
                                                closeFunction=lambda y: y)
         utils.set_serializer_date_time_handler()
 

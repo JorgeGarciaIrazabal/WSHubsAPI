@@ -24,11 +24,11 @@ class TestFunctionMessage(unittest.TestCase):
                 return x
 
             def testReplayUnsuccessful(self, x):
-                return self._constructUnsuccessfulReplay(x)
+                return self._construct_unsuccessful_replay(x)
 
         self.testHubClass = TestHub
-        HubsInspector.inspectImplementedHubs(forceReconstruction=True)
-        self.testHubInstance = HubsInspector.getHubInstance(self.testHubClass)
+        HubsInspector.inspect_implemented_hubs(force_reconstruction=True)
+        self.testHubInstance = HubsInspector.get_hub_instance(self.testHubClass)
 
     def tearDown(self):
         del self.testHubClass
@@ -60,7 +60,7 @@ class TestFunctionMessage(unittest.TestCase):
     def test_CallFunction_ReturnsAnExpectedReplayMessageIfSuccess(self):
         fn = FunctionMessage(self.__constructMessageStr(args=["x"], ID=15, function="testNoSender"), "_sender")
 
-        functionResult = fn.callFunction()
+        functionResult = fn.call_function()
 
         self.assertEqual(functionResult["replay"], "x")
         self.assertEqual(functionResult["success"], True)
@@ -71,7 +71,7 @@ class TestFunctionMessage(unittest.TestCase):
     def test_CallFunction_ReturnsAnExpectedReplayMessageIfNoSuccess(self):
         fn = FunctionMessage(self.__constructMessageStr(ID=15, function="testException"), "_sender")
 
-        functionResult = fn.callFunction()
+        functionResult = fn.call_function()
 
         self.assertEqual(functionResult["success"], False)
         self.assertEqual(functionResult["hub"], self.testHubClass.__HubName__)
@@ -82,7 +82,7 @@ class TestFunctionMessage(unittest.TestCase):
         cc = ConnectedClient(None, None)
         fn = FunctionMessage(self.__constructMessageStr(args=["x"]), cc)
 
-        functionResult = fn.callFunction()
+        functionResult = fn.call_function()
 
         self.assertEqual(functionResult["replay"][0], "x")
         self.assertIsInstance(functionResult["replay"][1], ClientInHub)
@@ -93,7 +93,7 @@ class TestFunctionMessage(unittest.TestCase):
     def test_CallFunction_DoesNotIncludesSenderIfNotRequested(self):
         fn = FunctionMessage(self.__constructMessageStr(args=["x"], function="testNoSender"), "_sender")
 
-        functionResult = fn.callFunction()
+        functionResult = fn.call_function()
 
         self.assertEqual(functionResult["replay"], "x")
         self.assertEqual(functionResult["success"], True)
@@ -101,7 +101,7 @@ class TestFunctionMessage(unittest.TestCase):
     def test_CallFunction_SuccessFalseIfMethodRaisesException(self):
         fn = FunctionMessage(self.__constructMessageStr(function="testException"), "_sender")
 
-        functionResult = fn.callFunction()
+        functionResult = fn.call_function()
 
         self.assertEqual(functionResult["success"], False)
         self.assertEqual(functionResult["replay"]["error"], "MyException")
@@ -109,7 +109,7 @@ class TestFunctionMessage(unittest.TestCase):
     def test_CallFunction_ReplaysSuccessFalseIfReturnsUnsuccessfulReplayObject(self):
         fn = FunctionMessage(self.__constructMessageStr(function="testReplayUnsuccessful", args=["x"]), "_sender")
 
-        functionResult = fn.callFunction()
+        functionResult = fn.call_function()
 
         self.assertEqual(functionResult["success"], False)
         self.assertEqual(functionResult["replay"], "x")

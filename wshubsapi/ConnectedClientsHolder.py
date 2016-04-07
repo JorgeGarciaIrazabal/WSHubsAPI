@@ -22,7 +22,7 @@ class ConnectedClientsHolder:
         return ConnectedClientsGroup([self.allConnectedClientsDict[clientId]], self.hubName)[0]
 
     def getSubscribedClients(self):
-        subscribedClients = HubsInspector.getHubInstance(self.hubName).getSubscribedClientsToHub()
+        subscribedClients = HubsInspector.get_hub_instance(self.hubName).get_subscribed_clients_to_hub()
         return ConnectedClientsGroup([self.allConnectedClientsDict[ID] for ID in subscribedClients], self.hubName)
 
     @classmethod

@@ -27,13 +27,13 @@ class ConnectionHandler(WebSocket):
             clientId = int(args[0])
         except:
             clientId = None
-        ID = self.commEnvironment.onOpen(self._connectedClient, clientId)
+        ID = self.commEnvironment.on_opened(self._connectedClient, clientId)
         log.debug("open new connection with ID: {} ".format(ID))
 
     def received_message(self, message):
         log.debug("Message received from ID: %s\n%s " % (str(self._connectedClient.ID), str(message)))
-        self.commEnvironment.onAsyncMessage(self._connectedClient, message.data)
+        self.commEnvironment.on_async_message(self._connectedClient, message.data)
 
     def closed(self, code, reason=None):
         log.debug("client closed %s" % self._connectedClient.__dict__.get("ID", "None"))
-        self.commEnvironment.onClosed(self._connectedClient)
+        self.commEnvironment.on_closed(self._connectedClient)

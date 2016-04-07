@@ -2,18 +2,18 @@ from wshubsapi.ClientInHub import ClientInHub
 
 
 class ConnectedClientsGroup(object):
-    def __init__(self, connectedClientsInGroup, hubName):
+    def __init__(self, connected_clients_in_group, hub_name):
         """
-        :type connectedClientsInGroup: list of wshubsapi.ConnectedClient.ConnectedClient
+        :type connected_clients_in_group: list of wshubsapi.ConnectedClient.ConnectedClient
         """
-        self.hubName = hubName
-        self.connectedClients = map(lambda c: ClientInHub(c, hubName), connectedClientsInGroup)
+        self.hub_name = hub_name
+        self.connected_clients = map(lambda c: ClientInHub(c, hub_name), connected_clients_in_group)
 
-    def append(self, connectedClient):
+    def append(self, connected_client):
         """
-        :type connectedClient: ConnectedClient.ConnectedClient
+        :type connected_client: ConnectedClient.ConnectedClient
         """
-        self.connectedClients.append(ClientInHub(connectedClient, self.hubName))
+        self.connected_clients.append(ClientInHub(connected_client, self.hub_name))
 
     def __getattr__(self, item):
         """
@@ -24,25 +24,25 @@ class ConnectedClientsGroup(object):
             return
         functions = []
         futures = []
-        for c in self.connectedClients:
+        for c in self.connected_clients:
             functions.append(c.__getattr__(item))
 
-        def connectionFunctions(*args):
+        def connection_functions(*args):
             for f in functions:
                 futures.append(f(*args))
             return futures
 
-        return connectionFunctions
+        return connection_functions
 
     def __getitem__(self, item):
         """
         :rtype : ConnectedClient
         """
-        return self.connectedClients.__getitem__(item)
+        return self.connected_clients.__getitem__(item)
 
     def __len__(self):
-        return self.connectedClients.__len__()
+        return self.connected_clients.__len__()
 
     def __iter__(self):
-        for x in self.connectedClients:
+        for x in self.connected_clients:
             yield x
