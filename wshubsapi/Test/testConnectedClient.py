@@ -125,6 +125,6 @@ class TestConnectedClient(unittest.TestCase):
     def test_replay_writeMessageWithAString(self):
         replayMessage = MessageCreator.createReplayMessage()
         self.connectedClient = flexmock(self.connectedClient)
-        self.connectedClient.should_receive("api_writeMessage").with_args(str).once()
+        self.connectedClient.should_receive("api_write_message").with_args(str).once()
 
         self.commEnvironment.replay(self.connectedClient, replayMessage, "test")
