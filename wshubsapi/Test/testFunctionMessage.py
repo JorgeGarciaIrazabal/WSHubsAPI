@@ -47,11 +47,11 @@ class TestFunctionMessage(unittest.TestCase):
     def test_FunctionMessageConstruction_InitializeNecessaryAttributes(self):
         fn = FunctionMessage(self.__constructMessageStr(), "connectedClient")
 
-        self.assertEqual(fn.hubInstance, self.testHubInstance)
-        self.assertEqual(fn.hubName, self.testHubClass.__HubName__)
+        self.assertEqual(fn.hub_instance, self.testHubInstance)
+        self.assertEqual(fn.hub_name, self.testHubClass.__HubName__)
         self.assertEqual(fn.args, [])
         self.assertEqual(fn.method, self.testHubInstance.testMethod)
-        self.assertEqual(fn.connectedClient, "connectedClient")
+        self.assertEqual(fn.connected_client, "connectedClient")
 
     def test_FunctionMessageConstruction_WithUnrealMethodNameRaisesAnError(self):
         message = self.__constructMessageStr(function="notExists")

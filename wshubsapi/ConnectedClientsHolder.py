@@ -21,6 +21,21 @@ class ConnectedClientsHolder:
     def get_client(self, client_id):
         return ConnectedClientsGroup([self.all_connected_clients[client_id]], self.hub_name)[0]
 
+    def get(self, filter_criteria):
+        """
+        smart function that will retrieve clients depending on the filter criteria type
+        :param filter_criteria: - if list of IDs,  returns the clients with the matching IDs
+                                - if ID, returns the client with the matching ID
+                                - if function, filter all clients with the specified function
+        :return: ClientInHub or ConnectedClientsGroup
+        """
+        if isinstance(filter_criteria, (list, tuple)):
+            return self.get_clients(lambda x: x.ID in filter_criteria)
+        elif hasattr(filter_criteria, '__call__'):
+            return self.get_clients(filter_criteria)
+        else:
+            return self.get_client(filter_criteria)
+
     def get_subscribed_clients(self):
         subscribed_clients = HubsInspector.get_hub_instance(self.hub_name).get_subscribed_clients_to_hub()
         return ConnectedClientsGroup([self.all_connected_clients[ID] for ID in subscribed_clients], self.hub_name)

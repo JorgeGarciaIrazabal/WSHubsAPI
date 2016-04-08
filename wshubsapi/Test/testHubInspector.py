@@ -32,10 +32,10 @@ class TestHubDetection(unittest.TestCase):
         removeHubsSubclasses()
 
     def test_hubsInspection(self):
-        self.assertEqual(len(HubsInspector.HUBs_DICT), 3, 'Detects all Hubs')
-        self.assertTrue(issubclass(HubsInspector.HUBs_DICT['TestHub'].__class__, Hub), 'Hubs subclass is class')
-        self.assertTrue(issubclass(HubsInspector.HUBs_DICT['TestHub2'].__class__, Hub), 'Hubs subclass is class')
-        self.assertTrue(getattr(HubsInspector.HUBs_DICT['TestHub'], "getData"), 'Detects function')
+        self.assertEqual(len(HubsInspector.HUBS_DICT), 3, 'Detects all Hubs')
+        self.assertTrue(issubclass(HubsInspector.HUBS_DICT['TestHub'].__class__, Hub), 'Hubs subclass is class')
+        self.assertTrue(issubclass(HubsInspector.HUBS_DICT['TestHub2'].__class__, Hub), 'Hubs subclass is class')
+        self.assertTrue(getattr(HubsInspector.HUBS_DICT['TestHub'], "getData"), 'Detects function')
 
     def test_hubsLimitations(self):
         class TestHubLimitation(Hub):

@@ -13,10 +13,18 @@ class HubsInspectorError(Exception):
 
 class HubsInspector:
     __hubs_constructed = False
-    HUBs_DICT = {}
+    HUBS_DICT = {}
 
     def __init__(self):
         raise HubsInspectorError("Static class, do not create an instance of HubsInspector")
+
+    @classmethod
+    def __handle_hub_construction_error(cls, e, hub_class):
+        if "__init__()" in str(e):
+            constructor_with_params_text = "Hubs can't have a constructor with parameters. Check Hub: %s"
+            raise HubsInspectorError(constructor_with_params_text % hub_class.__name__)
+        else:
+            raise e
 
     @classmethod
     def ignore_hub_implementation(cls, hub_class):
@@ -25,26 +33,22 @@ class HubsInspector:
     @classmethod
     def get_all_hubs_subclasses(cls, hub_class_to_inspect, current_hub_classes=None):
         current_hub_classes = current_hub_classes if current_hub_classes is not None else []
-        for hubClass in hub_class_to_inspect.__subclasses__():
-            if not cls.ignore_hub_implementation(hubClass):
-                current_hub_classes.append(hubClass)
+        for hub_class in hub_class_to_inspect.__subclasses__():
+            if not cls.ignore_hub_implementation(hub_class):
+                current_hub_classes.append(hub_class)
             else:
-                cls.get_all_hubs_subclasses(hubClass, current_hub_classes)
+                cls.get_all_hubs_subclasses(hub_class, current_hub_classes)
         return current_hub_classes
 
     @classmethod
     def inspect_implemented_hubs(cls, force_reconstruction=False):
         if not cls.__hubs_constructed or force_reconstruction:
-            cls.HUBs_DICT.clear()
+            cls.HUBS_DICT.clear()
             for hub_class in cls.get_all_hubs_subclasses(Hub):
                 try:
                     hub_class()
                 except TypeError as e:
-                    if "__init__()" in str(e):
-                        raise HubsInspectorError(
-                            "Hubs can't have a constructor with parameters. Check Hub: %s" % hub_class.__name__)
-                    else:
-                        raise e
+                    cls.__handle_hub_construction_error(e, hub_class)
             cls.__hubs_constructed = True
 
     @classmethod
@@ -55,14 +59,14 @@ class HubsInspector:
     @classmethod
     def construct_java_file(cls, package, path="."):
         cls.inspect_implemented_hubs()
-        hubs = cls.HUBs_DICT.values()
+        hubs = cls.HUBS_DICT.values()
         JAVAFileGenerator.create_file(path, package, hubs)
         JAVAFileGenerator.create_client_template(path, package, hubs)
 
     @classmethod
     def construct_python_file(cls, path="."):
         cls.inspect_implemented_hubs()
-        PythonClientFileGenerator.create_file(path, cls.HUBs_DICT.values())
+        PythonClientFileGenerator.create_file(path, cls.HUBS_DICT.values())
 
     @classmethod
     def construct_cpp_file(cls, path="."):
@@ -76,12 +80,12 @@ class HubsInspector:
         """
         if not isinstance(hub, basestring):
             hub = hub.__HubName__
-        return cls.HUBs_DICT[hub]
+        return cls.HUBS_DICT[hub]
 
     @classmethod
     def get_hubs_information(cls):
         info_report = {}
-        hubs = cls.HUBs_DICT.values()
+        hubs = cls.HUBS_DICT.values()
         for hub in hubs:
             functions = inspect.getmembers(hub, predicate=is_function_for_ws_client)
             server_methods = {}

@@ -14,7 +14,7 @@ class TestHub(unittest.TestCase):
             pass
         hub = TestHub1()
 
-        self.assertTrue(hub in HubsInspector.HUBs_DICT.values())
+        self.assertTrue(hub in HubsInspector.HUBS_DICT.values())
 
         del hub
 
@@ -33,7 +33,7 @@ class TestHub(unittest.TestCase):
             pass
         hub = TestHub1()
 
-        self.assertEqual("newValue", list(HubsInspector.HUBs_DICT.keys())[0])
+        self.assertEqual("newValue", list(HubsInspector.HUBS_DICT.keys())[0])
 
         del hub
 

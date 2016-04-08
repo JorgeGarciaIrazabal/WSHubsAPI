@@ -14,14 +14,14 @@ class FunctionMessage:
         """
         :type messageStr: bytes|str
         """
-        self.hubInstance = HubsInspector.HUBs_DICT[msg_obj["hub"]]
-        self.hubName = msg_obj["hub"]
+        self.hub_instance = HubsInspector.HUBS_DICT[msg_obj["hub"]]
+        self.hub_name = msg_obj["hub"]
         self.args = msg_obj["args"]
-        self.connectedClient = connected_client
+        self.connected_client = connected_client
 
-        self.functionName = msg_obj["function"]
-        self.method = getattr(self.hubInstance, self.functionName)
-        self.messageID = msg_obj.get("ID", -1)
+        self.function_name = msg_obj["function"]
+        self.method = getattr(self.hub_instance, self.function_name)
+        self.message_id = msg_obj.get("ID", -1)
 
     def __execute_function(self):
         try:
@@ -41,9 +41,9 @@ class FunctionMessage:
         return {
             "success": success,
             "replay": replay,
-            "hub": self.hubName,
-            "function": self.functionName,
-            "ID": self.messageID
+            "hub": self.hub_name,
+            "function": self.function_name,
+            "ID": self.message_id
         }
 
     def __include_sender_in_args(self, method, args):
@@ -53,7 +53,7 @@ class FunctionMessage:
         method_args = get_args(method, include_sender=True)
         try:
             sender_index = method_args.index(SENDER_KEY_PARAMETER)
-            args.insert(sender_index, ClientInHub(self.connectedClient, self.hubName))
+            args.insert(sender_index, ClientInHub(self.connected_client, self.hub_name))
         except ValueError:
             pass
 
@@ -62,4 +62,4 @@ class FunctionMessage:
 HubName = {0}
 FunctionName = {1}
 args = {2}
-messageID = {3}""".format(self.hubName, self.functionName, str(self.args), self.messageID)
+messageID = {3}""".format(self.hub_name, self.function_name, str(self.args), self.message_id)

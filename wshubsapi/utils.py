@@ -34,9 +34,9 @@ def get_defaults(method):
     if defaults is None:
         return []
     defaults = list(filter(lambda x: x not in NOT_PASSING_PARAMETERS, list(defaults)))
-    for i, dValue in enumerate(defaults):
+    for i, default_value in enumerate(defaults):
         if isinstance(defaults[i], basestring):
-            defaults[i] = '"%s"' % dValue
+            defaults[i] = '"%s"' % default_value
     return defaults
 
 

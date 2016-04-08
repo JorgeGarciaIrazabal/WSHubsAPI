@@ -29,10 +29,10 @@ class ConnectionHandler(tornado.websocket.WebSocketHandler):
 
     def open(self, *args):
         try:
-            clientId = int(args[0])
+            client_id = int(args[0])
         except:
-            clientId = None
-        ID = self.comm_environment.on_opened(self._connectedClient, clientId)
+            client_id = None
+        ID = self.comm_environment.on_opened(self._connectedClient, client_id)
         log.debug("open new connection with ID: {} ".format(ID))
 
     def on_message(self, message):

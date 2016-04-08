@@ -76,7 +76,7 @@ class TestUtils(unittest.TestCase):
         self.assertFalse(is_function_for_ws_client(__thisIsAPrivateFunction), "private function is excluded")
 
     def test_isFunctionForWSClient_ExcludesAlreadyExistingFunctions(self):
-        self.assertFalse(is_function_for_ws_client(HubsInspector.HUBs_DICT), "excludes existing functions")
+        self.assertFalse(is_function_for_ws_client(HubsInspector.HUBS_DICT), "excludes existing functions")
 
     def test_getModulePath_ReturnsTestUtilsPyModulePath(self):
         self.assertIn("wshubsapi" + os.sep + "Test", get_module_path())

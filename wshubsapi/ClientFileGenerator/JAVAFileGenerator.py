@@ -84,12 +84,16 @@ class JAVAFileGenerator:
             if not isfile(os.path.join(dst_path, f)):
                 abs_dst_path = os.path.join(dst_path, f)
                 abs_ori_path = os.path.join(files_path, f)
-                with open(abs_ori_path) as oriFile:
-                    with open(abs_dst_path, 'w') as dstFile:
-                        ori_str = oriFile.read()
-                        dst_str = "package %s;\n" % package + ori_str
-                        dstFile.write(dst_str)
+                cls.__copy_file(abs_dst_path, abs_ori_path, package)
                 log.info("Created file: %s", abs_dst_path)
+
+    @classmethod
+    def __copy_file(cls, abs_dst_path, abs_ori_path, package):
+        with open(abs_ori_path) as oriFile:
+            with open(abs_dst_path, 'w') as dstFile:
+                ori_str = oriFile.read()
+                dst_str = "package %s;\n" % package + ori_str
+                dstFile.write(dst_str)
 
     CLASS_TEMPLATE = """
     public class {name} {{
