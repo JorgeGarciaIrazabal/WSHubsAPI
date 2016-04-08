@@ -12,7 +12,7 @@ from wshubsapi.Hub import Hub
 from wshubsapi.HubsInspector import HubsInspector
 from wshubsapi.Test.utils.HubsUtils import removeHubsSubclasses
 from wshubsapi.Test.utils.MessageCreator import MessageCreator
-from flexmock import flexmock
+from flexmock import flexmock, flexmock_teardown
 
 
 class TestConnectedClient(unittest.TestCase):
@@ -32,6 +32,8 @@ class TestConnectedClient(unittest.TestCase):
                 self.close = flexmock()
                 pass
 
+        flexmock(CommEnvironment, __check_futures=lambda *args: None)
+
         HubsInspector.inspect_implemented_hubs(force_reconstruction=True)
         self.testHubClass = TestHub
         self.testHubInstance = HubsInspector.get_hub_instance(self.testHubClass)
@@ -43,6 +45,7 @@ class TestConnectedClient(unittest.TestCase):
         self.connectedClientsHolder = ConnectedClientsHolder(self.testHubClass.__HubName__)
 
     def tearDown(self):
+        flexmock_teardown()
         self.connectedClientsHolder.all_connected_clients.clear()
         del self.testHubClass
         del self.testHubInstance

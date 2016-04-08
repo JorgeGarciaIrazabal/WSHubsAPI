@@ -20,7 +20,7 @@ class MessagesReceivedQueue(Queue):
         self.keepAlive = True
 
     def start_threads(self):
-        for i in range(self.DEFAULT_MAX_WORKERS):
+        for i in range(self.maxWorkers):
             self.executor.submit(self.__on_message_handler_loop)
 
     def __on_message_handler_loop(self):

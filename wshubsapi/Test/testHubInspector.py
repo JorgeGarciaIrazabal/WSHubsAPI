@@ -11,6 +11,8 @@ from wshubsapi.HubsInspector import HubsInspector
 from wshubsapi.HubsInspector import HubsInspectorError
 from wshubsapi.Test.utils.HubsUtils import removeHubsSubclasses
 
+# do not remove this
+from wshubsapi.UtilsAPIHub import UtilsAPIHub
 
 class TestHubDetection(unittest.TestCase):
     def setUp(self):

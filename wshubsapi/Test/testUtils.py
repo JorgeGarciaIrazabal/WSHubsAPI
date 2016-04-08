@@ -2,7 +2,7 @@
 import time
 import unittest
 
-from flexmock import flexmock
+from flexmock import flexmock, flexmock_teardown
 
 from wshubsapi.CommEnvironment import CommEnvironment
 from wshubsapi.ConnectedClient import ConnectedClient
@@ -12,15 +12,27 @@ from wshubsapi.utils import *
 
 
 class TestUtils(unittest.TestCase):
+    def setUp(self):
+        flexmock(MessagesReceivedQueue, DEFAULT_MAX_WORKERS=0)
+        flexmock(CommEnvironment, __check_futures=lambda *args: None)
+        self.queue = None
+
+    def tearDown(self):
+        flexmock_teardown()
+        if isinstance(self.queue, MessagesReceivedQueue):
+            self.queue.keepAlive = False
+            for i in range(self.queue.maxWorkers):
+                self.queue.put(None, None)
+            self.queue.executor.shutdown()
 
     def test_ASCII_UpperCaseIsInitialized(self):
-        randomExistingLetters = ["A", "Q", "P"]
-        for letter in randomExistingLetters:
+        random_letters = ["A", "Q", "P"]
+        for letter in random_letters:
             self.assertIn(letter, ASCII_UpperCase, "letter in ASCII_UpperCase")
 
     def test_ASCII_UpperCaseDoesNotContainNotASCIICharacters(self):
-        nonASCII_letter = "Ñ"
-        self.assertNotIn(nonASCII_letter, ASCII_UpperCase)
+        non_ascii_letter = "Ñ"
+        self.assertNotIn(non_ascii_letter, ASCII_UpperCase)
 
     def test_getArgsReturnsAllArgumentsInMethod(self):
         class AuxClass:
@@ -81,45 +93,42 @@ class TestUtils(unittest.TestCase):
     def test_getModulePath_ReturnsTestUtilsPyModulePath(self):
         self.assertIn("wshubsapi" + os.sep + "Test", get_module_path())
 
-    def setUp_WSMessagesReceivedQueue(self, commEnvironment, MAX_WORKERS):
-        queue = MessagesReceivedQueue(commEnvironment, MAX_WORKERS)
-        return queue
+    def setUp_WSMessagesReceivedQueue(self, comm_environment, max_workers):
+        self.queue = MessagesReceivedQueue(comm_environment, max_workers)
+        return self.queue
 
     def test_WSMessagesReceivedQueue_Creates__MAX_WORKERS__WORKERS(self):
-        queue = self.setUp_WSMessagesReceivedQueue(CommEnvironment(), 3)
-        queue.executor.submit = flexmock()
+        self.queue = self.setUp_WSMessagesReceivedQueue(CommEnvironment(max_workers=0), 3)
+        self.queue.executor = flexmock(self.queue.executor)
+        self.queue.executor.should_receive("submit").times(3)
+        self.queue.start_threads()
 
-        queue.start_threads()
-
-    def setUp_WSMessagesReceivedQueue_infiniteOnMessageHandlerLoop(self, MAX_WORKERS, message):
-        commEnvironment = flexmock(CommEnvironment())
-        connectedClient = flexmock(ConnectedClient(commEnvironment, None))
-        queue = self.setUp_WSMessagesReceivedQueue(commEnvironment, MAX_WORKERS)
-        queue = flexmock(queue, get=lambda: [message, connectedClient])
-        return queue, connectedClient, commEnvironment
+    def setUp_WSMessagesReceivedQueue_infiniteOnMessageHandlerLoop(self, max_workers, message):
+        comm_environment = flexmock(CommEnvironment(max_workers=0))
+        connected_client = flexmock(ConnectedClient(comm_environment, None))
+        self.queue = self.setUp_WSMessagesReceivedQueue(comm_environment, max_workers)
+        self.queue = flexmock(self.queue, get=lambda: [message, connected_client])
+        return self.queue, connected_client, comm_environment
 
     def test_WSMessagesReceivedQueue_infiniteOnMessageHandlerLoop_CallsClientOnMessage(self):
-        queue, cc, commEnvironment = self.setUp_WSMessagesReceivedQueue_infiniteOnMessageHandlerLoop(1, "message")
+        self.queue, cc, commEnvironment = self.setUp_WSMessagesReceivedQueue_infiniteOnMessageHandlerLoop(1, "message")
         commEnvironment.should_receive("on_message").with_args(cc, "message").once()
-        queue.start_threads()
+        self.queue.start_threads()
         time.sleep(0.02)
-        queue.keepAlive = False
 
     def test_WSMessagesReceivedQueue_infiniteOnMessageHandlerLoop_CallsOnErrorIfRaisesException(self):
-        queue, cc, commEnvironment = self.setUp_WSMessagesReceivedQueue_infiniteOnMessageHandlerLoop(1, "message")
+        self.queue, cc, commEnvironment = self.setUp_WSMessagesReceivedQueue_infiniteOnMessageHandlerLoop(1, "message")
         commEnvironment.should_receive("on_message").and_raise(cc, Exception, "test").once()
         commEnvironment.should_receive("on_error").with_args(cc, Exception).once()
-        queue.start_threads()
+        self.queue.start_threads()
         time.sleep(0.02)
-        queue.keepAlive = False
 
     def test_WSMessagesReceivedQueue_infiniteOnMessageHandlerLoop_PrintExceptionIfConnectedClientIsNoConnectedClient(
             self):
-        queue, cc, commEnvironment = self.setUp_WSMessagesReceivedQueue_infiniteOnMessageHandlerLoop(1, "message")
-        queue.should_receive("get").and_return(["message", None]).once()
-        commEnvironment.should_receive("on_message").never()
-        commEnvironment.should_receive("on_error").never()
+        self.queue, cc, comm_environment = self.setUp_WSMessagesReceivedQueue_infiniteOnMessageHandlerLoop(1, "message")
+        self.queue.should_receive("get").and_return(["message", None]).once()
+        comm_environment.should_receive("on_message").never()
+        comm_environment.should_receive("on_error").never()
 
-        queue.start_threads()
+        self.queue.start_threads()
         time.sleep(0.02)
-        queue.keepAlive = False
