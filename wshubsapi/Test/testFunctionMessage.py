@@ -2,12 +2,12 @@
 import json
 import unittest
 
-from wshubsapi.ClientInHub import ClientInHub
-from wshubsapi.ConnectedClient import ConnectedClient
-from wshubsapi.ConnectedClientsGroup import ConnectedClientsGroup
-from wshubsapi.FunctionMessage import FunctionMessage
-from wshubsapi.HubsInspector import HubsInspector
-from wshubsapi.Hub import Hub
+from wshubsapi.client_in_hub import ClientInHub
+from wshubsapi.connected_client import ConnectedClient
+from wshubsapi.connected_clients_group import ConnectedClientsGroup
+from wshubsapi.function_message import FunctionMessage
+from wshubsapi.hubs_inspector import HubsInspector
+from wshubsapi.hub import Hub
 from wshubsapi.Test.utils.HubsUtils import removeHubsSubclasses
 
 

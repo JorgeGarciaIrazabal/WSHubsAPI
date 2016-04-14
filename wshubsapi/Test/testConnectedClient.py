@@ -4,12 +4,12 @@ import unittest
 
 from jsonpickle.pickler import Pickler
 
-from wshubsapi.ClientInHub import ClientInHub
-from wshubsapi.CommEnvironment import CommEnvironment
-from wshubsapi.ConnectedClient import ConnectedClient
-from wshubsapi.ConnectedClientsHolder import ConnectedClientsHolder
-from wshubsapi.Hub import Hub
-from wshubsapi.HubsInspector import HubsInspector
+from wshubsapi.client_in_hub import ClientInHub
+from wshubsapi.comm_environment import CommEnvironment
+from wshubsapi.connected_client import ConnectedClient
+from wshubsapi.connected_clients_holder import ConnectedClientsHolder
+from wshubsapi.hub import Hub
+from wshubsapi.hubs_inspector import HubsInspector
 from wshubsapi.Test.utils.HubsUtils import removeHubsSubclasses
 from wshubsapi.Test.utils.MessageCreator import MessageCreator
 from flexmock import flexmock, flexmock_teardown

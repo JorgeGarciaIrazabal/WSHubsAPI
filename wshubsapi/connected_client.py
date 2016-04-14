@@ -1,8 +1,8 @@
 import logging
 
 from wshubsapi import utils
-from wshubsapi.ConnectedClientsHolder import ConnectedClientsHolder
-from wshubsapi.FunctionMessage import FunctionMessage
+from wshubsapi.connected_clients_holder import ConnectedClientsHolder
+from wshubsapi.function_message import FunctionMessage
 
 log = logging.getLogger(__name__)
 
@@ -11,7 +11,7 @@ log = logging.getLogger(__name__)
 class ConnectedClient(object):
     def __init__(self, communication_environment, write_message_function):
         """
-        :type communication_environment: WSHubsAPI.CommEnvironment.CommEnvironment | None
+        :type communication_environment: WSHubsAPI.comm_environment.CommEnvironment | None
         """
         self.ID = None
         """:type : int|None|str"""

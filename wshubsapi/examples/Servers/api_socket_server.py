@@ -3,8 +3,8 @@ import json
 import logging
 import logging.config
 
-from wshubsapi.HubsInspector import HubsInspector
-from wshubsapi.ConnectionHandlers.SocketHandler import create_socket_server
+from wshubsapi.hubs_inspector import HubsInspector
+from wshubsapi.connection_handlers.socket_handler import create_socket_server
 
 logging.config.dictConfig(json.load(open('logging.json')))
 log = logging.getLogger(__name__)

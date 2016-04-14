@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from wshubsapi.Hub import Hub
-from wshubsapi.HubsInspector import HubsInspector
+from wshubsapi.hub import Hub
+from wshubsapi.hubs_inspector import HubsInspector
 
 
 class UtilsAPIHub(Hub):

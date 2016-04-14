@@ -52,5 +52,5 @@ class ConnectedClientsHolder:
         return cls.all_connected_clients.pop(client_id, None)
 
 
-from wshubsapi.ConnectedClientsGroup import ConnectedClientsGroup
-from wshubsapi.HubsInspector import HubsInspector
+from wshubsapi.connected_clients_group import ConnectedClientsGroup
+from wshubsapi.hubs_inspector import HubsInspector

@@ -1,17 +1,17 @@
-from wshubsapi.ClientInHub import ClientInHub
+from wshubsapi.client_in_hub import ClientInHub
 
 
 class ConnectedClientsGroup(object):
     def __init__(self, connected_clients_in_group, hub_name):
         """
-        :type connected_clients_in_group: list of wshubsapi.ConnectedClient.ConnectedClient
+        :type connected_clients_in_group: list of wshubsapi.connected_client.ConnectedClient
         """
         self.hub_name = hub_name
         self.connected_clients = map(lambda c: ClientInHub(c, hub_name), connected_clients_in_group)
 
     def append(self, connected_client):
         """
-        :type connected_client: ConnectedClient.ConnectedClient
+        :type connected_client: connected_client.ConnectedClient
         """
         self.connected_clients.append(ClientInHub(connected_client, self.hub_name))
 
@@ -36,7 +36,7 @@ class ConnectedClientsGroup(object):
 
     def __getitem__(self, item):
         """
-        :rtype : ConnectedClient
+        :rtype : connected_client
         """
         return self.connected_clients.__getitem__(item)
 

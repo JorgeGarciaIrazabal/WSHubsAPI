@@ -11,12 +11,12 @@ except:
 from jsonpickle.pickler import Pickler
 from concurrent.futures import Future
 
-from wshubsapi.ConnectedClientsHolder import ConnectedClientsHolder
-from wshubsapi.FunctionMessage import FunctionMessage
+from wshubsapi.connected_clients_holder import ConnectedClientsHolder
+from wshubsapi.function_message import FunctionMessage
 from wshubsapi.utils import set_serializer_date_handler, serialize_message
-from wshubsapi.MessagesReceivedQueue import MessagesReceivedQueue
+from wshubsapi.messages_received_queue import MessagesReceivedQueue
 # do not remove this line (hubs inspector needs to find it)
-from wshubsapi import UtilsAPIHub, Asynchronous
+from wshubsapi import utils__api_hub, asynchronous
 
 log = logging.getLogger(__name__)
 __author__ = 'Jorge Garcia Irazabal'
@@ -81,7 +81,7 @@ class CommEnvironment(object):
         self.message_received_queue.put((message, client))
 
     def on_closed(self, client):
-        """:type client: wshubsapi.ConnectedClient.ConnectedClient"""
+        """:type client: wshubsapi.connected_client.ConnectedClient"""
         ConnectedClientsHolder.pop_client(client.ID)
         client.api_is_closed = True
 
@@ -90,7 +90,7 @@ class CommEnvironment(object):
 
     def replay(self, client, replay, origin_message):
         """
-        :type client: wshubsapi.ConnectedClient.ConnectedClient
+        :type client: wshubsapi.connected_client.ConnectedClient
         :param replay: serialized object to be sent as a replay of a message received
         :param origin_message: Message received (provided for overridden functions)
         """
@@ -103,7 +103,7 @@ class CommEnvironment(object):
             self.__futures_buffer[id_] = [Future(), datetime.now()]
         return self.__futures_buffer[id_][0], id_
 
-    @Asynchronous.asynchronous()
+    @asynchronous.asynchronous()
     def __check_futures(self):
         while True:
             for ID, [_, d] in self.__futures_buffer.items():

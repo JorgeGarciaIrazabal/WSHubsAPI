@@ -74,5 +74,5 @@ class Hub(object):
         pass
 
 
-from wshubsapi.HubsInspector import HubsInspector
-from wshubsapi.ConnectedClientsHolder import ConnectedClientsHolder
+from wshubsapi.hubs_inspector import HubsInspector
+from wshubsapi.connected_clients_holder import ConnectedClientsHolder

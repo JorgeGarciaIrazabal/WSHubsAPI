@@ -7,10 +7,10 @@ except ImportError:
     import _thread as thread
 import unittest
 
-from wshubsapi.ConnectedClient import ConnectedClient
-from wshubsapi.CommEnvironment import CommEnvironment
-from wshubsapi.ConnectedClientsHolder import ConnectedClientsHolder
-from wshubsapi.MessagesReceivedQueue import MessagesReceivedQueue
+from wshubsapi.connected_client import ConnectedClient
+from wshubsapi.comm_environment import CommEnvironment
+from wshubsapi.connected_clients_holder import ConnectedClientsHolder
+from wshubsapi.messages_received_queue import MessagesReceivedQueue
 
 
 class TestCommProtocol(unittest.TestCase):

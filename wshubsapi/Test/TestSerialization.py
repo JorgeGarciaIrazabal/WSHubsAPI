@@ -1,6 +1,6 @@
 import datetime
 
-import wshubsapi.CommEnvironment
+import wshubsapi.comm_environment
 from wshubsapi import utils
 import json
 import unittest
@@ -8,7 +8,7 @@ import unittest
 
 class TestSerialization(unittest.TestCase):
     def setUp(self):
-        self.pickler = wshubsapi.CommEnvironment._DEFAULT_PICKER
+        self.pickler = wshubsapi.comm_environment._DEFAULT_PICKER
         utils.set_serializer_date_handler()
 
     def test_basicObjectSerialization(self):

@@ -1,9 +1,9 @@
 import logging
 import traceback
 
-from wshubsapi.ClientInHub import ClientInHub
-from wshubsapi.Hub import UnsuccessfulReplay
-from wshubsapi.HubsInspector import HubsInspector
+from wshubsapi.client_in_hub import ClientInHub
+from wshubsapi.hub import UnsuccessfulReplay
+from wshubsapi.hubs_inspector import HubsInspector
 from wshubsapi.utils import get_args, SENDER_KEY_PARAMETER
 
 log = logging.getLogger(__name__)

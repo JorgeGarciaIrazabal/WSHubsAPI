@@ -1,9 +1,9 @@
 import inspect
 
-from wshubsapi.ClientFileGenerator.CppFileGenerator import CppFileGenerator
-from wshubsapi.ClientFileGenerator.JAVAFileGenerator import JAVAFileGenerator
-from wshubsapi.ClientFileGenerator.JSClientFileGenerator import JSClientFileGenerator
-from wshubsapi.ClientFileGenerator.PythonClientFileGenerator import PythonClientFileGenerator
+from wshubsapi.client_file_generator.cpp_file_generator import CppFileGenerator
+from wshubsapi.client_file_generator.java_file_generator import JAVAFileGenerator
+from wshubsapi.client_file_generator.js_file_generator import JSClientFileGenerator
+from wshubsapi.client_file_generator.python_file_generator import PythonClientFileGenerator
 from wshubsapi.utils import is_function_for_ws_client, get_args, get_defaults
 
 
@@ -101,4 +101,4 @@ class HubsInspector:
         return info_report
 
 
-from wshubsapi.Hub import Hub
+from wshubsapi.hub import Hub

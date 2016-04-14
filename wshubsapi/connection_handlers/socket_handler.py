@@ -4,8 +4,8 @@ import threading
 from _socket import error
 import socket
 
-from wshubsapi.ConnectedClient import ConnectedClient
-from wshubsapi.CommEnvironment import CommEnvironment
+from wshubsapi.connected_client import ConnectedClient
+from wshubsapi.comm_environment import CommEnvironment
 from wshubsapi.utils import MessageSeparator
 
 log = logging.getLogger(__name__)

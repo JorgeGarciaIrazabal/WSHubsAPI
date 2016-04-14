@@ -2,17 +2,17 @@ import os
 import shutil
 import unittest
 from os import listdir
-from wshubsapi.ClientFileGenerator.JAVAFileGenerator import JAVAFileGenerator
-from wshubsapi.ClientFileGenerator.JSClientFileGenerator import JSClientFileGenerator
-from wshubsapi.ClientFileGenerator.PythonClientFileGenerator import PythonClientFileGenerator
-from wshubsapi.Hub import Hub
-from wshubsapi.Hub import HubError
-from wshubsapi.HubsInspector import HubsInspector
-from wshubsapi.HubsInspector import HubsInspectorError
+from wshubsapi.client_file_generator.java_file_generator import JAVAFileGenerator
+from wshubsapi.client_file_generator.js_file_generator import JSClientFileGenerator
+from wshubsapi.client_file_generator.python_file_generator import PythonClientFileGenerator
+from wshubsapi.hub import Hub
+from wshubsapi.hub import HubError
+from wshubsapi.hubs_inspector import HubsInspector
+from wshubsapi.hubs_inspector import HubsInspectorError
 from wshubsapi.Test.utils.HubsUtils import removeHubsSubclasses
 
 # do not remove this
-from wshubsapi.UtilsAPIHub import UtilsAPIHub
+from wshubsapi.utils__api_hub import UtilsAPIHub
 
 class TestHubDetection(unittest.TestCase):
     def setUp(self):

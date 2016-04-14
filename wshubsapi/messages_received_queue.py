@@ -11,7 +11,7 @@ class MessagesReceivedQueue(Queue):
 
     def __init__(self, comm_environment, max_workers=DEFAULT_MAX_WORKERS):
         """
-        :type comm_environment: wshubsapi.CommEnvironment.CommEnvironment
+        :type comm_environment: wshubsapi.comm_environment.CommEnvironment
         """
         Queue.__init__(self)
         self.comm_environment = comm_environment

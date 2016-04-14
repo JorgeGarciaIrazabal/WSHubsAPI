@@ -3,9 +3,9 @@ import unittest
 
 from flexmock import flexmock, flexmock_teardown
 
-from wshubsapi.CommEnvironment import CommEnvironment
-from wshubsapi.ConnectedClient import ConnectedClient
-from wshubsapi.ConnectedClientsHolder import ConnectedClientsHolder
+from wshubsapi.comm_environment import CommEnvironment
+from wshubsapi.connected_client import ConnectedClient
+from wshubsapi.connected_clients_holder import ConnectedClientsHolder
 
 
 class TestConnectedClientsHolder(unittest.TestCase):

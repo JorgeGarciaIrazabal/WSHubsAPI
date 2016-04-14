@@ -4,10 +4,10 @@ import unittest
 
 from flexmock import flexmock, flexmock_teardown
 
-from wshubsapi.CommEnvironment import CommEnvironment
-from wshubsapi.ConnectedClient import ConnectedClient
-from wshubsapi.HubsInspector import HubsInspector
-from wshubsapi.MessagesReceivedQueue import MessagesReceivedQueue
+from wshubsapi.comm_environment import CommEnvironment
+from wshubsapi.connected_client import ConnectedClient
+from wshubsapi.hubs_inspector import HubsInspector
+from wshubsapi.messages_received_queue import MessagesReceivedQueue
 from wshubsapi.utils import *
 
 

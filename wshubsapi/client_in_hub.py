@@ -8,7 +8,7 @@ Class that wraps a client but includes de hubName to be able to construct the me
 class ClientInHub(object):
     def __init__(self, client, hub_name):
         """
-        :type client: wshubsapi.ConnectedClient.ConnectedClient
+        :type client: wshubsapi.connected_client.ConnectedClient
         :type hub_name: str
         """
         self.__hub_name = str(hub_name)
