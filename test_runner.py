@@ -21,6 +21,12 @@ def __get_suites():
     relative_test_files = [test_file.split(os.sep)[-3:] for test_file in test_files]
     module_strings = [".".join(test_file)[:-3] for test_file in relative_test_files]
     print module_strings
+    for t in module_strings:
+        try:
+            unittest.defaultTestLoader.loadTestsFromName(t)
+            print t, 'good'
+        except Exception as e:
+            print t, str(e)
     return [unittest.defaultTestLoader.loadTestsFromName(test_file) for test_file in module_strings]
 
 
