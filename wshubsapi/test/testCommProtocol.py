@@ -23,6 +23,7 @@ class TestCommProtocol(unittest.TestCase):
         super(TestCommProtocol, self).tearDown()
 
     def test_construct_initializeMandatoryAttributes(self):
+        1/0
         self.assertIsInstance(self.comm_environment.message_received_queue, MessagesReceivedQueue)
         self.assertIsInstance(self.comm_environment.lock, thread.LockType)
         self.assertIs(self.comm_environment.all_connected_clients, ConnectedClientsHolder.all_connected_clients)
