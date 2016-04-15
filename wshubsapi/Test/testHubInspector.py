@@ -9,7 +9,7 @@ from wshubsapi.hub import Hub
 from wshubsapi.hub import HubError
 from wshubsapi.hubs_inspector import HubsInspector
 from wshubsapi.hubs_inspector import HubsInspectorError
-from wshubsapi.Test.utils.HubsUtils import removeHubsSubclasses
+from wshubsapi.test.utils.HubsUtils import removeHubsSubclasses
 
 # do not remove this
 from wshubsapi.utils__api_hub import UtilsAPIHub

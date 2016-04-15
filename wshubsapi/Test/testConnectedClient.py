@@ -10,8 +10,8 @@ from wshubsapi.connected_client import ConnectedClient
 from wshubsapi.connected_clients_holder import ConnectedClientsHolder
 from wshubsapi.hub import Hub
 from wshubsapi.hubs_inspector import HubsInspector
-from wshubsapi.Test.utils.HubsUtils import removeHubsSubclasses
-from wshubsapi.Test.utils.MessageCreator import MessageCreator
+from wshubsapi.test.utils.HubsUtils import removeHubsSubclasses
+from wshubsapi.test.utils.MessageCreator import MessageCreator
 from flexmock import flexmock, flexmock_teardown
 
 

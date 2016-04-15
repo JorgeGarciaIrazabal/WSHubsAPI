@@ -2,7 +2,7 @@
 import unittest
 from wshubsapi.hub import Hub, HubError, UnsuccessfulReplay
 from wshubsapi.hubs_inspector import HubsInspector
-from wshubsapi.Test.utils.HubsUtils import removeHubsSubclasses
+from wshubsapi.test.utils.HubsUtils import removeHubsSubclasses
 
 
 class TestHub(unittest.TestCase):

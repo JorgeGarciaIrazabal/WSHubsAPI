@@ -1,14 +1,12 @@
 # coding=utf-8
-import json
 import unittest
 
 from wshubsapi.client_in_hub import ClientInHub
 from wshubsapi.connected_client import ConnectedClient
-from wshubsapi.connected_clients_group import ConnectedClientsGroup
 from wshubsapi.function_message import FunctionMessage
 from wshubsapi.hubs_inspector import HubsInspector
 from wshubsapi.hub import Hub
-from wshubsapi.Test.utils.HubsUtils import removeHubsSubclasses
+from wshubsapi.test.utils.HubsUtils import removeHubsSubclasses
 
 
 class TestFunctionMessage(unittest.TestCase):
