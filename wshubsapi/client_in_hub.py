@@ -46,3 +46,6 @@ class ClientInHub(object):
 
     def api_get_real_connected_client(self):
         return self.__client
+
+    def __repr__(self):
+        return self.__client.__repr__()

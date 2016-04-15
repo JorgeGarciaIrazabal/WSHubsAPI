@@ -21,3 +21,6 @@ class ConnectedClient(object):
 
     def api_get_comm_environment(self):
         return self.__communication_environment
+
+    def __repr__(self):
+        return u"Connected client with ID: {}".format(self.ID)

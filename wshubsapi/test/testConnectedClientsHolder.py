@@ -1,5 +1,6 @@
 # coding=utf-8
 import unittest
+import pprint
 
 from flexmock import flexmock, flexmock_teardown
 
@@ -12,11 +13,14 @@ class TestConnectedClientsHolder(unittest.TestCase):
     def setUp(self):
         self.test_hub_name = "testHubName"
         self.clients_holder = ConnectedClientsHolder(self.test_hub_name)
+        pprint.pprint(self.clients_holder.all_connected_clients)
         flexmock(CommEnvironment, __check_futures=lambda *args: None)
 
         for i in range(10):
-            connected_client = flexmock(ConnectedClient(CommEnvironment(max_workers=0), None), ID=i)
+            connected_client = flexmock(ConnectedClient(CommEnvironment(max_workers=0), None))
+            connected_client.ID = i
             self.clients_holder.append_client(connected_client)
+        pprint.pprint(self.clients_holder.all_connected_clients)
 
     def tearDown(self):
         flexmock_teardown()
@@ -58,6 +62,7 @@ class TestConnectedClientsHolder(unittest.TestCase):
 
     def test_get__returns_only_clients_with_odd_ids_passing_filter_function(self):
         def only_odds(x):
+            print x
             return x.ID % 2 != 0
 
         odd_clients = self.clients_holder.get(only_odds)
