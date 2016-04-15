@@ -1,0 +1,3 @@
+jsonpickle
+futures
+inflection==0.3.1
