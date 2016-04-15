@@ -1,0 +1,7 @@
+jsonpickle
+futures
+inflection==0.3.1
+flexmock
+tornado
+ws4py
+xmlrunner
