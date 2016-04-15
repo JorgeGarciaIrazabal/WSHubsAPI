@@ -11,7 +11,7 @@ pip install wshubsapi
 
 Examples of usage
 -----------------
-Bellow you can find an example of how easy is to create a chat room with this library.
+Bellow you can find an examples of how easy is to create a chat room with this library.
 
 Server side
 -----------------

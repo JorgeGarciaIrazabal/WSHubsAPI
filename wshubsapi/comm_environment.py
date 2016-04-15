@@ -16,7 +16,7 @@ from wshubsapi.function_message import FunctionMessage
 from wshubsapi.utils import set_serializer_date_handler, serialize_message
 from wshubsapi.messages_received_queue import MessagesReceivedQueue
 # do not remove this line (hubs inspector needs to find it)
-from wshubsapi import utils__api_hub, asynchronous
+from wshubsapi import utils_api_hub, asynchronous
 
 log = logging.getLogger(__name__)
 __author__ = 'Jorge Garcia Irazabal'
