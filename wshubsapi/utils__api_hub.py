@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from wshubsapi.hub2 import Hub
+from wshubsapi.hub import Hub
 from wshubsapi.hubs_inspector import HubsInspector
 
 

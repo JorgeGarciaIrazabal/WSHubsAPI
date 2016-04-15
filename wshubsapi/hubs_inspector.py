@@ -101,4 +101,4 @@ class HubsInspector:
         return info_report
 
 
-from wshubsapi.hub2 import Hub
+from wshubsapi.hub import Hub

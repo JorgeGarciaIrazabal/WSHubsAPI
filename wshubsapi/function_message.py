@@ -2,7 +2,7 @@ import logging
 import traceback
 
 from wshubsapi.client_in_hub import ClientInHub
-from wshubsapi.hub2 import UnsuccessfulReplay
+from wshubsapi.hub import UnsuccessfulReplay
 from wshubsapi.hubs_inspector import HubsInspector
 from wshubsapi.utils import get_args, SENDER_KEY_PARAMETER
 
