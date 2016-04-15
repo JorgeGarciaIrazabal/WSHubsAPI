@@ -20,7 +20,7 @@ def __get_suites():
     test_files = glob.glob(os.path.join(test_path, 'test*.py'))
     relative_test_files = [test_file.split(os.sep)[-3:] for test_file in test_files]
     module_strings = [".".join(test_file)[:-3] for test_file in relative_test_files]
-    print path
+    print "this is a test", path
     print module_strings
     for t in module_strings:
         try:
