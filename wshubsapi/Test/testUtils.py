@@ -91,7 +91,7 @@ class TestUtils(unittest.TestCase):
         self.assertFalse(is_function_for_ws_client(HubsInspector.HUBS_DICT), "excludes existing functions")
 
     def test_getModulePath_ReturnsTestUtilsPyModulePath(self):
-        self.assertIn("wshubsapi" + os.sep + "Test", get_module_path())
+        self.assertIn("wshubsapi" + os.sep + "test", get_module_path())
 
     def setUp_WSMessagesReceivedQueue(self, comm_environment, max_workers):
         self.queue = MessagesReceivedQueue(comm_environment, max_workers)
