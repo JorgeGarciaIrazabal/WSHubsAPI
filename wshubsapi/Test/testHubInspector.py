@@ -5,8 +5,8 @@ from os import listdir
 from wshubsapi.client_file_generator.java_file_generator import JAVAFileGenerator
 from wshubsapi.client_file_generator.js_file_generator import JSClientFileGenerator
 from wshubsapi.client_file_generator.python_file_generator import PythonClientFileGenerator
-from wshubsapi.hub import Hub
-from wshubsapi.hub import HubError
+from wshubsapi.hub2 import Hub
+from wshubsapi.hub2 import HubError
 from wshubsapi.hubs_inspector import HubsInspector
 from wshubsapi.hubs_inspector import HubsInspectorError
 from wshubsapi.test.utils.HubsUtils import removeHubsSubclasses

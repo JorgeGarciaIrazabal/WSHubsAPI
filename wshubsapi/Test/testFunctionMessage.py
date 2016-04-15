@@ -5,7 +5,7 @@ from wshubsapi.client_in_hub import ClientInHub
 from wshubsapi.connected_client import ConnectedClient
 from wshubsapi.function_message import FunctionMessage
 from wshubsapi.hubs_inspector import HubsInspector
-from wshubsapi.hub import Hub
+from wshubsapi.hub2 import Hub
 from wshubsapi.test.utils.HubsUtils import removeHubsSubclasses
 
 

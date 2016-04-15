@@ -1,6 +1,6 @@
 # coding=utf-8
 import unittest
-from wshubsapi.hub import Hub, HubError, UnsuccessfulReplay
+from wshubsapi.hub2 import Hub, HubError, UnsuccessfulReplay
 from wshubsapi.hubs_inspector import HubsInspector
 from wshubsapi.test.utils.HubsUtils import removeHubsSubclasses
 

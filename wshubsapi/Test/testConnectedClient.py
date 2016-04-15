@@ -8,7 +8,7 @@ from wshubsapi.client_in_hub import ClientInHub
 from wshubsapi.comm_environment import CommEnvironment
 from wshubsapi.connected_client import ConnectedClient
 from wshubsapi.connected_clients_holder import ConnectedClientsHolder
-from wshubsapi.hub import Hub
+from wshubsapi.hub2 import Hub
 from wshubsapi.hubs_inspector import HubsInspector
 from wshubsapi.test.utils.HubsUtils import removeHubsSubclasses
 from wshubsapi.test.utils.MessageCreator import MessageCreator
