@@ -16,7 +16,7 @@ log = logging.getLogger(__name__)
 
 def get_module_path():
     path = os.path.join(os.path.dirname(__file__))
-    if path.endswith("WSHubsAPI"):
+    if not path.endswith("resources"):
         path = os.path.join(path, 'wshubsapi', 'test', 'integration', 'resources')
     return path
 
