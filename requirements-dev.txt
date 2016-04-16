@@ -5,3 +5,4 @@ flexmock
 tornado
 ws4py
 xmlrunner
+coverage

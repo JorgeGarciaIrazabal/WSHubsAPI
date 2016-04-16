@@ -32,7 +32,8 @@ class HubsApiException(Exception):
 
 class CommEnvironment(object):
     def __init__(self, max_workers=MessagesReceivedQueue.DEFAULT_MAX_WORKERS,
-                 unprovided_id_template="UNPROVIDED__{}", pickler=_DEFAULT_PICKER,
+                 unprovided_id_template="UNPROVIDED__{}",
+                 serialization_max_depth=5, serialization_max_iter=80,
                  client_function_timeout=5):
         self.lock = threading.Lock()
         self.available_unprovided_ids = list()
@@ -41,7 +42,7 @@ class CommEnvironment(object):
         self.message_received_queue = MessagesReceivedQueue(self, max_workers)
         self.message_received_queue.start_threads()
         self.all_connected_clients = ConnectedClientsHolder.all_connected_clients
-        self.pickler = pickler
+        self.serialization_args = dict(max_depth=serialization_max_depth, max_iter=serialization_max_iter)
         self.client_function_timeout = client_function_timeout
         self.__last_client_message_id = 0
         self.__new_client_message_id_lock = threading.Lock()
@@ -94,7 +95,7 @@ class CommEnvironment(object):
         :param replay: serialized object to be sent as a replay of a message received
         :param origin_message: Message received (provided for overridden functions)
         """
-        client.api_write_message(serialize_message(self.pickler, replay))
+        client.api_write_message(serialize_message(self.serialization_args, replay))
 
     def get_new_clients_future(self):
         with self.__new_client_message_id_lock:

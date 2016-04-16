@@ -68,5 +68,6 @@ def set_serializer_date_handler():
     handlers.register(datetime.time, WSDateTimeObjects)
 
 
-def serialize_message(serialization_pickler, message):
-    return jsonpickle.encode(serialization_pickler.flatten(message))
+def serialize_message(serialization_args, message):
+    serialization_args['unpicklable'] = True
+    return jsonpickle.encode(message, **serialization_args)

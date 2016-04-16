@@ -17,7 +17,7 @@ def get_module_path():
 def __get_suites():
     path = get_module_path()
     test_path = os.path.abspath(os.path.join(path, 'wshubsapi', 'test'))
-    test_files = glob.glob(os.path.join(test_path, 'test*.py'))
+    test_files = glob.glob(os.path.join(test_path, '**/test*.py'))
     relative_test_files = [test_file.split(os.sep)[-3:] for test_file in test_files]
     module_strings = [".".join(test_file)[:-3] for test_file in relative_test_files]
     print "this is a test", path, test_path, test_files

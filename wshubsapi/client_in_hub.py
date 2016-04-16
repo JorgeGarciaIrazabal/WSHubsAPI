@@ -32,7 +32,7 @@ class ClientInHub(object):
         def connection_function(*args):
             future, id_ = self.__com_environment.get_new_clients_future()
             message = dict(function=function_name, args=list(args), hub=self.__hub_name, ID=id_)
-            msg_str = utils.serialize_message(self.__com_environment.pickler, message)
+            msg_str = utils.serialize_message(self.__com_environment.serialization_args, message)
             self.api_write_message(msg_str)
             return future
 

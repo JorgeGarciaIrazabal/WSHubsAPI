@@ -3,7 +3,7 @@ import logging
 import logging.config
 import sys
 
-from wshubsapi.ConnectionHandlers.SocketHandler import SocketClient
+from wshubsapi.connection_handlers.socket_handler import SocketClient
 
 logging.config.dictConfig(json.load(open('logging.json')))
 if sys.version_info[0] == 2:
