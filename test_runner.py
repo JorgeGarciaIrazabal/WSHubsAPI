@@ -1,9 +1,12 @@
 import glob
 import inspect
 import os
+import threading
 import unittest
 
 import sys
+
+import time
 import xmlrunner
 
 
@@ -14,13 +17,13 @@ def get_module_path():
     return os.path.dirname(os.path.abspath(file_name))
 
 
-def __get_suites():
+def __get_suites(tests_path):
     path = get_module_path()
-    test_path = os.path.abspath(os.path.join(path, 'wshubsapi', 'test'))
-    test_files = glob.glob(os.path.join(test_path, '**/test*.py'))
+    tests_path = os.path.abspath(os.path.join(path, tests_path))
+    test_files = glob.glob(tests_path)
     relative_test_files = [test_file.split(os.sep)[-4:] for test_file in test_files]
     module_strings = [".".join(test_file)[:-3] for test_file in relative_test_files]
-    print "this is a test", path, test_path, test_files
+    print "this is a test", path, tests_path, test_files
     print module_strings
     for t in module_strings:
         try:
@@ -37,9 +40,30 @@ def __run_test(suite):
 
 
 def run_unit_test():
-    suite = unittest.TestSuite(__get_suites())
+    suite = unittest.TestSuite(__get_suites('wshubsapi/test/unit/test*.py'))
+    __run_test(suite)
+
+
+def run_integration_test():
+    def exec_server():
+        execfile("wshubsapi/test/integration/resources/tornado_ws_server.py")
+
+    suite = unittest.TestSuite(__get_suites('wshubsapi/test/integration/test*.py'))
+    t = threading.Thread(target=exec_server)
+    t.setDaemon(True)
+    t.start()
+    time.sleep(1)  # wait sever to start
     __run_test(suite)
 
 
 if __name__ == '__main__':
-    run_unit_test()
+    try:
+        if len(sys.argv) <= 1:
+            run_unit_test()
+        else:
+            if sys.argv[1] in ("unit", "all"):
+                run_unit_test()
+            if sys.argv[1] in ("integration", "all"):
+                run_integration_test()
+    finally:
+        os._exit(1)

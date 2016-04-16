@@ -10,7 +10,7 @@ if sys.version_info[0] == 2:
     input = raw_input
 
 # file created by the server
-from _static.WSHubsApi import HubsAPI
+from _static.hubs_api import HubsAPI
 
 if __name__ == '__main__':
 

@@ -6,7 +6,7 @@ __author__ = 'jgarc'
 
 
 class PythonClientFileGenerator:
-    FILE_NAME = "WSHubsApi.py"
+    FILE_NAME = "hubs_api.py"
     TAB = "    "
 
     def __init__(self):

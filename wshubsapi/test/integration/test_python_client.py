@@ -1,7 +1,6 @@
 # coding=utf-8
 import unittest
-from flexmock import flexmock, flexmock_teardown
-from wshubsapi.test.integration.resources.clients_api.WSHubsApi import HubsAPI
+from wshubsapi.test.integration.resources.clients_api.hubs_api import HubsAPI
 
 
 class TestCommProtocol(unittest.TestCase):
@@ -13,7 +12,6 @@ class TestCommProtocol(unittest.TestCase):
         cls.api.connect()
 
     def tearDown(self):
-        flexmock_teardown()
         super(TestCommProtocol, self).tearDown()
 
     def test_echo_responds_same_message(self):
@@ -22,7 +20,7 @@ class TestCommProtocol(unittest.TestCase):
         self.assertEqual(future.result(timeout=1), "myMessage")
 
     def test_echo_responds_complex_object(self):
-        class A:
+        class A(object):
             def __init__(self, name):
                 self.name = name
 
@@ -43,6 +41,6 @@ class TestCommProtocol(unittest.TestCase):
 
         self.api.EchoHub.client.on_echo = on_echo
 
-        self.api.EchoHub.server.echo_to_sender("testing").result(timeout=10000)
+        self.api.EchoHub.server.echo_to_sender("testing").result(timeout=1)
 
         self.assertTrue(self.echo_is_called)
