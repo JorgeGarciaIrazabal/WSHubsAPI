@@ -9,10 +9,11 @@ from wshubsapi.hub import Hub
 from wshubsapi.hub import HubError
 from wshubsapi.hubs_inspector import HubsInspector
 from wshubsapi.hubs_inspector import HubsInspectorError
-from wshubsapi.test.utils.HubsUtils import removeHubsSubclasses
+from wshubsapi.test.utils.hubs_utils import remove_hubs_subclasses
 
 # do not remove this
 from wshubsapi.utils_api_hub import UtilsAPIHub
+
 
 class TestHubDetection(unittest.TestCase):
     def setUp(self):
@@ -31,7 +32,13 @@ class TestHubDetection(unittest.TestCase):
     def tearDown(self):
         del self.testHubClass
         del self.testHub2Class
-        removeHubsSubclasses()
+        remove_hubs_subclasses()
+
+    def test_constructor_should_raise_exception(self):
+        def create_instance():
+            return HubsInspector()
+
+        self.assertRaises(HubsInspectorError, create_instance)
 
     def test_hubsInspection(self):
         self.assertEqual(len(HubsInspector.HUBS_DICT), 3, 'Detects all Hubs')
@@ -116,7 +123,7 @@ class TestClientFileConstructor(unittest.TestCase):
         HubsInspector.inspect_implemented_hubs(force_reconstruction=True)
 
     def tearDown(self):
-        removeHubsSubclasses()
+        remove_hubs_subclasses()
 
         try:
             otherPath = "onTest"

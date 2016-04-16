@@ -2,7 +2,8 @@ import gc
 from wshubsapi.hubs_inspector import HubsInspector
 from wshubsapi.hub import Hub
 
-def removeHubsSubclasses():
+
+def remove_hubs_subclasses():
     HubsInspector.HUBS_DICT.clear()
     gc.collect()
     for i in reversed(range(len(Hub.__subclasses__()))):

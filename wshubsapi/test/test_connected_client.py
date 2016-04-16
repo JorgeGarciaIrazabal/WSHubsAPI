@@ -10,8 +10,8 @@ from wshubsapi.connected_client import ConnectedClient
 from wshubsapi.connected_clients_holder import ConnectedClientsHolder
 from wshubsapi.hub import Hub
 from wshubsapi.hubs_inspector import HubsInspector
-from wshubsapi.test.utils.HubsUtils import removeHubsSubclasses
-from wshubsapi.test.utils.MessageCreator import MessageCreator
+from wshubsapi.test.utils.hubs_utils import remove_hubs_subclasses
+from wshubsapi.test.utils.message_creator import MessageCreator
 from flexmock import flexmock, flexmock_teardown
 
 
@@ -49,7 +49,7 @@ class TestConnectedClient(unittest.TestCase):
         self.connectedClientsHolder.all_connected_clients.clear()
         del self.testHubClass
         del self.testHubInstance
-        removeHubsSubclasses()
+        remove_hubs_subclasses()
 
     def test_onOpen_appendsClientInConnectedClientsHolderWithDefinedID(self):
         ID = 3
@@ -72,13 +72,13 @@ class TestConnectedClient(unittest.TestCase):
         self.assertIsInstance(self.connectedClientsHolder.get_client(secondId), ClientInHub)
 
     def __setUp_onMessage(self, functionStr, args, replay, success=True):
-        message = MessageCreator.createOnMessageMessage(hub=self.testHubClass.__HubName__,
-                                                        function=functionStr,
-                                                        args=args)
-        replayMessage = MessageCreator.createReplayMessage(hub=self.testHubClass.__HubName__,
+        message = MessageCreator.create_on_message_message(hub=self.testHubClass.__HubName__,
                                                            function=functionStr,
-                                                           replay=replay,
-                                                           success=success)
+                                                           args=args)
+        replayMessage = MessageCreator.create_replay_message(hub=self.testHubClass.__HubName__,
+                                                             function=functionStr,
+                                                             replay=replay,
+                                                             success=success)
         messageStr = json.dumps(message)
         self.commEnvironment = flexmock(self.commEnvironment)
 
@@ -110,7 +110,7 @@ class TestConnectedClient(unittest.TestCase):
         self.commEnvironment.on_message(self.connectedClient, messageStr + "breaking message")
 
     def test_onAsyncMessage_putsTheMessageAndTheConnectionInTheQueue(self):
-        message = MessageCreator.createOnMessageMessage()
+        message = MessageCreator.create_on_message_message()
         self.commEnvironment.wsMessageReceivedQueue = flexmock(self.commEnvironment.message_received_queue)
         self.commEnvironment.wsMessageReceivedQueue.should_receive("put").with_args((message, self.connectedClient)).once()
 
@@ -126,7 +126,7 @@ class TestConnectedClient(unittest.TestCase):
         self.assertEqual(len(self.connectedClientsHolder.all_connected_clients), 0)
 
     def test_replay_writeMessageWithAString(self):
-        replayMessage = MessageCreator.createReplayMessage()
+        replayMessage = MessageCreator.create_replay_message()
         self.connectedClient = flexmock(self.connectedClient)
         self.connectedClient.should_receive("api_write_message").with_args(str).once()
 

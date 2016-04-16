@@ -1,10 +1,11 @@
-import jsonpickle
 import datetime
 import inspect
 import os
 import string
 import sys
 from inspect import getargspec
+
+import jsonpickle
 from jsonpickle import handlers
 
 SENDER_KEY_PARAMETER = "_sender"
@@ -69,17 +70,3 @@ def set_serializer_date_handler():
 
 def serialize_message(serialization_pickler, message):
     return jsonpickle.encode(serialization_pickler.flatten(message))
-
-
-class MessageSeparator:
-    DEFAULT_API_SEP = "*API_SEP*"
-
-    def __init__(self, separator=DEFAULT_API_SEP):
-        self.buffer = ""
-        self.separator = separator
-
-    def add_data(self, data):
-        data = self.buffer + data
-        messages = data.split(self.separator)
-        self.buffer = messages.pop(-1)
-        return messages

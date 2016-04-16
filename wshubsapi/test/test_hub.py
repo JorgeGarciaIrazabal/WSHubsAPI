@@ -2,12 +2,12 @@
 import unittest
 from wshubsapi.hub import Hub, HubError, UnsuccessfulReplay
 from wshubsapi.hubs_inspector import HubsInspector
-from wshubsapi.test.utils.HubsUtils import removeHubsSubclasses
+from wshubsapi.test.utils.hubs_utils import remove_hubs_subclasses
 
 
 class TestHub(unittest.TestCase):
     def tearDown(self):
-        removeHubsSubclasses()
+        remove_hubs_subclasses()
 
     def test_HubCreation_insertsInstanceInHUBs_DICT(self):
         class TestHub1(Hub):

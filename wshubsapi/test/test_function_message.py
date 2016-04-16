@@ -6,7 +6,7 @@ from wshubsapi.connected_client import ConnectedClient
 from wshubsapi.function_message import FunctionMessage
 from wshubsapi.hubs_inspector import HubsInspector
 from wshubsapi.hub import Hub
-from wshubsapi.test.utils.HubsUtils import removeHubsSubclasses
+from wshubsapi.test.utils.hubs_utils import remove_hubs_subclasses
 
 
 class TestFunctionMessage(unittest.TestCase):
@@ -31,7 +31,7 @@ class TestFunctionMessage(unittest.TestCase):
     def tearDown(self):
         del self.testHubClass
         del self.testHubInstance
-        removeHubsSubclasses()
+        remove_hubs_subclasses()
 
     def __constructMessageStr(self, hub="TestHub", function="testMethod", ID=1, args=list()):
         message = {

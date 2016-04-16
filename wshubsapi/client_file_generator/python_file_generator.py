@@ -5,7 +5,7 @@ from wshubsapi.utils import is_function_for_ws_client, get_defaults, get_args
 __author__ = 'jgarc'
 
 
-class PythonClientFileGenerator():
+class PythonClientFileGenerator:
     FILE_NAME = "WSHubsApi.py"
     TAB = "    "
 

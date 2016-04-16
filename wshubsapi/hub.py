@@ -14,7 +14,7 @@ class Hub(object):
     def __init__(self):
         hub_name = self.__class__.__dict__.get("__HubName__", self.__class__.__name__)
         if hub_name in HubsInspector.HUBS_DICT:
-            raise HubError("Hub's name must be unique")
+            raise HubError("Hub's name must be unique, found duplicated name with: {}".format(hub_name))
         if hub_name.startswith("__"):
             raise HubError("Hub's name can not start with '__'")
         if hub_name == "wsClient":

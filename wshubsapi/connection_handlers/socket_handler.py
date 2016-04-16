@@ -6,7 +6,7 @@ import socket
 
 from wshubsapi.connected_client import ConnectedClient
 from wshubsapi.comm_environment import CommEnvironment
-from wshubsapi.utils import MessageSeparator
+from message_separator import MessageSeparator
 
 log = logging.getLogger(__name__)
 log.addHandler(logging.NullHandler())
