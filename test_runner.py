@@ -48,11 +48,11 @@ def run_integration_test():
     def exec_server():
         execfile("wshubsapi/test/integration/resources/tornado_ws_server.py")
 
-    suite = unittest.TestSuite(__get_suites('wshubsapi/test/integration/test*.py'))
     t = threading.Thread(target=exec_server)
     t.setDaemon(True)
     t.start()
     time.sleep(1)  # wait sever to start
+    suite = unittest.TestSuite(__get_suites('wshubsapi/test/integration/test*.py'))
     __run_test(suite)
 
 

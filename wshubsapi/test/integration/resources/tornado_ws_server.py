@@ -8,11 +8,20 @@ import sys
 from tornado import web, ioloop
 from wshubsapi.hubs_inspector import HubsInspector
 from wshubsapi.connection_handlers.tornado_handler import ConnectionHandler
+
 if os.path.exists('logging.json'):
     logging.config.dictConfig(json.load(open('logging.json')))
 log = logging.getLogger(__name__)
 
-settings = {"static_path": join(os.path.dirname(__file__), "clients_api")}
+
+def get_module_path():
+    path = os.path.join(os.path.dirname(__file__))
+    if path.endswith("WSHubsAPI"):
+        path = os.path.join(path, 'wshubsapi', 'test', 'integration', 'resources')
+    return path
+
+
+settings = {"static_path": join(get_module_path(), "clients_api")}
 
 app = web.Application([
     (r'/(.*)', ConnectionHandler),
