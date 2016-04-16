@@ -1,7 +1,7 @@
 # coding=utf-8
 import unittest
 from flexmock import flexmock, flexmock_teardown
-from test.integration.resources.clients_api.WSHubsApi import HubsAPI
+from wshubsapi.test.integration.resources.clients_api.WSHubsApi import HubsAPI
 
 
 class TestCommProtocol(unittest.TestCase):

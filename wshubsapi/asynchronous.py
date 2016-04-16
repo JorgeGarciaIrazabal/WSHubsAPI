@@ -1,6 +1,5 @@
 import logging
 from datetime import datetime
-from threading import Thread
 from concurrent.futures import ThreadPoolExecutor
 
 log = logging.getLogger(__name__)
