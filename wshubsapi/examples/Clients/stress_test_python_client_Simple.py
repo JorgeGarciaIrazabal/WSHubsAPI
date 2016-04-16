@@ -20,7 +20,7 @@ sentMessagesCount = 0
 errorsCount = 0
 
 # file created by the server
-from _static.WSHubsApi import HubsAPI
+from _static.hubs_api import HubsAPI
 
 
 def print_message(sender_name, message):
