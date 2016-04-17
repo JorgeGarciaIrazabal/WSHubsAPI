@@ -1,12 +1,44 @@
 WSHubsAPI
 ================================================
 
-The ``wshubsapi`` package/module allows an intuitive communication between back-end (Python) and front-end (Python, JS, JAVA or Android) applications through the webSocket protocol.
+The package makes really easy to establish intuitive communication in a server/clients architecture.<br /><br />
+Forget to handle web-socket messages with huge switch cases or maintain url strings for your API-REST.
+Just **call server functions from the client** and **call client function from the server** like it is the same program.<br />
+But not only that! with this package you will be able to communicate client applications with different languages or communication protocols at the same time!
+
+**Available coding languages:** <br />
+* Server side:
+   * only python
+* Client side:
+   * python
+   * javascript
+   * java/android (on going)
+   * c++/arduino (on going)
+   * micro-python (planned)
+
+**Communication protocols** <br /> <br />
+This package is mainly a message handler so it doesn't matter which communication protocol you use as long as you create a Wrapper to handle it. However, we provide handlers to start coding right away :)
+* Web-Sockets for tornado and ws4py
+* Http requests for Django and tornado frameworks (of course we lose server to client communication)
+* Socket
+
+**Of course, any contribution will be more that appreciated ;)**
 
 Installation
 -----------------
+The next command will install wshubsapi with the minimum dependencies required.
 ```bash
 pip install wshubsapi
+```
+To run all the examples and tests, install following packages:
+```bash
+pip install flexmock
+pip install tornado
+pip install ws4py
+pip install xmlrunner
+pip install coverage
+pip install requests
+pip install django
 ```
 
 Examples of usage
@@ -16,7 +48,7 @@ Bellow you can find an examples of how easy is to create a chat room with this l
 Server side
 -----------------
 In this example we will use the tornado framework and the tornado clientHandler for the web-socket connections.
-for this example, remember to install tornado.
+For this example, remember to **install tornado** package.
 ```bash
 pip install tornado
 ```
@@ -129,16 +161,21 @@ if __name__ == '__main__':
         server_replay = ws.ForumHub.server.publish_message(name, message).result(timeout=3)
         print("Server replay: {}".format(server_replay))
 ```
-jk
+
 Client side JAVA/Android client
 -----------------
 
 Not a beta version yet, working on it! ;)
 
-Client side C++/Android client
+Client side C++/Arduino client
 -----------------
 
 Not a beta version yet, working on it! ;)
+
+Other examples
+-----------------
+find other examples in folder .../wshubsapi/examples.
+Where you can find http request or old socket communication together with more functionality.
 
 Enabling logging
 -----------------
