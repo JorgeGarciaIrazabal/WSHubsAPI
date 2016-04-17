@@ -11,7 +11,7 @@ from wshubsapi.connection_handlers.tornado_handler import ConnectionHandler
 logging.config.dictConfig(json.load(open('logging.json')))
 log = logging.getLogger(__name__)
 
-settings = {"static_path": os.path.join(os.path.dirname(__file__), "../Clients/_static"),}
+settings = {"static_path": os.path.join(os.path.dirname(__file__), "../Clients/_static")}
 
 app = web.Application([
     (r'/(.*)', ConnectionHandler),

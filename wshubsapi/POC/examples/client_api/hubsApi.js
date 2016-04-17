@@ -171,41 +171,31 @@ function HubsAPI(url, serverTimeout, wsClientClass, PromiseClass) {
         return promise;
     };
     
-    this.ChatHub = {};
-    this.ChatHub.server = {
-        __HUB_NAME : 'ChatHub',
+    this.ForumHub = {};
+    this.ForumHub.server = {
+        __HUB_NAME : 'ForumHub',
         
-        classMethod : function (){
+        subscribeToHub : function (){
             
-            return constructMessage('ChatHub', 'class_method', arguments);
-        },
-
-        staticFunc : function (){
-            
-            return constructMessage('ChatHub', 'static_func', arguments);
+            return constructMessage('ForumHub', 'subscribe_to_hub', arguments);
         },
 
         getSubscribedClientsToHub : function (){
             
-            return constructMessage('ChatHub', 'get_subscribed_clients_to_hub', arguments);
-        },
-
-        subscribeToHub : function (){
-            
-            return constructMessage('ChatHub', 'subscribe_to_hub', arguments);
-        },
-
-        sendToAll : function (name, message){
-            arguments[0] = name === undefined ? "hello" : name;
-            return constructMessage('ChatHub', 'send_to_all', arguments);
+            return constructMessage('ForumHub', 'get_subscribed_clients_to_hub', arguments);
         },
 
         unsubscribeFromHub : function (){
             
-            return constructMessage('ChatHub', 'unsubscribe_from_hub', arguments);
+            return constructMessage('ForumHub', 'unsubscribe_from_hub', arguments);
+        },
+
+        publishMessage : function (userName, message){
+            
+            return constructMessage('ForumHub', 'publish_message', arguments);
         }
     };
-    this.ChatHub.client = {};
+    this.ForumHub.client = {};
     this.UtilsAPIHub = {};
     this.UtilsAPIHub.server = {
         __HUB_NAME : 'UtilsAPIHub',

@@ -8,7 +8,7 @@ __author__ = 'jgarc'
 
 
 class JSClientFileGenerator:
-    FILE_NAME = "WSHubsApi.js"
+    FILE_NAME = "hubsApi.js"
 
     def __init__(self):
         raise Exception("static class, do not create an instance of it")
