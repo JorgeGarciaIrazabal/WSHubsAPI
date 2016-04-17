@@ -15,8 +15,8 @@ if __name__ == '__main__':
     importlib.import_module("ChatHub")  # necessary to add this import for code inspection
     importlib.import_module("DB_API")  # necessary to add this import for code inspection
     # construct the necessary client files in the specified path
-    HubsInspector.inspectImplementedHubs()
-    HubsInspector.constructPythonFile()
+    HubsInspector.inspect_implemented_hubs()
+    HubsInspector.construct_python_file()
     # Hub.constructJAVAFile("tornado.WSHubsApi", "../Clients/_static") in beta
     # HubsInspector.constructCppFile("../Clients/_static") in alpha
 

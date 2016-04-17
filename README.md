@@ -1,46 +1,87 @@
 WSHubsAPI
 ================================================
 
-The ``wshubsapi`` package/module allows an intuitive communication between back-end (Python) and front-end (Python, JS, JAVA or Android) applications through the webSocket protocol.
+The package makes really easy to establish intuitive communication in a server/clients architecture.<br /><br />
+Forget to handle web-socket messages with huge switch cases or maintain url strings for your API-REST.
+Just **call server functions from the client** and **call client function from the server** like it is the same program.<br />
+But not only that! with this package you will be able to communicate client applications with different languages or communication protocols at the same time!
+
+**Available coding languages:** <br />
+* Server side:
+   * only python
+* Client side:
+   * python
+   * javascript
+   * java/android (on going)
+   * c++/arduino (on going)
+   * micro-python (planned)
+
+**Communication protocols** <br /> <br />
+This package is mainly a message handler so it doesn't matter which communication protocol you use as long as you create a Wrapper to handle it. However, we provide handlers to start coding right away :)
+* Web-Sockets for tornado and ws4py
+* Http requests for Django and tornado frameworks (of course we lose server to client communication)
+* Socket
+
+**Of course, any contribution will be more that appreciated ;)**
 
 Installation
 -----------------
+The next command will install wshubsapi with the minimum dependencies required.
 ```bash
 pip install wshubsapi
+```
+To run all the examples and tests, install following packages:
+```bash
+pip install flexmock
+pip install tornado
+pip install ws4py
+pip install xmlrunner
+pip install coverage
+pip install requests
+pip install django
 ```
 
 Examples of usage
 -----------------
-Bellow you can find an example of how easy is to create a chat room with this library.
+Bellow you can find an examples of how easy is to create a chat room with this library.
 
 Server side
 -----------------
-In this example we will use the WS4Py library and the ws4py clientHandler for the webssocket connections.
+In this example we will use the tornado framework and the tornado clientHandler for the web-socket connections.
+For this example, remember to **install tornado** package.
+```bash
+pip install tornado
+```
 
 ```python
-from wshubsapi.HubsInspector import HubsInspector
-from wshubsapi.ConnectionHandlers.WS4Py import ConnectionHandler
-from wsgiref.simple_server import make_server
-from ws4py.server.wsgirefserver import WSGIServer, WebSocketWSGIRequestHandler
-from wshubsapi.Hub import Hub
-from ws4py.server.wsgiutils import WebSocketWSGIApplication
-
+from wshubsapi.hubs_inspector import HubsInspector
+from wshubsapi.connection_handlers.tornado_handler import ConnectionHandler
+from tornado import web, ioloop
+from wshubsapi.hub import Hub
+import logging
 
 if __name__ == '__main__':
-    class ChatHub(Hub):
-        def sendToAll(self, name, message):
-            allConnectedClients = self._getClientsHolder().getAllClients()
-            #onMessage function has to be defined in the client side
-            allConnectedClients.onMessage(name, message)
-            return "Sent to %d clients" % len(allConnectedClients)
-    HubsInspector.inspectImplementedHubs() #setup api
-    HubsInspector.constructPythonFile("_static") #only if you will use a python client
-    HubsInspector.constructJSFile("_static") #only if you will use a js client
-    server = make_server('127.0.0.1', 8888, server_class=WSGIServer,
-                         handler_class=WebSocketWSGIRequestHandler,
-                         app=WebSocketWSGIApplication(handler_cls=ConnectionHandler))
-    server.initialize_websockets_manager()
-    server.serve_forever()
+    logging.basicConfig(level=logging.DEBUG)
+
+    class ForumHub(Hub):
+        def publish_message(self, user_name, message):
+            # get all connected clients to call client functions directly from here
+            all_clients = self.clients.get_all_clients()
+            # messagePosted function has to be defined in the client side
+            all_clients.messagePosted(user_name, message)
+            return "Sent to %d user(s)" % len(all_clients)
+
+    # inspect Hubs in project to be included in the api environment
+    HubsInspector.inspect_implemented_hubs()
+    # create api modules to be used by the clients
+    HubsInspector.construct_python_file("_static")  # python api module will be created in "_static" folder
+    HubsInspector.construct_js_file("_static")  # javascript api library will be created in "_static" folder
+
+    # initialize server
+    app = web.Application([(r'/(.*)', ConnectionHandler)])
+    app.listen(8888)
+    logging.debug("server is listening in port: {}".format(8888))
+    ioloop.IOLoop.instance().start()
 ```
     
 Client side JS client
@@ -48,70 +89,47 @@ Client side JS client
 works like:
 
 ```javascript
-<!DOCTYPE html>
 <html>
 <head>
-    <title>tornado WebSocket example</title>
+    <title>HubsAPI example</title>
     <!--File auto-generated by the server.
-    Path needs to match with Hub.constructJSFile path parameter-->
-    <script type="text/javascript" src="_static/WSHubsApi.js"></script>
+    Path needs to match with Hub.construct_js_file path parameter-->
+    <script type="text/javascript" src="client_api/hubsApi.js"></script>
     <script type="text/javascript" src="http://code.jquery.com/jquery-1.4.2.js"></script>
 </head>
 <body>
-<div class="container">
-    <h1>tornado WebSocket example with WSHubsAPI</h1>
+<div>
+    <h1>WebSocket example with WSHubsAPI</h1>
     <hr>
     WebSocket status : <span id="status">Waiting connection</span><br>
     Name: <input type="text" id="name" value="Kevin"/><br>
-    <input type="text" id="message" />
-    <input type="button" id="sendmessage" value="Send" />
-    <input type="hidden" id="displayname" />
-    <ul id="discussion">
-    </ul>
+    <input type="text" id="message"/>
+    <input type="button" id="post" value="Post"/>
+    <ul id="discussion"/>
 </div>
-    <script>
+<script>
     var hubsApi = new HubsAPI('ws://127.0.0.1:8888/');
-        function sendToAll() {
-            var name = $('#name').val(),
-                message = $('#message').val();
-            $('#discussion').append('<li><strong> Me'
-                + '</strong>: ' + message + '</li>');
+    function postMessage() {
+        var name = $('#name').val(),
+            message = $('#message').val();
 
-
-            hubsApi.ChatHub.server.sendToAll(name, message)
-                .then(function (numOfMessagesSent) {
-                    console.log("message sent to " + numOfMessagesSent + " client(s)");
-                }, function (err) {
-                    console.log("message not sent " + err);
-                }).finally(function () {
-                    console.log("I am in finnally");
-                });
-            $('#message').val('').focus();
-        }
-
-        hubsApi.connect().then(function () {
-            $('#status').text("Connected")
-
-            //function to be called from server
-            hubsApi.ChatHub.client.onMessage = function (from, message) {
-                $('#discussion').append('<li><strong>' + from
-                    + '</strong>: ' + message + '</li>');
-                return "received"
-            }
-
-            //sending message
-            $('#sendmessage').click(sendToAll);
-            $('#message').keypress(function (e) {
-                if (e.which == 13)
-                    sendToAll()
+        hubsApi.ForumHub.server.publishMessage(name, message)
+            .then(function (serverReplay) {
+                console.log("Server replayed:  " + serverReplay);
             });
-        }, function (error) {
-            console.error(error);
-        });
 
-        hubsApi.wsClient.onerror = function (ev) {
-            console.error(ev.reason);
-        };
+        $('#message').val('').focus();
+    }
+
+    hubsApi.connect().then(function () {
+        $('#status').text("Connected");
+    });
+    hubsApi.ForumHub.client.messagePublished = function (from, message) {
+        $('#discussion').append('<li><strong>' + from
+            + '</strong>: ' + message + '</li>');
+    };
+
+    $('#post').click(postMessage);
 </script>
 </body>
 </html>
@@ -121,44 +139,43 @@ Client side Python client
 -----------------
 change raw_input for input for python 3.*
 ```python
-import json
-import logging
-import logging.config
-import sys
-
-logging.config.dictConfig(json.load(open('logging.json')))
-if sys.version_info[0] == 2:
-    input = raw_input
-
 # file created by the server
-from _static.WSHubsApi import HubsAPI
+from _static.hubs_api import HubsAPI
+
+
+def message_posted(user_name, msg):
+    print("{} posted:\n{}".format(user_name, msg))
 
 
 if __name__ == '__main__':
     ws = HubsAPI('ws://127.0.0.1:8888/')
     ws.connect()
-    ws.defaultOnError = lambda m: sys.stdout.write("message could not be sent!!!!! {}\n".format(m))
-    ws.UtilsAPIHub.server.setId("testing")
-    
-    def printMessage(senderName, message):
-        print(u"From {0}: {1}".format(senderName, message))
-        
-    ws.ChatHub.client.onMessage = printMessage
-    ws.ChatHub.server.subscribeToHub().done(lambda x: ws.ChatHub.server.getSubscribedClientsToHub())
-    name = input("Enter your name:")
-    print("Hello %s. You have entered in the chat room, write and press enter to send message" % name)
+    name = raw_input("What is your name: ")
+    # defining client function to be called from server
+    ws.ForumHub.client.messagePosted = message_posted
+
+    print("Hello %s!" % name)
     while True:
-        message = input("")
-        if sys.version_info[0] == 2:
-            message = message.decode(sys.stdin.encoding)
-        ws.ChatHub.server.sendToAll(name, message).done(lambda m: sys.stdout.write("message sent to {} client(s)\n".format(m)))
-                                                       
+        message = raw_input("Write whatever you want to post it in the forum: ")
+        # ws.ForumHub.server.publish_message is automaticly by the server in HugsAPI module
+        server_replay = ws.ForumHub.server.publish_message(name, message).result(timeout=3)
+        print("Server replay: {}".format(server_replay))
 ```
 
 Client side JAVA/Android client
 -----------------
 
 Not a beta version yet, working on it! ;)
+
+Client side C++/Arduino client
+-----------------
+
+Not a beta version yet, working on it! ;)
+
+Other examples
+-----------------
+find other examples in folder .../wshubsapi/examples.
+Where you can find http request or old socket communication together with more functionality.
 
 Enabling logging
 -----------------
@@ -183,4 +200,4 @@ License
 
 This software is licensed under the `MIT license`_.
 
-© 2015 Jorge Garcia Irazabal.
+© 2015 Jorge García Irazábal.

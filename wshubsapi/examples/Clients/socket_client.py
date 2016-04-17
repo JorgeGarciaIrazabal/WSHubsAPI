@@ -3,15 +3,18 @@ import logging
 import logging.config
 import sys
 
+from wshubsapi.connection_handlers.socket_handler import SocketClient
+
 logging.config.dictConfig(json.load(open('logging.json')))
 if sys.version_info[0] == 2:
     input = raw_input
 
 # file created by the server
-from WSHubsApi import HubsAPI
+from _static.hubs_api import HubsAPI
 
 if __name__ == '__main__':
-    ws = HubsAPI('ws://127.0.0.1:8888/')
+
+    ws = HubsAPI('ws://127.0.0.1:8890/', clientClass=SocketClient)
     ws.connect()
     ws.defaultOnError = lambda m: sys.stdout.write("message could not be sent!!!!! {}\n".format(m))
     ws.UtilsAPIHub.server.set_id("testing")

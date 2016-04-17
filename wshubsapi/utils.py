@@ -1,10 +1,11 @@
-import jsonpickle
 import datetime
 import inspect
 import os
 import string
 import sys
 from inspect import getargspec
+
+import jsonpickle
 from jsonpickle import handlers
 
 SENDER_KEY_PARAMETER = "_sender"
@@ -14,47 +15,47 @@ NOT_PASSING_PARAMETERS = (SENDER_KEY_PARAMETER,)
 ASCII_UpperCase = string.uppercase if sys.version_info[0] == 2 else string.ascii_uppercase
 
 
-def getArgs(method, includeSender=False):
+def get_args(method, include_sender=False):
     args = getargspec(method).args
-    if args is None: return []
+    if args is None:
+        return []
     if hasattr(method, "__self__"):
         args.pop(0)
-    if not includeSender:
+    if not include_sender:
         for arg in NOT_PASSING_PARAMETERS:
             try:
                 args.remove(arg)
-            except:
+            except ValueError:
                 pass
     return args
 
 
-def getDefaults(method):
+def get_defaults(method):
     defaults = getargspec(method).defaults
-    if defaults is None: return []
+    if defaults is None:
+        return []
     defaults = list(filter(lambda x: x not in NOT_PASSING_PARAMETERS, list(defaults)))
-    for i, dValue in enumerate(defaults):
+    for i, default_value in enumerate(defaults):
         if isinstance(defaults[i], basestring):
-            defaults[i] = '"%s"' % dValue
+            defaults[i] = '"%s"' % default_value
     return defaults
 
 
-def isFunctionForWSClient(method):
-    from wshubsapi.Hub import Hub
-    isFunction = lambda x: inspect.ismethod(x) or inspect.isfunction(x)
-    BaseHubFunctions = inspect.getmembers(Hub, predicate=isFunction)
-    BaseHubFunctionsNames = [f[0] for f in BaseHubFunctions]
+def is_function_for_ws_client(method):
+    def is_function():
+        return inspect.ismethod(method) or inspect.isfunction(method)
 
-    return isFunction(method) and not method.__name__.startswith("_") and method.__name__
+    return is_function() and not method.__name__.startswith("_") and method.__name__
 
 
-def getModulePath():
+def get_module_path():
     frame = inspect.currentframe().f_back
     info = inspect.getframeinfo(frame)
-    fileName = info.filename
-    return os.path.dirname(os.path.abspath(fileName))
+    file_name = info.filename
+    return os.path.dirname(os.path.abspath(file_name))
 
 
-def setSerializerDateTimeHandler():
+def set_serializer_date_handler():
     class WSDateTimeObjects(handlers.BaseHandler):
         def restore(self, obj):
             pass
@@ -67,19 +68,6 @@ def setSerializerDateTimeHandler():
     handlers.register(datetime.time, WSDateTimeObjects)
 
 
-def serializeMessage(serializationPickler, message):
-    return jsonpickle.encode(serializationPickler.flatten(message))
-
-
-class MessageSeparator:
-    DEFAULT_API_SEP = "*API_SEP*"
-
-    def __init__(self, messageSeparator=DEFAULT_API_SEP):
-        self.buffer = ""
-        self.sep = messageSeparator
-
-    def addData(self, data):
-        data = self.buffer + data
-        messages = data.split(self.sep)
-        self.buffer = messages.pop(-1)
-        return messages
+def serialize_message(serialization_args, message):
+    serialization_args['unpicklable'] = True
+    return jsonpickle.encode(message, **serialization_args)

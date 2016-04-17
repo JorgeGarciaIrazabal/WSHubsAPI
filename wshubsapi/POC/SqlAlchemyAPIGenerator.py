@@ -47,7 +47,7 @@ class {0}(RelationalDBHub):
         for t in self.declarativeBase.__subclasses__():
             hubName = self.hubNameTemplate.format(t.__name__)
             hubClassInstance = importlib.import_module("DB_API.{}".format(hubName)).__dict__[hubName]
-            hub = HubsInspector.getHubInstance(hubClassInstance)
+            hub = HubsInspector.get_hub_instance(hubClassInstance)
             hub.engine = self.engine
             hub.entryTable = t
 
