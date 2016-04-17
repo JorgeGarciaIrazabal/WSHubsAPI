@@ -6,3 +6,5 @@ tornado
 ws4py
 xmlrunner
 coverage
+requests
+django

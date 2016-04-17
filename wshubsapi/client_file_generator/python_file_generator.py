@@ -212,7 +212,9 @@ class HubsAPI(object):
                 id_ = self._get_next_message_id()
                 body = {{"hub": self.hub_name, "function": "{name}", "args": args, "ID": id_}}
                 future = self.ws_client.get_future(id_)
-                self.ws_client.send(self._serialize_object(body))
+                send_return_obj = self.ws_client.send(self._serialize_object(body))
+                if isinstance(send_return_obj, Future):
+                    return send_return_obj
                 return future'''
 
     ARGS_COOK_TEMPLATE = "args.append({name})"

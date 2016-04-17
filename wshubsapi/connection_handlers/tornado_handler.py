@@ -17,14 +17,14 @@ class ConnectionHandler(tornado.websocket.WebSocketHandler):
         super(ConnectionHandler, self).__init__(application, request, **kwargs)
         if ConnectionHandler.comm_environment is None:
             ConnectionHandler.comm_environment = CommEnvironment()
-        self._connectedClient = ConnectedClient(self.comm_environment, self.write_message)
+        self._connected_client = ConnectedClient(self.comm_environment, self.write_message)
 
     def data_received(self, chunk):
         pass
 
     def write_message(self, message, binary=False):
         future = super(ConnectionHandler, self).write_message(message, binary)
-        log.debug("message to %s:\n%s" % (self._connectedClient.ID, message))
+        log.debug("message to %s:\n%s" % (self._connected_client.ID, message))
         return future
 
     def open(self, *args):
@@ -32,16 +32,16 @@ class ConnectionHandler(tornado.websocket.WebSocketHandler):
             client_id = int(args[0])
         except ValueError:
             client_id = None
-        id_ = self.comm_environment.on_opened(self._connectedClient, client_id)
+        id_ = self.comm_environment.on_opened(self._connected_client, client_id)
         log.debug("open new connection with ID: {} ".format(id_))
 
     def on_message(self, message):
-        log.debug("Message received from ID: {}\n{} ".format(self._connectedClient.ID, message))
-        self.comm_environment.on_async_message(self._connectedClient, message)
+        log.debug("Message received from ID: {}\n{} ".format(self._connected_client.ID, message))
+        self.comm_environment.on_async_message(self._connected_client, message)
 
     def on_close(self):
-        log.debug("client closed %s" % self._connectedClient.__dict__.get("ID", "None"))
-        self.comm_environment.on_closed(self._connectedClient)
+        log.debug("client closed %s" % self._connected_client.__dict__.get("ID", "None"))
+        self.comm_environment.on_closed(self._connected_client)
 
     def check_origin(self, origin):
         return True
