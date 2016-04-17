@@ -15,7 +15,7 @@ from wshubsapi.utils_api_hub import UtilsAPIHub
 class TestUtilsApiHub(unittest.TestCase):
     def setUp(self):
         self.utils_hub = UtilsAPIHub()
-        self.clients_holder = ConnectedClientsHolder(UtilsAPIHub.__HubName__)
+        self.clients_holder = ConnectedClientsHolder(self.utils_hub)
         ConnectedClientsHolder.all_connected_clients = dict()
         flexmock(CommEnvironment, __check_futures=lambda *args: None)
         for i in range(2):

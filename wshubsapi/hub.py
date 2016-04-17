@@ -1,3 +1,6 @@
+
+from wshubsapi.connected_clients_holder import ConnectedClientsHolder
+
 __author__ = 'Jorge'
 
 
@@ -6,25 +9,14 @@ class UnsuccessfulReplay:
         self.replay = replay
 
 
-class HubError(Exception):
-    pass
-
-
 class Hub(object):
     def __init__(self):
         hub_name = self.__class__.__dict__.get("__HubName__", self.__class__.__name__)
-        if hub_name in HubsInspector.HUBS_DICT:
-            raise HubError("Hub's name must be unique, found duplicated name with: {}".format(hub_name))
-        if hub_name.startswith("__"):
-            raise HubError("Hub's name can not start with '__'")
-        if hub_name == "wsClient":
-            raise HubError("Hub's name can not be 'wsClient', it is a  reserved name")
         setattr(self.__class__, "__HubName__", hub_name)
-        HubsInspector.HUBS_DICT[hub_name] = self
 
         self._client_functions = dict()
         self._define_client_functions()
-        self._clients_holder = ConnectedClientsHolder(hub_name)
+        self._clients_holder = ConnectedClientsHolder(self)
         self.__hub_subscribers = []
 
     def subscribe_to_hub(self, _sender):
@@ -72,7 +64,3 @@ class Hub(object):
 
     def _define_client_functions(self):
         pass
-
-
-from wshubsapi.hubs_inspector import HubsInspector
-from wshubsapi.connected_clients_holder import ConnectedClientsHolder

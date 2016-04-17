@@ -6,9 +6,8 @@ from wshubsapi.client_file_generator.java_file_generator import JAVAFileGenerato
 from wshubsapi.client_file_generator.js_file_generator import JSClientFileGenerator
 from wshubsapi.client_file_generator.python_file_generator import PythonClientFileGenerator
 from wshubsapi.hub import Hub
-from wshubsapi.hub import HubError
 from wshubsapi.hubs_inspector import HubsInspector
-from wshubsapi.hubs_inspector import HubsInspectorError
+from wshubsapi.hubs_inspector import HubsInspectorError, HubError
 from wshubsapi.test.utils.hubs_utils import remove_hubs_subclasses
 
 # do not remove this
@@ -40,13 +39,13 @@ class TestHubDetection(unittest.TestCase):
 
         self.assertRaises(HubsInspectorError, create_instance)
 
-    def test_hubsInspection(self):
+    def test_hubs_inspection(self):
         self.assertEqual(len(HubsInspector.HUBS_DICT), 3, 'Detects all Hubs')
         self.assertTrue(issubclass(HubsInspector.HUBS_DICT['TestHub'].__class__, Hub), 'Hubs subclass is class')
         self.assertTrue(issubclass(HubsInspector.HUBS_DICT['TestHub2'].__class__, Hub), 'Hubs subclass is class')
         self.assertTrue(getattr(HubsInspector.HUBS_DICT['TestHub'], "getData"), 'Detects function')
 
-    def test_hubsLimitations(self):
+    def test_hubs_limitations(self):
         class TestHubLimitation(Hub):
             pass
 
@@ -63,17 +62,46 @@ class TestHubDetection(unittest.TestCase):
         self.assertRaises(HubsInspectorError, HubsInspector.inspect_implemented_hubs, force_reconstruction=True)
         TestHubLimitation3.__init__ = lambda: 1 + 1
 
-    def test_hubsLimitations_startWithUnderscores(self):
+    def test_hubs_limitations_starts_with_underscores(self):
         class __TestHubLimitation(Hub):
             pass
 
         self.assertRaises(HubError, HubsInspector.inspect_implemented_hubs, force_reconstruction=True)
 
-    def test_hubsLimitations_cant_be_named_wsClient(self):
-        class wsClient(Hub):
+    def test_hubs_limitations_cant_be_named_ws_client(self):
+        class ws_client(Hub):
             pass
 
         self.assertRaises(HubError, HubsInspector.inspect_implemented_hubs, force_reconstruction=True)
+
+    def test_HubCreation_insertsInstanceInHUBs_DICT(self):
+        class TestHub1(Hub):
+            pass
+
+        HubsInspector.inspect_implemented_hubs(force_reconstruction=True)
+
+        self.assertTrue(HubsInspector.get_hub_instance(TestHub1) in HubsInspector.HUBS_DICT.values())
+
+    def test_hub_creation_inserts_new__HubName__in_HUBS_DICT(self):
+        class TestHub1(Hub):
+            __HubName__ = "newValue"
+            pass
+
+        HubsInspector.inspect_implemented_hubs(force_reconstruction=True)
+
+        self.assertIn("newValue", HubsInspector.HUBS_DICT.keys())
+
+    def test_HubCreation_RaisesExceptionIfClassNameStartsWith__(self):
+        class __TestHub1(Hub):
+            pass
+
+        self.assertRaises(HubError, HubsInspector.inspect_implemented_hubs, True)
+
+    def test_HubCreation_RaisesExceptionIfClassNameIsWsClient(self):
+        class ws_client(Hub):
+            pass
+
+        self.assertRaises(HubError, HubsInspector.inspect_implemented_hubs, True)
 
     def test_getHubInstance_returnsAnInstanceOfHubIfExists(self):
         self.assertIsInstance(HubsInspector.get_hub_instance(self.testHubClass), Hub)

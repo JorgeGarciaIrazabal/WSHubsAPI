@@ -42,13 +42,14 @@ class TestConnectedClient(unittest.TestCase):
         self.commEnvironment = CommEnvironment(max_workers=0, unprovided_id_template="unprovidedTest__{}")
         self.clientMock = ClientMock()
         self.connectedClient = ConnectedClient(self.commEnvironment, self.clientMock.writeMessage)
-        self.connectedClientsHolder = ConnectedClientsHolder(self.testHubClass.__HubName__)
+        self.connectedClientsHolder = ConnectedClientsHolder(self.testHubInstance)
 
     def tearDown(self):
         flexmock_teardown()
         self.connectedClientsHolder.all_connected_clients.clear()
         del self.testHubClass
         del self.testHubInstance
+        del self.connectedClientsHolder.hub_instance
         remove_hubs_subclasses()
 
     def test_onOpen_appendsClientInConnectedClientsHolderWithDefinedID(self):

@@ -1,7 +1,6 @@
 # coding=utf-8
 import unittest
-from wshubsapi.hub import Hub, HubError, UnsuccessfulReplay
-from wshubsapi.hubs_inspector import HubsInspector
+from wshubsapi.hub import Hub, UnsuccessfulReplay
 from wshubsapi.test.utils.hubs_utils import remove_hubs_subclasses
 
 
@@ -9,16 +8,7 @@ class TestHub(unittest.TestCase):
     def tearDown(self):
         remove_hubs_subclasses()
 
-    def test_HubCreation_insertsInstanceInHUBs_DICT(self):
-        class TestHub1(Hub):
-            pass
-        hub = TestHub1()
-
-        self.assertTrue(hub in HubsInspector.HUBS_DICT.values())
-
-        del hub
-
-    def test_HubCreation_Adds__HubName__AttributeToSubClass(self):
+    def test_hub_creation__adds__HubName__attribute_to_sub_class(self):
         class TestHub1(Hub):
             pass
         hub = TestHub1()
@@ -27,38 +17,7 @@ class TestHub(unittest.TestCase):
 
         del hub
 
-    def test_HubCreation_InsertDefined__HubName__InHUBs_DICT(self):
-        class TestHub1(Hub):
-            __HubName__ = "newValue"
-            pass
-        hub = TestHub1()
-
-        self.assertEqual("newValue", list(HubsInspector.HUBS_DICT.keys())[0])
-
-        del hub
-
-    def test_HubCreation_RaisesExceptionIfCreatedMoreThatOneInstanceOfHub(self):
-        class TestHub1(Hub):
-            pass
-        hub = TestHub1()
-
-        self.assertRaises(HubError, TestHub1)
-
-        del hub
-
-    def test_HubCreation_RaisesExceptionIfClassNameStartsWith__(self):
-        class __TestHub1(Hub):
-            pass
-
-        self.assertRaises(HubError, __TestHub1)
-
-    def test_HubCreation_RaisesExceptionIfClassNameIsWsClient(self):
-        class wsClient(Hub):
-            pass
-
-        self.assertRaises(HubError, wsClient)
-
-    def test_ConstructUnsuccessfulReplay_returnsUnsuccessfulReplayInstance(self):
+    def test_construct_unnecessary_replay_returns_unsuccessful_replay_instance(self):
         class TestHub1(Hub):
             pass
         hub = TestHub1()

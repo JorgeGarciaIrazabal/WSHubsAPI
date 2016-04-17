@@ -1,9 +1,11 @@
+from wshubsapi.connected_clients_group import ConnectedClientsGroup
 
 class ConnectedClientsHolder:
     all_connected_clients = dict()
 
-    def __init__(self, hub_name):
-        self.hub_name = hub_name
+    def __init__(self, hub_instance):
+        self.hub_instance = hub_instance
+        self.hub_name = self.hub_instance.__class__.__HubName__
 
     def get_all_clients(self):
         return ConnectedClientsGroup(list(self.all_connected_clients.values()), self.hub_name)
@@ -13,13 +15,13 @@ class ConnectedClientsHolder:
         :type sender: ConnectedClientsGroup
         """
         connected_clients = [c for c in self.all_connected_clients.values() if c.ID != sender.ID]
-        return ConnectedClientsGroup(connected_clients, self.hub_name)
+        return ConnectedClientsGroup(connected_clients, self.hub_instance)
 
     def get_clients(self, filter_function):
-        return ConnectedClientsGroup(filter(filter_function, self.all_connected_clients.values()), self.hub_name)
+        return ConnectedClientsGroup(filter(filter_function, self.all_connected_clients.values()), self.hub_instance)
 
     def get_client(self, client_id):
-        return ConnectedClientsGroup([self.all_connected_clients[client_id]], self.hub_name)[0]
+        return ConnectedClientsGroup([self.all_connected_clients[client_id]], self.hub_instance)[0]
 
     def get(self, filter_criteria):
         """
@@ -37,8 +39,8 @@ class ConnectedClientsHolder:
             return self.get_client(filter_criteria)
 
     def get_subscribed_clients(self):
-        subscribed_clients = HubsInspector.get_hub_instance(self.hub_name).get_subscribed_clients_to_hub()
-        return ConnectedClientsGroup([self.all_connected_clients[ID] for ID in subscribed_clients], self.hub_name)
+        subscribed_clients = self.hub_instance.get_subscribed_clients_to_hub()
+        return ConnectedClientsGroup([self.all_connected_clients[ID] for ID in subscribed_clients], self.hub_instance)
 
     @classmethod
     def append_client(cls, client):
@@ -52,5 +54,4 @@ class ConnectedClientsHolder:
         return cls.all_connected_clients.pop(client_id, None)
 
 
-from wshubsapi.connected_clients_group import ConnectedClientsGroup
-from wshubsapi.hubs_inspector import HubsInspector
+

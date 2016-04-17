@@ -11,8 +11,11 @@ from wshubsapi.connected_clients_holder import ConnectedClientsHolder
 
 class TestConnectedClientsHolder(unittest.TestCase):
     def setUp(self):
+
+        class MyHub:
+            __HubName__ = "testHubName"
         self.test_hub_name = "testHubName"
-        self.clients_holder = ConnectedClientsHolder(self.test_hub_name)
+        self.clients_holder = ConnectedClientsHolder(MyHub())
         ConnectedClientsHolder.all_connected_clients = dict()
         flexmock(CommEnvironment, __check_futures=lambda *args: None)
 

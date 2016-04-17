@@ -11,6 +11,10 @@ class HubsInspectorError(Exception):
     pass
 
 
+class HubError(Exception):
+    pass
+
+
 class HubsInspector:
     __hubs_constructed = False
     HUBS_DICT = {}
@@ -25,6 +29,21 @@ class HubsInspector:
             raise HubsInspectorError(constructor_with_params_text % hub_class.__name__)
         else:
             raise e
+
+    @classmethod
+    def __construct_hub(cls, hub_class):
+        try:
+            hub = hub_class()
+            hub_name = hub.__class__.__HubName__
+            if hub_name in cls.HUBS_DICT:
+                raise HubError("Hub's name must be unique, found duplicated name with: {}".format(hub_name))
+            if hub_name.startswith("__"):
+                raise HubError("Hub's name can not start with '__'")
+            if hub_name == "ws_client":
+                raise HubError("Hub's name can not be 'wsClient', it is a  reserved name")
+            cls.HUBS_DICT[hub_name] = hub
+        except TypeError as e:
+            cls.__handle_hub_construction_error(e, hub_class)
 
     @classmethod
     def ignore_hub_implementation(cls, hub_class):
@@ -45,10 +64,8 @@ class HubsInspector:
         if not cls.__hubs_constructed or force_reconstruction:
             cls.HUBS_DICT.clear()
             for hub_class in cls.get_all_hubs_subclasses(Hub):
-                try:
-                    hub_class()
-                except TypeError as e:
-                    cls.__handle_hub_construction_error(e, hub_class)
+                cls.__construct_hub(hub_class)
+
             cls.__hubs_constructed = True
 
     @classmethod

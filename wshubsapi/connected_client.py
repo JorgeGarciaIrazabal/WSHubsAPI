@@ -1,10 +1,6 @@
 import logging
 
-from wshubsapi import utils
-from wshubsapi.connected_clients_holder import ConnectedClientsHolder
-from wshubsapi.function_message import FunctionMessage
-
-log = logging.getLogger(__name__)
+slog = logging.getLogger(__name__)
 
 
 # Change class name //WSAPIClient? WSHUBsClient? ConnHandler?
