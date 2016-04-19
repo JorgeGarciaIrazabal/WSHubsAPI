@@ -66,5 +66,4 @@ if __name__ == '__main__':
             if sys.argv[1] in ("integration", "all"):
                 run_integration_test()
     finally:
-        pass
-        # os._exit(0)
+        sys.exit(0)
