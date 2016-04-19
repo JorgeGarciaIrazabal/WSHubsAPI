@@ -51,3 +51,4 @@ wshubsapi.egg-info
 build
 *.pyc
 **/test-reports/
+.sonar

@@ -15,7 +15,7 @@ from os import path
 here = path.abspath(path.dirname(__file__))
 
 # Get the long description from the relevant file
-with open(path.join(here, 'DESCRIPTION.rst')) as f:
+with open(path.join(here, 'DESCRIPTION.md')) as f:
     long_description = f.read()
 
 setup(

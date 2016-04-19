@@ -22,5 +22,10 @@ exclude_lines =
 
 ignore_errors = True
 
+[run]
+omit =
+    **/POC/**
+    test_runner.py
+
 [html]
 directory = coverage_html_report
