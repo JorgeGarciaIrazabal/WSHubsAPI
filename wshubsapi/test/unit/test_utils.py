@@ -14,7 +14,6 @@ from wshubsapi.utils import *
 class TestUtils(unittest.TestCase):
     def setUp(self):
         flexmock(MessagesReceivedQueue, DEFAULT_MAX_WORKERS=0)
-        flexmock(CommEnvironment, __check_futures=lambda *args: None)
         self.queue = None
 
     def tearDown(self):

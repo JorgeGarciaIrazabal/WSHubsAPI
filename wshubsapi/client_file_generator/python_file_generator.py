@@ -57,11 +57,9 @@ class PythonClientFileGenerator:
             class_strings.append(cls.__get_hub_class_str(h))
         return class_strings
 
-    WRAPPER = '''import json
-import logging
-import threading
+    WRAPPER = '''import logging
 import jsonpickle
-from jsonpickle.pickler import Pickler
+import threading
 from wshubsapi import utils
 from concurrent.futures import Future
 

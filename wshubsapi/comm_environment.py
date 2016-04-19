@@ -47,8 +47,7 @@ class CommEnvironment(object):
         self.__last_client_message_id = 0
         self.__new_client_message_id_lock = threading.Lock()
         self.__futures_buffer = {}
-        self.__check_futures()
-        """:type : dict[int, list[Future, datetime]]"""
+        """:type : dict[int, Future, datetime]"""
 
     def get_unprovided_id(self):
         if len(self.available_unprovided_ids) > 0:
@@ -68,7 +67,7 @@ class CommEnvironment(object):
 
     def on_message(self, client, msg_str):
         try:
-            msg_str = msg_str if isinstance(msg_str, str) else msg_str.decode("utf-8")
+            msg_str = msg_str if isinstance(msg_str, str) else msg_str.encode("utf-8")
             msg_obj = json.loads(msg_str)
             if "replay" not in msg_obj:
                 self.__on_replay(client, msg_str, msg_obj)
@@ -101,21 +100,16 @@ class CommEnvironment(object):
         with self.__new_client_message_id_lock:
             self.__last_client_message_id += 1
             id_ = self.__last_client_message_id
-            self.__futures_buffer[id_] = [Future(), datetime.now()]
-        return self.__futures_buffer[id_][0], id_
+            self.__futures_buffer[id_] = Future()
+        return self.__futures_buffer[id_], id_
 
-    @asynchronous.asynchronous()
-    def __check_futures(self):
-        while True:
-            for ID, [_, d] in self.__futures_buffer.items():
-                if datetime.now() - d > timedelta(seconds=self.client_function_timeout):
-                    self.__on_time_out(ID)
-            time.sleep(0.1)
+    def close(self, **kwargs):
+        self.message_received_queue.executor.shutdown(**kwargs)
 
     def __on_time_out(self, id_):
         with self.__new_client_message_id_lock:
             if id_ in self.__futures_buffer:
-                future = self.__futures_buffer.pop(id_)[0]
+                future = self.__futures_buffer.pop(id_)
                 future.set_exception(HubsApiException("Timeout exception"))
 
     def __on_replay(self, client, msg_str, msg_obj):
@@ -125,9 +119,11 @@ class CommEnvironment(object):
             self.replay(client, replay, msg_str)
 
     def __on_replayed(self, msg_obj):
-        future = self.__futures_buffer.pop(msg_obj["ID"], [None])[0]
+        future = self.__futures_buffer.pop(msg_obj["ID"], None)
         if future is not None:
             if msg_obj["success"]:
                 future.set_result(msg_obj["replay"])
             else:
                 future.set_exception(Exception(msg_obj["replay"]))
+
+

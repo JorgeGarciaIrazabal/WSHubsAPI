@@ -32,8 +32,6 @@ class TestConnectedClient(unittest.TestCase):
                 self.close = flexmock()
                 pass
 
-        flexmock(CommEnvironment, __check_futures=lambda *args: None)
-
         HubsInspector.inspect_implemented_hubs(force_reconstruction=True)
         self.testHubClass = TestHub
         self.testHubInstance = HubsInspector.get_hub_instance(self.testHubClass)

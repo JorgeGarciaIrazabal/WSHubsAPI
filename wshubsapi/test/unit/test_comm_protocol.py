@@ -15,7 +15,6 @@ from wshubsapi.messages_received_queue import MessagesReceivedQueue
 
 class TestCommProtocol(unittest.TestCase):
     def setUp(self):
-        flexmock(CommEnvironment, __check_futures=lambda *args: None)
         self.comm_environment = CommEnvironment(max_workers=0, unprovided_id_template="unprovided_{}")
 
     def tearDown(self):

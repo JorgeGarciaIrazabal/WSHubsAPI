@@ -43,13 +43,6 @@
     hubsApi.connect().then(function () {
         $('#status').text("Connected")
 
-        //function to be called from server
-        hubsApi.ChatHub.client.on_message = function (from, message) {
-            $('#discussion').append('<li><strong>' + from
-                + '</strong>: ' + message + '</li>');
-            return "received"
-        }
-
         //sending message
         $('#sendmessage').click(sendToAll);
         $('#message').keypress(function (e) {
@@ -59,6 +52,13 @@
     }, function (error) {
         console.error(error);
     });
+
+    //function to be called from server
+    hubsApi.ChatHub.client.onMessage = function (from, message) {
+        $('#discussion').append('<li><strong>' + from
+            + '</strong>: ' + message + '</li>');
+        return "received"
+    }
 
     hubsApi.wsClient.onerror = function (ev) {
         console.error(ev.reason);

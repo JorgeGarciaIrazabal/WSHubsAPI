@@ -99,6 +99,10 @@ function HubsAPI(url, serverTimeout, wsClientClass, PromiseClass) {{
         onOpenTriggers = [];
     url = url || '';
 
+    function toCamelCase(str) {{
+        return str.replace(/_([a-z])/g, function (g) {{ return g[1].toUpperCase(); }});
+    }}
+
     this.clearTriggers = function () {{
         messagesBeforeOpen = [];
         onOpenTriggers = [];
@@ -158,6 +162,7 @@ function HubsAPI(url, serverTimeout, wsClientClass, PromiseClass) {{
                         promiseHandler = promisesHandler[msgObj.ID];
                         msgObj.success ? promiseHandler.resolve(msgObj.replay) : promiseHandler.reject(msgObj.replay);
                     }} else {{
+                        msgObj.function = toCamelCase(msgObj.function);
                         var executor = thisApi[msgObj.hub].client[msgObj.function];
                         if (executor !== undefined) {{
                             var replayMessage = {{ID: msgObj.ID}};

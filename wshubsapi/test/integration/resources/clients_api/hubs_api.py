@@ -1,8 +1,6 @@
-import json
 import logging
-import threading
 import jsonpickle
-from jsonpickle.pickler import Pickler
+import threading
 from wshubsapi import utils
 from concurrent.futures import Future
 

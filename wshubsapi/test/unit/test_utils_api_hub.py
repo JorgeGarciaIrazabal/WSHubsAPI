@@ -17,7 +17,6 @@ class TestUtilsApiHub(unittest.TestCase):
         self.utils_hub = UtilsAPIHub()
         self.clients_holder = ConnectedClientsHolder(self.utils_hub)
         ConnectedClientsHolder.all_connected_clients = dict()
-        flexmock(CommEnvironment, __check_futures=lambda *args: None)
         for i in range(2):
             connected_client = flexmock(ConnectedClient(CommEnvironment(max_workers=0), None))
             connected_client.ID = i

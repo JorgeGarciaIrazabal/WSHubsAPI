@@ -66,5 +66,4 @@ if __name__ == '__main__':
             if sys.argv[1] in ("integration", "all"):
                 run_integration_test()
     finally:
-        if "coverage" not in sys.argv:
-            os._exit(0)
+        os._exit(0)

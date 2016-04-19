@@ -11,6 +11,10 @@ class TestCommProtocol(unittest.TestCase):
         cls.api = HubsAPI('ws://127.0.0.1:11111/')
         cls.api.connect()
 
+    @classmethod
+    def tearDownClass(cls):
+        cls.api.ws_client.close()
+
     def tearDown(self):
         super(TestCommProtocol, self).tearDown()
 

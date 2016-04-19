@@ -17,7 +17,6 @@ class TestConnectedClientsHolder(unittest.TestCase):
         self.test_hub_name = "testHubName"
         self.clients_holder = ConnectedClientsHolder(MyHub())
         ConnectedClientsHolder.all_connected_clients = dict()
-        flexmock(CommEnvironment, __check_futures=lambda *args: None)
 
         for i in range(10):
             connected_client = flexmock(ConnectedClient(CommEnvironment(max_workers=0), None))
