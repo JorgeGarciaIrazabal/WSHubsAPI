@@ -26,7 +26,7 @@ setup(
         # https://packaging.python.org/en/latest/single_source_version.html
         version='0.7.1',
 
-        description='function protocol to communicate frontend -> backend and backend -> frontend in a intuitive way like signalR in C#',
+        description='message handler to communicate frontend -> backend and backend -> frontend in a intuitive way like signalR in C#',
         long_description=long_description,
 
         # The project's main homepage.

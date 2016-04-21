@@ -5,6 +5,9 @@ class ConnectedClientsHolder:
     all_connected_clients = dict()
 
     def __init__(self, hub_instance):
+        """
+        :type hub_instance: wshubsapi.hub.Hub
+        """
         self.hub_instance = hub_instance
         self.hub_name = self.hub_instance.__class__.__HubName__
 
@@ -13,7 +16,7 @@ class ConnectedClientsHolder:
 
     def get_other_clients(self, sender):
         """
-        :type sender: ConnectedClientsGroup
+        :type sender: wshubsapi.client_in_hub.ClientInHub
         """
         connected_clients = [c for c in self.all_connected_clients.values() if c.ID != sender.ID]
         return ConnectedClientsGroup(connected_clients, self.hub_name)
@@ -22,6 +25,9 @@ class ConnectedClientsHolder:
         return ConnectedClientsGroup(filter(filter_function, self.all_connected_clients.values()), self.hub_name)
 
     def get_client(self, client_id):
+        """
+        :rtype: wshubsapi.client_in_hub.ClientInHub
+        """
         return ConnectedClientsGroup([self.all_connected_clients[client_id]], self.hub_name)[0]
 
     def get(self, filter_criteria):
@@ -40,8 +46,7 @@ class ConnectedClientsHolder:
             return self.get_client(filter_criteria)
 
     def get_subscribed_clients(self):
-        subscribed_clients = self.hub_instance.get_subscribed_clients_to_hub()
-        return ConnectedClientsGroup([self.all_connected_clients[ID] for ID in subscribed_clients], self.hub_name)
+        return self.hub_instance.get_subscribed_clients_to_hub()
 
     @classmethod
     def append_client(cls, client):
