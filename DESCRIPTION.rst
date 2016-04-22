@@ -1,9 +1,10 @@
 WSHubsAPI
 =========
 
-The package makes really easy to establish intuitive communication in a server/clients architecture.<br /><br />
+The package makes really easy to establish intuitive communication in a server/clients architecture.
+
 Forget to handle web-socket messages with huge switch cases or maintain url strings for your API-REST.
-Just **call server functions from the client** and **call client function from the server** like it is the same program.<br />
+Just **call server functions from the client** and **call client function from the server** like it is the same program.
 But not only that! with this package you will be able to communicate client applications with different languages or communication protocols at the same time!
 
 Available coding languages:
