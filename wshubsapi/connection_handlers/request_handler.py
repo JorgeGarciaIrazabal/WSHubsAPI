@@ -1,3 +1,4 @@
+from SimpleHTTPServer import SimpleHTTPRequestHandler
 import logging
 import threading
 
@@ -12,6 +13,33 @@ from wshubsapi.comm_environment import CommEnvironment
 __author__ = 'Jorge'
 log = logging.getLogger(__name__)
 log.addHandler(logging.NullHandler())
+
+
+class SimpleRequestHandler(SimpleHTTPRequestHandler):
+    comm_environment = None
+
+    def setup(self):
+        SimpleHTTPRequestHandler.setup(self)
+        self._connected_client_mock = ConnectedClient(self.comm_environment, self.write_message)
+        if SimpleRequestHandler.comm_environment is None:
+            SimpleRequestHandler.comm_environment = CommEnvironment()
+
+    def __get_body(self):
+        content_len = int(self.headers.getheader('content-length', 0))
+        return self.rfile.read(content_len)
+
+    def write_message(self, message):
+        self.send_response(200)
+        self.send_header('Content-Type', 'application/json')
+        self.end_headers()
+        self.wfile.write(message)
+        self.wfile.close()
+
+    def do_GET(self):
+        message = self.__get_body()
+        log.debug("request received: \n{} ".format(message))
+        self.comm_environment.on_message(self._connected_client_mock, message)
+        # SimpleHTTPRequestHandler.do_GET(self)
 
 
 class TornadoRequestHandler(tornado.web.RequestHandler):
@@ -45,7 +73,7 @@ class DjangoRequestHandler:
         self.response = msg
 
     def request_handler(self, request):
-        from django.http import HttpResponse # this could not necessary if imported at top
+        from django.http import HttpResponse  # this could not necessary if imported at top
         message = request.body
         self.comm_environment.onMessage(self._connected_client_mock, message)
         return HttpResponse(self.response)
@@ -68,5 +96,5 @@ class RequestClient:
             else:
                 future.set_exception(result['replay'])
 
-        threading.Thread(target=request).start()
+        threading.Thread(target=request).start() # todo use a thread pool
         return future

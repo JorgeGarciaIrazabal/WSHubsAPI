@@ -7,9 +7,11 @@ from wshubsapi import utils
 import json
 import unittest
 
+
 class ComplexObject(object):
     def __init__(self):
         self.a = self
+
 
 class TestSerialization(unittest.TestCase):
     def setUp(self):
