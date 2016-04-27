@@ -75,8 +75,8 @@ if __name__ == '__main__':
     # inspect Hubs in project to be included in the api environment
     HubsInspector.inspect_implemented_hubs()
     # create api modules to be used by the clients
-    HubsInspector.construct_python_file()  # python api module will be created in "_static" folder
-    HubsInspector.construct_js_file()  # javascript api library will be created in "_static" folder
+    HubsInspector.construct_python_file()  # python api module will be created in current working dir
+    HubsInspector.construct_js_file()  # javascript api library will be created in current working dir
 
     # initialize server
     app = web.Application([(r'/(.*)', ConnectionHandler)])

@@ -10,23 +10,17 @@ log.addHandler(logging.NullHandler())
 
 
 class ConnectionHandler(WebSocket):
-    comm_environment = None
-
     def __init__(self, sock, protocols=None, extensions=None, environ=None, heartbeat_freq=None):
         super(ConnectionHandler, self).__init__(sock, protocols, extensions, environ, heartbeat_freq)
-        if ConnectionHandler.comm_environment is None:
-            ConnectionHandler.comm_environment = CommEnvironment()
+        self.comm_environment = CommEnvironment.get_instance()
         self._connected_client = ConnectedClient(self.comm_environment, self.write_message)
 
     def write_message(self, message):
         self.send(message)
         log.debug("message to %s:\n%s" % (self._connected_client.ID, message))
 
-    def opened(self, *args):
-        try:
-            client_id = int(args[0])
-        except (ValueError, IndexError):
-            client_id = None
+    def opened(self):
+        client_id = None
         id_ = self.comm_environment.on_opened(self._connected_client, client_id)
         log.debug("open new connection with ID: {} ".format(id_))
 

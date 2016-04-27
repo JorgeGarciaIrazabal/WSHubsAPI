@@ -24,11 +24,8 @@ class ConnectionHandler(tornado.websocket.WebSocketHandler):
         log.debug("message to %s:\n%s" % (self._connected_client.ID, message))
         return future
 
-    def open(self, *args):
-        try:
-            client_id = int(args[0])
-        except ValueError:
-            client_id = None
+    def open(self, name=None):
+        client_id = name
         id_ = self.comm_environment.on_opened(self._connected_client, client_id)
         log.debug("open new connection with ID: {} ".format(id_))
 

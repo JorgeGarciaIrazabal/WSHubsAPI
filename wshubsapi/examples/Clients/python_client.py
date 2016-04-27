@@ -22,8 +22,7 @@ if __name__ == '__main__':
 
 
     ws.ChatHub.client.on_message = print_message
-    future = ws.ChatHub.server.subscribe_to_hub().done(lambda x: ws.ChatHub.server.get_subscribed_clients_to_hub())
-    future.onFinally = lambda: sys.stdout.write("I am from finally")
+    ws.ChatHub.server.subscribe_to_hub().result()
     name = input("Enter your name:")
     # ws.ChatHub.server.get_subscribed_clients_to_hub() \
     #     .done(lambda x: sys.stdout.write(x[1] + "\n"), lambda x: sys.stdout.write("Error:%s\n" % x))
@@ -32,5 +31,5 @@ if __name__ == '__main__':
         message = input("")
         if sys.version_info[0] == 2:
             message = message.decode(sys.stdin.encoding)
-        ws.ChatHub.server.send_to_all(name, message).done(
-            lambda m: sys.stdout.write("message sent to {} client(s)\n".format(m)))
+        message_from_server = ws.ChatHub.server.send_to_all(name, message).result()
+        print "message sent to {} client(s)\n".format(message_from_server)

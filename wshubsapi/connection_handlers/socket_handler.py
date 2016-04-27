@@ -6,18 +6,18 @@ import socket
 
 from wshubsapi.connected_client import ConnectedClient
 from wshubsapi.comm_environment import CommEnvironment
-from message_separator import MessageSeparator
+from wshubsapi.message_separator import MessageSeparator
 
 log = logging.getLogger(__name__)
 log.addHandler(logging.NullHandler())
 
 
 class SocketHandler(SocketServer.BaseRequestHandler):
-    comm_environment = None
-
     def __init__(self, request, client_address, server):
         SocketServer.BaseRequestHandler.__init__(self, request, client_address, server)
         # never enter here :O
+        self.comm_environment = None
+        """:type : CommEnvironment"""
         self.__connected_client = None
         self.__message_separator = None
         """:type : MessageSeparator"""
@@ -25,9 +25,7 @@ class SocketHandler(SocketServer.BaseRequestHandler):
     def setup(self):
         self.__connected_client = None
         self.__message_separator = MessageSeparator()
-
-        if SocketHandler.comm_environment is None:
-            SocketHandler.comm_environment = CommEnvironment()
+        self.comm_environment = CommEnvironment.get_instance()
         self.__connected_client = ConnectedClient(self.comm_environment, self.write_message)
         self.comm_environment.on_opened(self.__connected_client)
 

@@ -16,13 +16,10 @@ log.addHandler(logging.NullHandler())
 
 
 class SimpleRequestHandler(SimpleHTTPRequestHandler):
-    comm_environment = None
-
     def setup(self):
         SimpleHTTPRequestHandler.setup(self)
         self._connected_client_mock = ConnectedClient(self.comm_environment, self.write_message)
-        if SimpleRequestHandler.comm_environment is None:
-            SimpleRequestHandler.comm_environment = CommEnvironment()
+        self.comm_environment = CommEnvironment.get_instance()
 
     def __get_body(self):
         content_len = int(self.headers.getheader('content-length', 0))
@@ -96,5 +93,5 @@ class RequestClient:
             else:
                 future.set_exception(result['replay'])
 
-        threading.Thread(target=request).start() # todo use a thread pool
+        threading.Thread(target=request).start()  # todo use a thread pool
         return future
