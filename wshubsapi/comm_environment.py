@@ -1,8 +1,6 @@
 import json
 import logging
 import threading
-from datetime import datetime, timedelta
-import time
 
 try:
     from Queue import Queue
@@ -31,6 +29,9 @@ class HubsApiException(Exception):
 
 
 class CommEnvironment(object):
+    _comm_environments = dict()
+    get_instance_lock = threading.Lock()
+
     def __init__(self, max_workers=MessagesReceivedQueue.DEFAULT_MAX_WORKERS,
                  unprovided_id_template="UNPROVIDED__{}",
                  serialization_max_depth=5, serialization_max_iter=80,
@@ -105,6 +106,18 @@ class CommEnvironment(object):
 
     def close(self, **kwargs):
         self.message_received_queue.executor.shutdown(**kwargs)
+
+    @classmethod
+    def get_instance(cls, key="generic", **kwargs):
+        """
+        :key: include a key to use multiple communication environments
+        :rtype: CommEnvironment
+        """
+        with cls.get_instance_lock:
+            cls._comm_environments[key] = cls._comm_environments.get(key, None)
+            if cls._comm_environments[key] is None:
+                cls._comm_environments[key] = CommEnvironment(**kwargs)
+            return cls._comm_environments[key]
 
     def __on_time_out(self, id_):
         with self.__new_client_message_id_lock:
