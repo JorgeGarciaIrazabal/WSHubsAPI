@@ -109,7 +109,7 @@ works like:
     <ul id="discussion"/>
 </div>
 <script>
-    var hubsApi = new HubsAPI('ws://127.0.0.1:8888/');
+    var hubsApi = new HubsAPI();
     function postMessage() {
         var name = $('#name').val(),
             message = $('#message').val();
@@ -122,7 +122,7 @@ works like:
         $('#message').val('').focus();
     }
 
-    hubsApi.connect().then(function () {
+    hubsApi.connect('ws://127.0.0.1:8888/').then(function () {
         $('#status').text("Connected");
     });
     hubsApi.ForumHub.client.messagePublished = function (from, message) {
