@@ -15,8 +15,11 @@ from os import path
 here = path.abspath(path.dirname(__file__))
 
 # Get the long description from the relevant file
-with open(path.join(here, 'DESCRIPTION.md')) as f:
-    long_description = f.read()
+try:
+    with open(path.join(here, 'DESCRIPTION.md')) as f:
+        long_description = f.read()
+except:
+    long_description='WSHubsAPI'
 
 setup(
         name='wshubsapi',
@@ -24,7 +27,7 @@ setup(
         # Versions should comply with PEP440.  For a discussion on single-sourcing
         # the version across setup.py and the project code, see
         # https://packaging.python.org/en/latest/single_source_version.html
-        version='0.7.2',
+        version='0.7.1',
 
         description='message handler to communicate frontend -> backend and backend -> frontend in a intuitive way like signalR in C#',
         long_description=long_description,
