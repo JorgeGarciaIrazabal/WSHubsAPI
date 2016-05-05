@@ -10,6 +10,7 @@ from wshubsapi.connected_client import ConnectedClient
 from wshubsapi.connected_clients_holder import ConnectedClientsHolder
 from wshubsapi.hub import Hub
 from wshubsapi.hubs_inspector import HubsInspector
+from wshubsapi.messages_received_queue import MessagesReceivedQueue
 from wshubsapi.test.utils.hubs_utils import remove_hubs_subclasses
 from wshubsapi.test.utils.message_creator import MessageCreator
 from flexmock import flexmock, flexmock_teardown
@@ -37,7 +38,9 @@ class TestConnectedClient(unittest.TestCase):
         self.testHubInstance = HubsInspector.get_hub_instance(self.testHubClass)
 
         self.jsonPickler = Pickler(max_depth=3, max_iter=30, make_refs=False)
-        self.commEnvironment = CommEnvironment(max_workers=0, unprovided_id_template="unprovidedTest__{}")
+        message_received_queue = flexmock(MessagesReceivedQueue(), start_threads=lambda: None)
+        self.commEnvironment = CommEnvironment(message_received_queue_class=message_received_queue,
+                                               unprovided_id_template="unprovidedTest__{}")
         self.clientMock = ClientMock()
         self.connectedClient = ConnectedClient(self.commEnvironment, self.clientMock.writeMessage)
         self.connectedClientsHolder = ConnectedClientsHolder(self.testHubInstance)
@@ -111,7 +114,8 @@ class TestConnectedClient(unittest.TestCase):
     def test_onAsyncMessage_putsTheMessageAndTheConnectionInTheQueue(self):
         message = MessageCreator.create_on_message_message()
         self.commEnvironment.wsMessageReceivedQueue = flexmock(self.commEnvironment.message_received_queue)
-        self.commEnvironment.wsMessageReceivedQueue.should_receive("put").with_args((message, self.connectedClient)).once()
+        self.commEnvironment.wsMessageReceivedQueue.should_receive("put").with_args(
+            (message, self.connectedClient)).once()
 
         self.commEnvironment.on_async_message(self.connectedClient, message)
 

@@ -8,6 +8,7 @@ from wshubsapi.comm_environment import CommEnvironment
 from wshubsapi.connected_client import ConnectedClient
 from wshubsapi.connected_clients_holder import ConnectedClientsHolder
 from wshubsapi.hub import Hub
+from wshubsapi.messages_received_queue import MessagesReceivedQueue
 from wshubsapi.test.utils.hubs_utils import remove_hubs_subclasses
 
 
@@ -22,7 +23,8 @@ class TestConnectedClientsHolder(unittest.TestCase):
         ConnectedClientsHolder.all_connected_clients = dict()
 
         for i in range(10):
-            connected_client = flexmock(ConnectedClient(CommEnvironment(max_workers=0), None))
+            message_received_queue = flexmock(MessagesReceivedQueue(), start_threads=lambda: None)
+            connected_client = flexmock(ConnectedClient(CommEnvironment(message_received_queue), None))
             connected_client.ID = i
             self.clients_holder.append_client(connected_client)
 

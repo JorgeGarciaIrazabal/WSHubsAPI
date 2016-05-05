@@ -1,5 +1,6 @@
 import inspect
 
+from wshubsapi import utils
 from wshubsapi.client_file_generator.cpp_file_generator import CppFileGenerator
 from wshubsapi.client_file_generator.java_file_generator import JAVAFileGenerator
 from wshubsapi.client_file_generator.js_file_generator import JSClientFileGenerator
@@ -95,7 +96,7 @@ class HubsInspector:
         """
         :rtype: Hub
         """
-        if not isinstance(hub, basestring):
+        if not isinstance(hub, utils.string_class):
             hub = hub.__HubName__
         return cls.HUBS_DICT[hub]
 

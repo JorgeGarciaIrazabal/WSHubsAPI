@@ -9,12 +9,10 @@ from concurrent.futures import ThreadPoolExecutor
 class MessagesReceivedQueue(Queue):
     DEFAULT_MAX_WORKERS = 151
 
-    def __init__(self, comm_environment, max_workers=DEFAULT_MAX_WORKERS):
-        """
-        :type comm_environment: wshubsapi.comm_environment.CommEnvironment
-        """
+    def __init__(self, max_workers=DEFAULT_MAX_WORKERS):
         Queue.__init__(self)
-        self.comm_environment = comm_environment
+        self.on_message = lambda *args: None
+        self.on_error = lambda *args: None
         self.maxWorkers = max_workers
         self.executor = ThreadPoolExecutor(max_workers=self.maxWorkers)
         self.keepAlive = True
@@ -28,9 +26,9 @@ class MessagesReceivedQueue(Queue):
             connected_client = None
             try:
                 msg, connected_client = self.get()
-                self.comm_environment.on_message(connected_client, msg)
+                self.on_message(connected_client, msg)
             except Exception as e:
                 if connected_client is not None:
-                    self.comm_environment.on_error(connected_client, e)
+                    self.on_error(connected_client, e)
                 else:
                     print(str(e))  # todo: create a call back for this exception

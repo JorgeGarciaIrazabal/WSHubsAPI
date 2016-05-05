@@ -32,19 +32,28 @@ class CommEnvironment(object):
     _comm_environments = dict()
     get_instance_lock = threading.Lock()
 
-    def __init__(self, max_workers=MessagesReceivedQueue.DEFAULT_MAX_WORKERS,
+    def __init__(self, message_received_queue_class=None,
                  unprovided_id_template="UNPROVIDED__{}",
-                 serialization_max_depth=5, serialization_max_iter=80,
-                 client_function_timeout=5):
+                 serialization_max_depth=5,
+                 serialization_max_iter=80):
+        """
+        :type message_received_queue_class: MessagesReceivedQueue
+        """
         self.lock = threading.Lock()
         self.available_unprovided_ids = list()
         self.unprovided_id_template = unprovided_id_template
         self.last_provided_id = 0
-        self.message_received_queue = MessagesReceivedQueue(self, max_workers)
+
+        if message_received_queue_class is None:
+            self.message_received_queue = MessagesReceivedQueue(self)
+        else:
+            self.message_received_queue = message_received_queue_class
+        self.message_received_queue.on_message = self.on_message
+        self.message_received_queue.on_error = self.on_error
+
         self.message_received_queue.start_threads()
         self.all_connected_clients = ConnectedClientsHolder.all_connected_clients
         self.serialization_args = dict(max_depth=serialization_max_depth, max_iter=serialization_max_iter)
-        self.client_function_timeout = client_function_timeout
         self.__last_client_message_id = 0
         self.__new_client_message_id_lock = threading.Lock()
         self.__futures_buffer = {}
@@ -138,5 +147,3 @@ class CommEnvironment(object):
                 future.set_result(msg_obj["replay"])
             else:
                 future.set_exception(Exception(msg_obj["replay"]))
-
-

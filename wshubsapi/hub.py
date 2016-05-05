@@ -1,3 +1,4 @@
+from wshubsapi import utils
 from wshubsapi.connected_clients_group import ConnectedClientsGroup
 from wshubsapi.connected_clients_holder import ConnectedClientsHolder
 
@@ -51,7 +52,7 @@ class Hub(object):
     def client_functions(self, client_functions):
         assert isinstance(client_functions, dict)
         for function_name, function in client_functions.items():
-            assert isinstance(function_name, basestring)
+            assert isinstance(function_name, utils.string_class)
             assert hasattr(function, '__call__')
         self._client_functions = client_functions
 
