@@ -15,7 +15,6 @@ class TestTornadoHandler(unittest.TestCase):
         connection = flexmock(set_close_callback=lambda *args: None)
         request = tornado.web._RequestDispatcher(app, connection)
         self.connection_handler = ConnectionHandler(app, request)
-        print self.connection_handler
 
     def get_app(self):
         self.app = tornado.web.Application([

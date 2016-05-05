@@ -7,7 +7,7 @@ class ConnectedClientsGroup(object):
         :type connected_clients_in_group: list of wshubsapi.connected_client.ConnectedClient
         """
         self.hub_name = hub_name
-        self.connected_clients = map(lambda c: ClientInHub(c, hub_name), connected_clients_in_group)
+        self.connected_clients = list(map(lambda c: ClientInHub(c, hub_name), connected_clients_in_group))
 
     def append(self, connected_client):
         """
@@ -41,7 +41,7 @@ class ConnectedClientsGroup(object):
         return self.connected_clients.__getitem__(item)
 
     def __len__(self):
-        return self.connected_clients.__len__()
+        return len(self.connected_clients)
 
     def __iter__(self):
         for x in self.connected_clients:

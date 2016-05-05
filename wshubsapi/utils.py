@@ -11,9 +11,8 @@ from jsonpickle import handlers
 SENDER_KEY_PARAMETER = "_sender"
 DATE_TIME_FORMAT = '%Y-%m-%dT%H:%M:%S.%f%z'
 NOT_PASSING_PARAMETERS = (SENDER_KEY_PARAMETER,)
-
 ASCII_UpperCase = string.uppercase if sys.version_info[0] == 2 else string.ascii_uppercase
-
+string_class = basestring if sys.version_info[0] == 2 else (str, bytes)
 
 def get_args(method, include_sender=False):
     args = getargspec(method).args
@@ -36,7 +35,7 @@ def get_defaults(method):
         return []
     defaults = list(filter(lambda x: x not in NOT_PASSING_PARAMETERS, list(defaults)))
     for i, default_value in enumerate(defaults):
-        if isinstance(defaults[i], basestring):
+        if isinstance(defaults[i], string_class):
             defaults[i] = '"%s"' % default_value
     return defaults
 
