@@ -1,7 +1,15 @@
+'use strict';
 /* jshint ignore:start */
 /* ignore jslint start */
-function HubsAPI(url, serverTimeout, wsClientClass, PromiseClass) {
-    'use strict';
+function HubsAPI(serverTimeout, wsClientClass, PromiseClass) {
+
+    var messageID = 0,
+        promisesHandler = {},
+        defaultRespondTimeout = serverTimeout || 5000,
+        thisApi = this,
+        messagesBeforeOpen = [],
+        emptyFunction = function () {},
+        onOpenTriggers = [];
 
     PromiseClass = PromiseClass || Promise;
     if (!PromiseClass.prototype.finally) {
@@ -35,15 +43,6 @@ function HubsAPI(url, serverTimeout, wsClientClass, PromiseClass) {
         };
     }
 
-    var messageID = 0,
-        promisesHandler = {},
-        defaultRespondTimeout = serverTimeout || 5000,
-        thisApi = this,
-        messagesBeforeOpen = [],
-        emptyFunction = function () {},
-        onOpenTriggers = [];
-    url = url || '';
-
     function toCamelCase(str) {
         return str.replace(/_([a-z])/g, function (g) { return g[1].toUpperCase(); });
     }
@@ -53,7 +52,7 @@ function HubsAPI(url, serverTimeout, wsClientClass, PromiseClass) {
         onOpenTriggers = [];
     };
 
-    this.connect = function (reconnectTimeout) {
+    this.connect = function (url, reconnectTimeout) {
         return new PromiseClass(function (resolve, reject) {
             reconnectTimeout = reconnectTimeout || -1;
             function reconnect(error) {
@@ -118,8 +117,20 @@ function HubsAPI(url, serverTimeout, wsClientClass, PromiseClass) {
                                 replayMessage.success = false;
                                 replayMessage.replay = e.toString();
                             } finally {
-                                replayMessage.replay = replayMessage.replay === undefined ? null : replayMessage.replay;
-                                thisApi.wsClient.send(JSON.stringify(replayMessage));
+                                if (replayMessage.replay instanceof PromiseClass) {
+                                    replayMessage.replay.then(function (result) {
+                                        replayMessage.success = true;
+                                        replayMessage.replay = result;
+                                        thisApi.wsClient.send(JSON.stringify(replayMessage));
+                                    }, function (error) {
+                                        replayMessage.success = false;
+                                        replayMessage.replay = error;
+                                        thisApi.wsClient.send(JSON.stringify(replayMessage));
+                                    });
+                                } else {
+                                    replayMessage.replay = replayMessage.replay === undefined ? null : replayMessage.replay;
+                                    thisApi.wsClient.send(JSON.stringify(replayMessage));
+                                }
                             }
                         } else {
                             thisApi.onClientFunctionNotFound(msgObj.hub, msgObj.function);
