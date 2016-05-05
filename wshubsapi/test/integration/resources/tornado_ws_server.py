@@ -29,7 +29,8 @@ app = web.Application([
 
 if __name__ == '__main__':
     # necessary to add this import for code inspection
-    importlib.import_module("wshubsapi.test.integration.resources.hubs")
+    importlib.import_module("wshubsapi.test.integration.resources.hubs.chat_hub")
+    importlib.import_module("wshubsapi.test.integration.resources.hubs.echo_hub")
     HubsInspector.inspect_implemented_hubs(force_reconstruction=True)
     HubsInspector.construct_js_file(settings["static_path"])
     HubsInspector.construct_python_file(settings["static_path"])

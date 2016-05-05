@@ -45,7 +45,7 @@ class CommEnvironment(object):
         self.last_provided_id = 0
 
         if message_received_queue_class is None:
-            self.message_received_queue = MessagesReceivedQueue(self)
+            self.message_received_queue = MessagesReceivedQueue()
         else:
             self.message_received_queue = message_received_queue_class
         self.message_received_queue.on_message = self.on_message

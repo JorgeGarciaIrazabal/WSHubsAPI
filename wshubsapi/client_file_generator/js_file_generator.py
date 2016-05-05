@@ -4,6 +4,8 @@ import inflection
 import jsonpickle
 from jsonpickle.pickler import Pickler
 
+from wshubsapi import utils
+
 __author__ = 'jgarc'
 
 
@@ -33,7 +35,7 @@ class JSClientFileGenerator:
         for method_name, method_info in hub_info["serverMethods"].items():
             defaults = method_info["defaults"]
             for i, default in enumerate(defaults):
-                if not isinstance(default, basestring) or not default.startswith("\""):
+                if not isinstance(default, utils.string_class) or not default.startswith("\""):
                     defaults[i] = jsonpickle.encode(pickler.flatten(default))
             args = [inflection.camelize(arg, False) for arg in method_info["args"]]
             defaults_array = []
