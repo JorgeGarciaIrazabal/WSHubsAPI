@@ -40,7 +40,7 @@ class JSClientFileGenerator:
             args = [inflection.camelize(arg, False) for arg in method_info["args"]]
             defaults_array = []
             for i, d in list(enumerate(defaults)):
-                arg_pos = len(args) - len(defaults) + i
+                arg_pos = len(args) - len(defaults) + i  # argument with the default value
                 defaults_array.append(cls.ARGS_COOK_TEMPLATE.format(iter=arg_pos, name=args[arg_pos], default=d))
             defaults_str = "\n\t\t\t".join(defaults_array)
             func_strings.append(cls.FUNCTION_TEMPLATE.format(name=method_name, args=", ".join(args),
