@@ -14,6 +14,7 @@ NOT_PASSING_PARAMETERS = (SENDER_KEY_PARAMETER,)
 ASCII_UpperCase = string.uppercase if sys.version_info[0] == 2 else string.ascii_uppercase
 string_class = basestring if sys.version_info[0] == 2 else (str, bytes)
 
+
 def get_args(method, include_sender=False):
     args = getargspec(method).args
     if args is None:

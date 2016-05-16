@@ -133,7 +133,7 @@ function HubsAPI(serverTimeout, wsClientClass, PromiseClass) {
                                 }
                             }
                         } else {
-                            thisApi.onClientFunctionNotFound(msgObj.hub, msgObj.function);
+                            thisApi.callbacks.onClientFunctionNotFound(msgObj.hub, msgObj.function);
                         }
                     }
                 } catch (err) {
@@ -212,7 +212,7 @@ function HubsAPI(serverTimeout, wsClientClass, PromiseClass) {
         },
 
         sendToAll : function (name, message){
-            arguments[0] = name === undefined ? "hello" : name;
+            arguments[1] = message === undefined ? "hello" : message;
             return constructMessage('ChatHub', 'send_to_all', arguments);
         },
 

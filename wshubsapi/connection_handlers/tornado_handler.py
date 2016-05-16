@@ -1,7 +1,6 @@
 import logging
 
 from wshubsapi.connected_client import ConnectedClient
-
 from wshubsapi.comm_environment import CommEnvironment
 import tornado.websocket
 

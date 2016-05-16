@@ -6,6 +6,7 @@ class MessageSeparator:
         self.separator = separator
 
     def add_data(self, data):
+        data = data if isinstance(data, str) else data.decode('utf-8')
         data = self.buffer + data
         messages = data.split(self.separator)
         self.buffer = messages.pop(-1)

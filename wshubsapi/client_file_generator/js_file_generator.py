@@ -39,8 +39,9 @@ class JSClientFileGenerator:
                     defaults[i] = jsonpickle.encode(pickler.flatten(default))
             args = [inflection.camelize(arg, False) for arg in method_info["args"]]
             defaults_array = []
-            for i, d in reversed(list(enumerate(defaults))):
-                defaults_array.insert(0, cls.ARGS_COOK_TEMPLATE.format(iter=i, name=args[i], default=d))
+            for i, d in list(enumerate(defaults)):
+                arg_pos = len(args) - len(defaults) + i
+                defaults_array.append(cls.ARGS_COOK_TEMPLATE.format(iter=arg_pos, name=args[arg_pos], default=d))
             defaults_str = "\n\t\t\t".join(defaults_array)
             func_strings.append(cls.FUNCTION_TEMPLATE.format(name=method_name, args=", ".join(args),
                                                              cook=defaults_str, hubName=hub_name,
@@ -190,7 +191,7 @@ function HubsAPI(serverTimeout, wsClientClass, PromiseClass) {{
                                 }}
                             }}
                         }} else {{
-                            thisApi.onClientFunctionNotFound(msgObj.hub, msgObj.function);
+                            thisApi.callbacks.onClientFunctionNotFound(msgObj.hub, msgObj.function);
                         }}
                     }}
                 }} catch (err) {{
