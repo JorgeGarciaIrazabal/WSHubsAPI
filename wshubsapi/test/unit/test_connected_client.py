@@ -73,13 +73,13 @@ class TestConnectedClient(unittest.TestCase):
         self.assertIsInstance(self.connectedClientsHolder.get_client(3), ClientInHub)
         self.assertIsInstance(self.connectedClientsHolder.get_client(secondId), ClientInHub)
 
-    def __setUp_onMessage(self, functionStr, args, replay, success=True):
+    def __setUp_onMessage(self, functionStr, args, reply, success=True):
         message = MessageCreator.create_on_message_message(hub=self.testHubClass.__HubName__,
                                                            function=functionStr,
                                                            args=args)
         replayMessage = MessageCreator.create_replay_message(hub=self.testHubClass.__HubName__,
                                                              function=functionStr,
-                                                             replay=replay,
+                                                             reply=reply,
                                                              success=success)
         messageStr = json.dumps(message)
         self.commEnvironment = flexmock(self.commEnvironment)
@@ -88,25 +88,25 @@ class TestConnectedClient(unittest.TestCase):
 
     def test_onMessage_callsReplayIfSuccess(self):
         messageStr, replayMessage = self.__setUp_onMessage("testFunctionReplayArg", [1], 1)
-        self.commEnvironment.should_receive("replay").with_args(self.connectedClient, replayMessage, messageStr).once()
+        self.commEnvironment.should_receive("reply").with_args(self.connectedClient, replayMessage, messageStr).once()
 
         self.commEnvironment.on_message(self.connectedClient, messageStr)
 
     def test_onMessage_callsOnErrorIfError(self):
         messageStr, replayMessage = self.__setUp_onMessage("testFunctionError", [], dict, success=False)
-        self.commEnvironment.should_receive("replay").with_args(self.connectedClient, dict, messageStr).once()
+        self.commEnvironment.should_receive("reply").with_args(self.connectedClient, dict, messageStr).once()
 
         self.commEnvironment.on_message(self.connectedClient, messageStr)
 
     def test_onMessage_notCallsReplayIfFunctionReturnNone(self):
         messageStr, replayMessage = self.__setUp_onMessage("testFunctionReplayNone", [], None)
-        self.commEnvironment.should_receive("replay").never()
+        self.commEnvironment.should_receive("reply").never()
 
         self.commEnvironment.on_message(self.connectedClient, messageStr)
 
     def test_onMessage_onErrorIsCalledIfMessageCanNotBeParsed(self):
         messageStr, replayMessage = self.__setUp_onMessage("testFunctionReplayNone", [], None)
-        self.commEnvironment.should_receive("replay").never()
+        self.commEnvironment.should_receive("reply").never()
         self.commEnvironment.should_receive("on_error").once()
 
         self.commEnvironment.on_message(self.connectedClient, messageStr + "breaking message")
@@ -133,4 +133,4 @@ class TestConnectedClient(unittest.TestCase):
         self.connectedClient = flexmock(self.connectedClient)
         self.connectedClient.should_receive("api_write_message").with_args(str).once()
 
-        self.commEnvironment.replay(self.connectedClient, replayMessage, "test")
+        self.commEnvironment.reply(self.connectedClient, replayMessage, "test")

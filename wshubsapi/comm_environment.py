@@ -79,7 +79,7 @@ class CommEnvironment(object):
         try:
             msg_str = msg_str if isinstance(msg_str, str) else msg_str.encode("utf-8")
             msg_obj = json.loads(msg_str)
-            if "replay" not in msg_obj:
+            if "reply" not in msg_obj:
                 self.__on_replay(client, msg_str, msg_obj)
             else:
                 self.__on_replayed(msg_obj)
@@ -98,13 +98,13 @@ class CommEnvironment(object):
     def on_error(self, client, exception):
         log.exception("Error parsing message")
 
-    def replay(self, client, replay, origin_message):
+    def reply(self, client, reply, origin_message):
         """
         :type client: wshubsapi.connected_client.ConnectedClient
-        :param replay: serialized object to be sent as a replay of a message received
+        :param reply: serialized object to be sent as a reply of a message received
         :param origin_message: Message received (provided for overridden functions)
         """
-        client.api_write_message(serialize_message(self.serialization_args, replay))
+        client.api_write_message(serialize_message(self.serialization_args, reply))
 
     def get_new_clients_future(self):
         with self.__new_client_message_id_lock:
@@ -136,14 +136,14 @@ class CommEnvironment(object):
 
     def __on_replay(self, client, msg_str, msg_obj):
         hub_function = FunctionMessage(msg_obj, client)
-        replay = hub_function.call_function()
-        if replay is not None:
-            self.replay(client, replay, msg_str)
+        reply = hub_function.call_function()
+        if reply is not None:
+            self.reply(client, reply, msg_str)
 
     def __on_replayed(self, msg_obj):
         future = self.__futures_buffer.pop(msg_obj["ID"], None)
         if future is not None:
             if msg_obj["success"]:
-                future.set_result(msg_obj["replay"])
+                future.set_result(msg_obj["reply"])
             else:
-                future.set_exception(Exception(msg_obj["replay"]))
+                future.set_exception(Exception(msg_obj["reply"]))

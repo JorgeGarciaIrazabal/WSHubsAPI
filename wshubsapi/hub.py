@@ -6,8 +6,8 @@ __author__ = 'Jorge'
 
 
 class UnsuccessfulReplay:
-    def __init__(self, replay):
-        self.replay = replay
+    def __init__(self, reply):
+        self.reply = reply
 
 
 class Hub(object):
@@ -57,8 +57,8 @@ class Hub(object):
         self._client_functions = client_functions
 
     @staticmethod
-    def _construct_unsuccessful_replay(replay):
-        return UnsuccessfulReplay(replay)
+    def _construct_unsuccessful_replay(reply):
+        return UnsuccessfulReplay(reply)
 
     def _define_client_functions(self):
         pass

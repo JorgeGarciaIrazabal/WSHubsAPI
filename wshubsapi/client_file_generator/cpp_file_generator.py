@@ -160,9 +160,9 @@ public:
             message = message.substr(sepPos + API_SEP_LEN);
             JsonObject &messageObj = jsonBuffer.parseObject(__messageBuffer);
             int ID = messageObj.get("ID");
-            if (messageObj.containsKey("replay")) {{
+            if (messageObj.containsKey("reply")) {{
                 JsonArray &args = jsonBuffer.createArray();
-                args.add(messageObj["replay"]);
+                args.add(messageObj["reply"]);
                 FunctionHolderBuffer[ID % HASH_SIZE].success(args);
             }} else if (messageObj.containsKey("args")) {{
                 JsonArray &args = messageObj.createNestedArray("args");

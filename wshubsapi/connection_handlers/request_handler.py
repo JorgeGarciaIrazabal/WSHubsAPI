@@ -89,9 +89,9 @@ class RequestClient:
         def request():
             result = requests.get(self.url, data=msg_str).json()
             if result['success']:
-                future.set_result(result['replay'])
+                future.set_result(result['reply'])
             else:
-                future.set_exception(result['replay'])
+                future.set_exception(result['reply'])
 
         threading.Thread(target=request).start()  # todo use a thread pool
         return future

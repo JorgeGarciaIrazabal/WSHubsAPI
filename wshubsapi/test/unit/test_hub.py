@@ -29,10 +29,10 @@ class TestHub(unittest.TestCase):
         self.assertEqual("TestHub1", self.hub.__HubName__)
 
     def test_construct_unnecessary_replay_returns_unsuccessful_replay_instance(self):
-        unsuccessful_replay = self.hub._construct_unsuccessful_replay("replay")
+        unsuccessful_replay = self.hub._construct_unsuccessful_replay("reply")
 
         self.assertIsInstance(unsuccessful_replay, UnsuccessfulReplay)
-        self.assertEqual(unsuccessful_replay.replay, "replay")
+        self.assertEqual(unsuccessful_replay.reply, "reply")
 
     def test_hub_creation_starts_with_no_subscribed_clients(self):
 

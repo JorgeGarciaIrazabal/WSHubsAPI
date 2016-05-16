@@ -60,7 +60,7 @@ class TestFunctionMessage(unittest.TestCase):
 
         functionResult = fn.call_function()
 
-        self.assertEqual(functionResult["replay"], "x")
+        self.assertEqual(functionResult["reply"], "x")
         self.assertEqual(functionResult["success"], True)
         self.assertEqual(functionResult["hub"], self.testHubClass.__HubName__)
         self.assertEqual(functionResult["function"], "testNoSender")
@@ -82,10 +82,10 @@ class TestFunctionMessage(unittest.TestCase):
 
         functionResult = fn.call_function()
 
-        self.assertEqual(functionResult["replay"][0], "x")
-        self.assertIsInstance(functionResult["replay"][1], ClientInHub)
-        self.assertEqual(functionResult["replay"][1].api_get_real_connected_client(), cc)
-        self.assertEqual(functionResult["replay"][2], 1)
+        self.assertEqual(functionResult["reply"][0], "x")
+        self.assertIsInstance(functionResult["reply"][1], ClientInHub)
+        self.assertEqual(functionResult["reply"][1].api_get_real_connected_client(), cc)
+        self.assertEqual(functionResult["reply"][2], 1)
         self.assertEqual(functionResult["success"], True)
 
     def test_CallFunction_DoesNotIncludesSenderIfNotRequested(self):
@@ -93,7 +93,7 @@ class TestFunctionMessage(unittest.TestCase):
 
         functionResult = fn.call_function()
 
-        self.assertEqual(functionResult["replay"], "x")
+        self.assertEqual(functionResult["reply"], "x")
         self.assertEqual(functionResult["success"], True)
 
     def test_CallFunction_SuccessFalseIfMethodRaisesException(self):
@@ -102,7 +102,7 @@ class TestFunctionMessage(unittest.TestCase):
         functionResult = fn.call_function()
 
         self.assertEqual(functionResult["success"], False)
-        self.assertEqual(functionResult["replay"]["error"], "MyException")
+        self.assertEqual(functionResult["reply"]["error"], "MyException")
 
     def test_CallFunction_ReplaysSuccessFalseIfReturnsUnsuccessfulReplayObject(self):
         fn = FunctionMessage(self.__constructMessageStr(function="testReplayUnsuccessful", args=["x"]), "_sender")
@@ -110,4 +110,4 @@ class TestFunctionMessage(unittest.TestCase):
         functionResult = fn.call_function()
 
         self.assertEqual(functionResult["success"], False)
-        self.assertEqual(functionResult["replay"], "x")
+        self.assertEqual(functionResult["reply"], "x")

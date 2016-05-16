@@ -18,5 +18,5 @@ if __name__ == '__main__':
         if sys.version_info[0] == 2:
             message = message.decode(sys.stdin.encoding)
         serverReplay = ws.ChatHub.server.send_to_all(name, message).result(timeout=30)
-        print("Server replay: {}".format(serverReplay))
+        print("Server reply: {}".format(serverReplay))
 

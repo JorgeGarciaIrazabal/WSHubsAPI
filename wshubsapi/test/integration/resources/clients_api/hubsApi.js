@@ -102,33 +102,33 @@ function HubsAPI(serverTimeout, wsClientClass, PromiseClass) {
                 try {
                     var promiseHandler,
                         msgObj = JSON.parse(ev.data);
-                    if (msgObj.hasOwnProperty('replay')) {
+                    if (msgObj.hasOwnProperty('reply')) {
                         promiseHandler = promisesHandler[msgObj.ID];
-                        msgObj.success ? promiseHandler.resolve(msgObj.replay) : promiseHandler.reject(msgObj.replay);
+                        msgObj.success ? promiseHandler.resolve(msgObj.reply) : promiseHandler.reject(msgObj.reply);
                     } else {
                         msgObj.function = toCamelCase(msgObj.function);
                         var executor = thisApi[msgObj.hub].client[msgObj.function];
                         if (executor !== undefined) {
                             var replayMessage = {ID: msgObj.ID};
                             try {
-                                replayMessage.replay = executor.apply(executor, msgObj.args);
+                                replayMessage.reply = executor.apply(executor, msgObj.args);
                                 replayMessage.success = true;
                             } catch (e) {
                                 replayMessage.success = false;
-                                replayMessage.replay = e.toString();
+                                replayMessage.reply = e.toString();
                             } finally {
-                                if (replayMessage.replay instanceof PromiseClass) {
-                                    replayMessage.replay.then(function (result) {
+                                if (replayMessage.reply instanceof PromiseClass) {
+                                    replayMessage.reply.then(function (result) {
                                         replayMessage.success = true;
-                                        replayMessage.replay = result;
+                                        replayMessage.reply = result;
                                         thisApi.wsClient.send(JSON.stringify(replayMessage));
                                     }, function (error) {
                                         replayMessage.success = false;
-                                        replayMessage.replay = error;
+                                        replayMessage.reply = error;
                                         thisApi.wsClient.send(JSON.stringify(replayMessage));
                                     });
                                 } else {
-                                    replayMessage.replay = replayMessage.replay === undefined ? null : replayMessage.replay;
+                                    replayMessage.reply = replayMessage.reply === undefined ? null : replayMessage.reply;
                                     thisApi.wsClient.send(JSON.stringify(replayMessage));
                                 }
                             }
@@ -187,48 +187,43 @@ function HubsAPI(serverTimeout, wsClientClass, PromiseClass) {
         return promise;
     };
     
-    this.ChatHub = {};
-    this.ChatHub.server = {
-        __HUB_NAME : 'ChatHub',
+    this.EchoHub = {};
+    this.EchoHub.server = {
+        __HUB_NAME : 'EchoHub',
         
-        raiseException : function (exceptionMessage){
+        echo : function (message){
             
-            return constructMessage('ChatHub', 'raise_exception', arguments);
-        },
-
-        sendMessageToClient : function (message, clientId){
-            
-            return constructMessage('ChatHub', 'send_message_to_client', arguments);
-        },
-
-        getSubscribedClientsToHub : function (){
-            
-            return constructMessage('ChatHub', 'get_subscribed_clients_to_hub', arguments);
-        },
-
-        subscribeToHub : function (){
-            
-            return constructMessage('ChatHub', 'subscribe_to_hub', arguments);
-        },
-
-        sendToAll : function (name, message){
-            arguments[1] = message === undefined ? "hello" : message;
-            return constructMessage('ChatHub', 'send_to_all', arguments);
+            return constructMessage('EchoHub', 'echo', arguments);
         },
 
         unsubscribeFromHub : function (){
             
-            return constructMessage('ChatHub', 'unsubscribe_from_hub', arguments);
+            return constructMessage('EchoHub', 'unsubscribe_from_hub', arguments);
+        },
+
+        getSubscribedClientsToHub : function (){
+            
+            return constructMessage('EchoHub', 'get_subscribed_clients_to_hub', arguments);
+        },
+
+        subscribeToHub : function (){
+            
+            return constructMessage('EchoHub', 'subscribe_to_hub', arguments);
+        },
+
+        echoToSender : function (message){
+            
+            return constructMessage('EchoHub', 'echo_to_sender', arguments);
         }
     };
-    this.ChatHub.client = {};
+    this.EchoHub.client = {};
     this.UtilsAPIHub = {};
     this.UtilsAPIHub.server = {
         __HUB_NAME : 'UtilsAPIHub',
         
-        getHubsStructure : function (){
+        getId : function (){
             
-            return constructMessage('UtilsAPIHub', 'get_hubs_structure', arguments);
+            return constructMessage('UtilsAPIHub', 'get_id', arguments);
         },
 
         isClientConnected : function (clientId){
@@ -236,9 +231,9 @@ function HubsAPI(serverTimeout, wsClientClass, PromiseClass) {
             return constructMessage('UtilsAPIHub', 'is_client_connected', arguments);
         },
 
-        getId : function (){
+        getHubsStructure : function (){
             
-            return constructMessage('UtilsAPIHub', 'get_id', arguments);
+            return constructMessage('UtilsAPIHub', 'get_hubs_structure', arguments);
         },
 
         getSubscribedClientsToHub : function (){
@@ -262,36 +257,41 @@ function HubsAPI(serverTimeout, wsClientClass, PromiseClass) {
         }
     };
     this.UtilsAPIHub.client = {};
-    this.EchoHub = {};
-    this.EchoHub.server = {
-        __HUB_NAME : 'EchoHub',
+    this.ChatHub = {};
+    this.ChatHub.server = {
+        __HUB_NAME : 'ChatHub',
         
-        subscribeToHub : function (){
+        sendMessageToClient : function (message, clientId){
             
-            return constructMessage('EchoHub', 'subscribe_to_hub', arguments);
+            return constructMessage('ChatHub', 'send_message_to_client', arguments);
         },
 
         getSubscribedClientsToHub : function (){
             
-            return constructMessage('EchoHub', 'get_subscribed_clients_to_hub', arguments);
-        },
-
-        echoToSender : function (message){
-            
-            return constructMessage('EchoHub', 'echo_to_sender', arguments);
+            return constructMessage('ChatHub', 'get_subscribed_clients_to_hub', arguments);
         },
 
         unsubscribeFromHub : function (){
             
-            return constructMessage('EchoHub', 'unsubscribe_from_hub', arguments);
+            return constructMessage('ChatHub', 'unsubscribe_from_hub', arguments);
         },
 
-        echo : function (message){
+        sendToAll : function (name, message){
+            arguments[1] = message === undefined ? "hello" : message;
+            return constructMessage('ChatHub', 'send_to_all', arguments);
+        },
+
+        raiseException : function (exceptionMessage){
             
-            return constructMessage('EchoHub', 'echo', arguments);
+            return constructMessage('ChatHub', 'raise_exception', arguments);
+        },
+
+        subscribeToHub : function (){
+            
+            return constructMessage('ChatHub', 'subscribe_to_hub', arguments);
         }
     };
-    this.EchoHub.client = {};
+    this.ChatHub.client = {};
 }
 /* jshint ignore:end */
 /* ignore jslint end */

@@ -32,15 +32,15 @@ class FunctionMessage:
             return False, dict(error=str(e), type=str(type(e)), trace=traceback.format_exc())
 
     def call_function(self):
-        success, replay = self.__execute_function()
-        if isinstance(replay, UnsuccessfulReplay):
-            return self.construct_replay_dict(False, replay.replay)
-        return self.construct_replay_dict(success, replay)
+        success, reply = self.__execute_function()
+        if isinstance(reply, UnsuccessfulReplay):
+            return self.construct_replay_dict(False, reply.reply)
+        return self.construct_replay_dict(success, reply)
 
-    def construct_replay_dict(self, success=None, replay=None):
+    def construct_replay_dict(self, success=None, reply=None):
         return {
             "success": success,
-            "replay": replay,
+            "reply": reply,
             "hub": self.hub_name,
             "function": self.function_name,
             "ID": self.message_id

@@ -18,4 +18,4 @@ if __name__ == '__main__':
         message = raw_input("Write whatever you want to post it in the forum: \n")
         # ws.ForumHub.server.publish_message is automaticly by the server in HugsAPI module
         server_replay = ws.ForumHub.server.publish_message(name, message).result(timeout=3)
-        print("Server replay: {}".format(server_replay))
+        print("Server reply: {}".format(server_replay))

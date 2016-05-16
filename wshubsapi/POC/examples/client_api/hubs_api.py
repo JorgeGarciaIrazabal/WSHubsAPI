@@ -66,24 +66,24 @@ def construct_api_client_class(client_class):
             except Exception as e:
                 self.on_error(e)
                 return
-            if "replay" in msg_obj:
+            if "reply" in msg_obj:
                 f = self.__futures.get(msg_obj["ID"], None)
                 if f is None:
                     return
                 if msg_obj["success"]:
-                    f.set_result(msg_obj["replay"])
+                    f.set_result(msg_obj["reply"])
                 else:
-                    f.set_exception(Exception(msg_obj["replay"]))
+                    f.set_exception(Exception(msg_obj["reply"]))
             else:
                 try:
                     client_function = self.api.__getattribute__(msg_obj["hub"]).client.__dict__[msg_obj["function"]]
                     replay_message = dict(ID=msg_obj["ID"])
                     try:
-                        replay = client_function(*msg_obj["args"])
-                        replay_message["replay"] = replay
+                        reply = client_function(*msg_obj["args"])
+                        replay_message["reply"] = reply
                         replay_message["success"] = True
                     except Exception as e:
-                        replay_message["replay"] = str(e)
+                        replay_message["reply"] = str(e)
                         replay_message["success"] = False
                     finally:
                         self.api.ws_client.send(self.api.serialize_object(replay_message))

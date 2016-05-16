@@ -11,7 +11,7 @@ class MessageCreator:
     def __get_default_replay_message(cls):
         return {
             "success": True,
-            "replay": "successfully completed",
+            "reply": "successfully completed",
             "hub": "TestHub",
             "function": "testFunction",
             "ID": 0
