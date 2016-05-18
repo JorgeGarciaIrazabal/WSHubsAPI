@@ -18,12 +18,11 @@ class Hub(object):
         self._client_functions = dict()
         self._define_client_functions()
         self._clients_holder = ConnectedClientsHolder(self)
-        self.__hub_subscribers = []
 
     def subscribe_to_hub(self, _sender):
-        if _sender.api_get_real_connected_client() in self.__hub_subscribers:
+        if _sender.api_get_real_connected_client() in self._clients_holder.hub_subscribers:
             return False
-        self.__hub_subscribers.append(_sender.api_get_real_connected_client())
+        self._clients_holder.hub_subscribers.append(_sender.api_get_real_connected_client())
         return True
 
     def unsubscribe_from_hub(self, _sender):
@@ -31,14 +30,13 @@ class Hub(object):
         :type _sender: ClientInHub
         """
         real_connected_client = _sender.api_get_real_connected_client()
-        if real_connected_client in self.__hub_subscribers:
-            self.__hub_subscribers.remove(real_connected_client)
+        if real_connected_client in self._clients_holder.hub_subscribers:
+            self._clients_holder.hub_subscribers.remove(real_connected_client)
             return True
         return False
 
-    def get_subscribed_clients_to_hub(self):
-        self.__hub_subscribers = list(filter(lambda c: not c.api_is_closed, self.__hub_subscribers))
-        return ConnectedClientsGroup(self.__hub_subscribers, self.__HubName__)
+    def get_subscribed_clients_ids(self):
+        return [c.ID for c in self._clients_holder.get_subscribed_clients()]
 
     @property
     def clients(self):

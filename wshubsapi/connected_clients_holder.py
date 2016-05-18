@@ -10,6 +10,7 @@ class ConnectedClientsHolder:
         """
         self.hub_instance = hub_instance
         self.hub_name = self.hub_instance.__class__.__HubName__
+        self.hub_subscribers = []
 
     def get_all_clients(self):
         return ConnectedClientsGroup(list(self.all_connected_clients.values()), self.hub_name)
@@ -46,7 +47,8 @@ class ConnectedClientsHolder:
             return self.get_client(filter_criteria)
 
     def get_subscribed_clients(self):
-        return self.hub_instance.get_subscribed_clients_to_hub()
+        self.hub_subscribers = list(filter(lambda c: not c.api_is_closed, self.hub_subscribers))
+        return ConnectedClientsGroup(self.hub_subscribers, self.hub_name)
 
     @classmethod
     def append_client(cls, client):

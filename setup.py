@@ -25,7 +25,7 @@ setup(
     name='wshubsapi',
     # the version across setup.py and the project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
-    version='0.7.6',
+    version='0.7.7',
 
     description='message handler to communicate frontend -> backend and backend -> frontend in a intuitive way like signalR in C#',
     long_description=long_description,

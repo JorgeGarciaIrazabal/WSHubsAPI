@@ -19,7 +19,7 @@ class TestConnectedClientsHolder(unittest.TestCase):
             __HubName__ = "testHubName"
 
         self.test_hub_name = "testHubName"
-        self.clients_holder = ConnectedClientsHolder(MyHub())
+        self.clients_holder = MyHub()._clients_holder
         ConnectedClientsHolder.all_connected_clients = dict()
 
         for i in range(10):

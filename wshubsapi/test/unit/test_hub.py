@@ -36,32 +36,32 @@ class TestHub(unittest.TestCase):
 
     def test_hub_creation_starts_with_no_subscribed_clients(self):
 
-        self.assertEqual(len(self.hub.get_subscribed_clients_to_hub()), 0)
+        self.assertEqual(len(self.hub.get_subscribed_clients_ids()), 0)
 
     def test_subscribe_to_hub_append_sender_to_hub_subscribes_and_returns_true(self):
         self.assertTrue(self.hub.subscribe_to_hub(self.sender))
 
-        subscribed_clients = self.hub.get_subscribed_clients_to_hub()
+        subscribed_clients_ids = self.hub.get_subscribed_clients_ids()
 
-        self.assertEqual(subscribed_clients[0].ID, self.sender.ID)
+        self.assertEqual(subscribed_clients_ids[0], self.sender.ID)
 
     def test_subscribe_to_hub_does_not_subscribes_client_if_already_exist_and_returns_false(self):
         self.hub.subscribe_to_hub(self.sender)
 
         self.assertFalse(self.hub.subscribe_to_hub(self.sender))
 
-        subscribed_clients = self.hub.get_subscribed_clients_to_hub()
-        self.assertEqual(len(subscribed_clients), 1)
+        subscribed_clients_ids = self.hub.get_subscribed_clients_ids()
+        self.assertEqual(len(subscribed_clients_ids), 1)
 
     def test_unsubscribe_from_hub_remove_sender_to_hub_subscribes_and_returns_true(self):
         self.hub.subscribe_to_hub(self.sender)
         self.assertTrue(self.hub.unsubscribe_from_hub(self.sender))
-        self.assertEqual(len(self.hub.get_subscribed_clients_to_hub()), 0)
+        self.assertEqual(len(self.hub.get_subscribed_clients_ids()), 0)
 
     def test_unsubscribe_from_hub_does_not_remove_sender_if_not_exists_and_returns_false(self):
         self.hub.subscribe_to_hub(self.sender)
         self.assertFalse(self.hub.unsubscribe_from_hub(flexmock(api_get_real_connected_client=lambda: "hello")))
-        self.assertEqual(len(self.hub.get_subscribed_clients_to_hub()), 1)
+        self.assertEqual(len(self.hub.get_subscribed_clients_ids()), 1)
 
     def test_get_subscribed_clients_returns_the_right_clients(self):
         def construct_sender(id):
@@ -72,13 +72,13 @@ class TestHub(unittest.TestCase):
         client_a = construct_sender("a")
         client_b = construct_sender("b")
         client_c = construct_sender("c")
-        self.assertEqual(len(self.hub.get_subscribed_clients_to_hub()), 0)
+        self.assertEqual(len(self.hub.get_subscribed_clients_ids()), 0)
         self.hub.subscribe_to_hub(client_a)
-        self.assertEqual(self.hub.get_subscribed_clients_to_hub()[0].ID, "a")
+        self.assertEqual(self.hub.get_subscribed_clients_ids()[0], "a")
         self.hub.subscribe_to_hub(client_b)
-        self.assertEqual(self.hub.get_subscribed_clients_to_hub()[1].ID, "b")
+        self.assertEqual(self.hub.get_subscribed_clients_ids()[1], "b")
         self.hub.subscribe_to_hub(client_c)
-        self.assertEqual(self.hub.get_subscribed_clients_to_hub()[2].ID, "c")
+        self.assertEqual(self.hub.get_subscribed_clients_ids()[2], "c")
 
     def test_clients_return_clients_holder(self):
         self.assertIsInstance(self.hub.clients, ConnectedClientsHolder)
