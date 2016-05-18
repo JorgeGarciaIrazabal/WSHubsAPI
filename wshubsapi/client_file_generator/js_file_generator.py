@@ -116,7 +116,7 @@ function HubsAPI(serverTimeout, wsClientClass, PromiseClass) {{
             function reconnect(error) {{
                 if (reconnectTimeout !== -1) {{
                     window.setTimeout(function () {{
-                        thisApi.connect(reconnectTimeout);
+                        thisApi.connect(url, reconnectTimeout);
                         thisApi.callbacks.onReconnecting(error);
                     }}, reconnectTimeout * 1000);
                 }}

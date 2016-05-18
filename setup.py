@@ -23,11 +23,9 @@ except:
 
 setup(
     name='wshubsapi',
-
-    # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
-    version='0.7.5',
+    version='0.7.6',
 
     description='message handler to communicate frontend -> backend and backend -> frontend in a intuitive way like signalR in C#',
     long_description=long_description,
@@ -59,8 +57,6 @@ setup(
 
         # Specify the Python versions you support here. In particular, ensure
         # that you indicate whether you support Python 2, Python 3 or both.
-        'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.2',
@@ -70,7 +66,7 @@ setup(
     ],
 
     # What does your project relate to?
-    keywords='communication protocol tornado sockets signalR websockets Android Java javascript API',
+    keywords='communication protocol tornado django sockets signalR websockets Android Java javascript API',
 
     # You can just specify the packages manually here if your project is
     # simple. Or you can use find_packages().
