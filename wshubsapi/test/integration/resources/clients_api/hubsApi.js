@@ -222,6 +222,96 @@ function HubsAPI(serverTimeout, wsClientClass, PromiseClass) {
         }
     };
     this.ChatHub.client = {};
+    this.SubHub2 = {};
+    this.SubHub2.server = {
+        __HUB_NAME : 'SubHub2',
+        
+        subscribeToHub : function (){
+            
+            return constructMessage('SubHub2', 'subscribe_to_hub', arguments);
+        },
+
+        unsubscribeFromHub : function (){
+            
+            return constructMessage('SubHub2', 'unsubscribe_from_hub', arguments);
+        },
+
+        getSubscribedClientsIds : function (){
+            
+            return constructMessage('SubHub2', 'get_subscribed_clients_ids', arguments);
+        }
+    };
+    this.SubHub2.client = {};
+    this.SubHub3 = {};
+    this.SubHub3.server = {
+        __HUB_NAME : 'SubHub3',
+        
+        subscribeToHub : function (){
+            
+            return constructMessage('SubHub3', 'subscribe_to_hub', arguments);
+        },
+
+        unsubscribeFromHub : function (){
+            
+            return constructMessage('SubHub3', 'unsubscribe_from_hub', arguments);
+        },
+
+        getSubscribedClientsIds : function (){
+            
+            return constructMessage('SubHub3', 'get_subscribed_clients_ids', arguments);
+        }
+    };
+    this.SubHub3.client = {};
+    this.EchoHub = {};
+    this.EchoHub.server = {
+        __HUB_NAME : 'EchoHub',
+        
+        subscribeToHub : function (){
+            
+            return constructMessage('EchoHub', 'subscribe_to_hub', arguments);
+        },
+
+        getSubscribedClientsIds : function (){
+            
+            return constructMessage('EchoHub', 'get_subscribed_clients_ids', arguments);
+        },
+
+        echoToSender : function (message){
+            
+            return constructMessage('EchoHub', 'echo_to_sender', arguments);
+        },
+
+        unsubscribeFromHub : function (){
+            
+            return constructMessage('EchoHub', 'unsubscribe_from_hub', arguments);
+        },
+
+        echo : function (message){
+            
+            return constructMessage('EchoHub', 'echo', arguments);
+        }
+    };
+    this.EchoHub.client = {};
+    this.SubHub = {};
+    this.SubHub.server = {
+        __HUB_NAME : 'SubHub',
+        
+        subscribeToHub : function (){
+            
+            return constructMessage('SubHub', 'subscribe_to_hub', arguments);
+        },
+
+        unsubscribeFromHub : function (){
+            
+            return constructMessage('SubHub', 'unsubscribe_from_hub', arguments);
+        },
+
+        getSubscribedClientsIds : function (){
+            
+            return constructMessage('SubHub', 'get_subscribed_clients_ids', arguments);
+        }
+    };
+    this.SubHub.client = {};
     this.UtilsAPIHub = {};
     this.UtilsAPIHub.server = {
         __HUB_NAME : 'UtilsAPIHub',
@@ -262,36 +352,26 @@ function HubsAPI(serverTimeout, wsClientClass, PromiseClass) {
         }
     };
     this.UtilsAPIHub.client = {};
-    this.EchoHub = {};
-    this.EchoHub.server = {
-        __HUB_NAME : 'EchoHub',
+    this.SubHub1 = {};
+    this.SubHub1.server = {
+        __HUB_NAME : 'SubHub1',
         
         subscribeToHub : function (){
             
-            return constructMessage('EchoHub', 'subscribe_to_hub', arguments);
-        },
-
-        getSubscribedClientsIds : function (){
-            
-            return constructMessage('EchoHub', 'get_subscribed_clients_ids', arguments);
-        },
-
-        echoToSender : function (message){
-            
-            return constructMessage('EchoHub', 'echo_to_sender', arguments);
+            return constructMessage('SubHub1', 'subscribe_to_hub', arguments);
         },
 
         unsubscribeFromHub : function (){
             
-            return constructMessage('EchoHub', 'unsubscribe_from_hub', arguments);
+            return constructMessage('SubHub1', 'unsubscribe_from_hub', arguments);
         },
 
-        echo : function (message){
+        getSubscribedClientsIds : function (){
             
-            return constructMessage('EchoHub', 'echo', arguments);
+            return constructMessage('SubHub1', 'get_subscribed_clients_ids', arguments);
         }
     };
-    this.EchoHub.client = {};
+    this.SubHub1.client = {};
 }
 /* jshint ignore:end */
 /* ignore jslint end */

@@ -1,12 +1,13 @@
+import glob
+import imp
 import inspect
+import os
 
 from wshubsapi import utils
-from wshubsapi.client_file_generator.cpp_file_generator import CppFileGenerator
-from wshubsapi.client_file_generator.java_file_generator import JAVAFileGenerator
 from wshubsapi.client_file_generator.js_file_generator import JSClientFileGenerator
 from wshubsapi.client_file_generator.python_file_generator import PythonClientFileGenerator
-from wshubsapi.utils import is_function_for_ws_client, get_args, get_defaults
 from wshubsapi.hub import Hub
+from wshubsapi.utils import is_function_for_ws_client, get_args, get_defaults
 
 
 class HubsInspectorError(Exception):
@@ -122,3 +123,20 @@ class HubsInspector:
 
             info_report[hub.__HubName__] = dict(serverMethods=server_methods, clientMethods=client_methods)
         return info_report
+
+    @classmethod
+    def include_hubs_in(cls, paths):
+        if paths not in (tuple, list, set):
+            paths = [paths]
+        paths = list(paths)
+        python_files = set()
+        for path in paths:
+            python_files |= set([f for f in glob.glob(path) if f.endswith(".py")])
+
+        for python_file in python_files:
+            module_name, _ = os.path.splitext(os.path.split(python_file)[-1])
+            imp.load_source(module_name, python_file)
+
+
+
+

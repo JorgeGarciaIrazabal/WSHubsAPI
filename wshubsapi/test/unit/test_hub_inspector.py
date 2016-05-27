@@ -1,15 +1,10 @@
 import os
-import shutil
 import unittest
-from os import listdir
 
-from wshubsapi.client_file_generator.client_file_generator import ClientFileGenerator
-from wshubsapi.client_file_generator.java_file_generator import JAVAFileGenerator
-from wshubsapi.client_file_generator.js_file_generator import JSClientFileGenerator
-from wshubsapi.client_file_generator.python_file_generator import PythonClientFileGenerator
 from wshubsapi.hub import Hub
 from wshubsapi.hubs_inspector import HubsInspector
 from wshubsapi.hubs_inspector import HubsInspectorError, HubError
+from wshubsapi.test.utils import path_utils
 from wshubsapi.test.utils.hubs_utils import remove_hubs_subclasses
 
 # do not remove this
@@ -26,6 +21,7 @@ class TestHubInspector(unittest.TestCase):
         class TestHub2(Hub):
             pass
 
+        self.resources_path = path_utils.get_resources_path("hubs_inspector")
         self.testHubClass = TestHub
         self.testHub2Class = TestHub2
         HubsInspector.inspect_implemented_hubs(force_reconstruction=True)
@@ -112,10 +108,10 @@ class TestHubInspector(unittest.TestCase):
         self.assertRaises(AttributeError, HubsInspector.get_hub_instance, (str,))
 
     def test_getHubsInformation_ReturnsDictionaryWithNoClientFunctions(self):
-        infoReport = HubsInspector.get_hubs_information()
+        hubs_info = HubsInspector.get_hubs_information()
 
-        self.assertIn("TestHub2", infoReport)
-        self.assertIn("getData", infoReport["TestHub"]["serverMethods"])
+        self.assertIn("TestHub2", hubs_info)
+        self.assertIn("getData", hubs_info["TestHub"]["serverMethods"])
 
     def test_getHubsInformation_ReturnsDictionaryWithClientFunctions(self):
         class TestHubWithClient(Hub):
@@ -139,77 +135,26 @@ class TestHubInspector(unittest.TestCase):
         self.assertEqual(client2Method["defaults"], [1])
         self.assertEqual(client3Method["defaults"], [0, 1])
 
+    def test_include_hubs_in_withOneModule(self):
+        hubs_info = HubsInspector.get_hubs_information()
+        self.assertNotIn("SubHub", hubs_info)
 
-class TestClientFileConstructor(unittest.TestCase):
-    def setUp(self):
-        class TestHub(Hub):
-            def getData(self):
-                pass
-
-        class TestHub2(Hub):
-            def getData(self):
-                pass
-
+        HubsInspector.include_hubs_in(self.resources_path + os.sep + "one_module/*.py")
         HubsInspector.inspect_implemented_hubs(force_reconstruction=True)
-        self.other_folder = "onTest"
-        self.other_name = "on_test"
-        self.temp_folder = "__temp_file__"
-        self.original_working_directory = os.getcwd()
-        if os.path.exists(self.temp_folder):
-            shutil.rmtree(self.temp_folder)
-        os.makedirs(self.temp_folder)
-        os.chdir(self.temp_folder)
 
-    def tearDown(self):
-        remove_hubs_subclasses()
-        os.chdir(self.original_working_directory)
-        shutil.rmtree(self.temp_folder)
+        hubs_info = HubsInspector.get_hubs_information()
+        self.assertIn("SubHub", hubs_info)
 
-    def test_construct_api_path_makeFoldersEvenIfNotExits(self):
-        new_folder = os.path.join("test", "new", "folder", "api.py")
-        self.assertFalse(os.path.exists(os.path.dirname(new_folder)))
-        ClientFileGenerator._construct_api_path(new_folder)
+    def test_include_hubs_in_withMultipleModules(self):
+        hubs_info = HubsInspector.get_hubs_information()
+        self.assertNotIn("SubHub2", hubs_info)
 
-        self.assertTrue(os.path.exists(os.path.dirname(new_folder)))
+        HubsInspector.include_hubs_in(self.resources_path + os.sep + "multiple_module/*.py")
+        HubsInspector.inspect_implemented_hubs(force_reconstruction=True)
 
-    def test_construct_api_path_returnParentPath(self):
-        new_folder = os.path.join("test", "new", "folder", "api.py")
-        parent_path = ClientFileGenerator._construct_api_path(new_folder)
+        hubs_info = HubsInspector.get_hubs_information()
+        self.assertIn("SubHub2", hubs_info)
+        self.assertIn("SubHub3", hubs_info)
 
-        self.assertEqual(parent_path, os.path.abspath(os.path.dirname(new_folder)))
 
-    def test_JSCreation_default_path(self):
-        HubsInspector.construct_js_file()
 
-        self.assertTrue(os.path.exists(HubsInspector.DEFAULT_JS_API_FILE_NAME))
-
-    def test_JSCreation_new_path(self):
-        full_path = os.path.join(self.other_folder, self.other_name)
-        HubsInspector.construct_js_file(full_path)
-
-        self.assertTrue(os.path.exists(full_path))
-
-    @unittest.skip("no Java client ready")
-    def test_JAVACreation(self):
-        path = "onTest"
-        try:
-            HubsInspector.construct_java_file("test", path)
-            self.assertTrue(os.path.exists(os.path.join(path, JAVAFileGenerator.SERVER_FILE_NAME)))
-            self.assertTrue(os.path.exists(os.path.join(path, JAVAFileGenerator.CLIENT_PACKAGE_NAME)))
-        finally:
-            for f in listdir(path):
-                full_path = os.path.join(path, f)
-                os.remove(full_path) if os.path.isfile(full_path) else shutil.rmtree(full_path)
-
-    def test_PythonCreation_default_values(self):
-        HubsInspector.construct_python_file()
-        self.assertTrue(os.path.exists(HubsInspector.DEFAULT_PY_API_FILE_NAME))
-        self.assertTrue(os.path.exists("__init__.py"), "Check if python package is created")
-        os.remove(HubsInspector.DEFAULT_PY_API_FILE_NAME)
-
-    def test_PythonCreation_new_path(self):
-        full_path = os.path.join(self.other_folder, self.other_name)
-        package_file_path = os.path.join(self.other_folder, "__init__.py")
-        HubsInspector.construct_python_file(full_path)
-        self.assertTrue(os.path.exists(full_path))
-        self.assertTrue(os.path.exists(package_file_path), "Check if python package is created")
