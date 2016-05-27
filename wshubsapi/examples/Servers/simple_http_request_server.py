@@ -10,7 +10,8 @@ log = logging.getLogger("_server_")
 httpd = SocketServer.TCPServer(("localhost", 8888), SimpleRequestHandler)
 
 log.debug("listening...")
-importlib.import_module("chat_hub")
+
+HubsInspector.include_hubs_in("*_hub.py")  # use glob path patterns
 HubsInspector.inspect_implemented_hubs()
 HubsInspector.construct_js_file("../Clients/_static/hubsApi.js")
 HubsInspector.construct_python_file("../Clients/_static/hubs_api.py")

@@ -58,7 +58,7 @@ function HubsAPI(serverTimeout, wsClientClass, PromiseClass) {
             function reconnect(error) {
                 if (reconnectTimeout !== -1) {
                     window.setTimeout(function () {
-                        thisApi.connect(reconnectTimeout);
+                        thisApi.connect(url, reconnectTimeout);
                         thisApi.callbacks.onReconnecting(error);
                     }, reconnectTimeout * 1000);
                 }
@@ -102,38 +102,38 @@ function HubsAPI(serverTimeout, wsClientClass, PromiseClass) {
                 try {
                     var promiseHandler,
                         msgObj = JSON.parse(ev.data);
-                    if (msgObj.hasOwnProperty('replay')) {
+                    if (msgObj.hasOwnProperty('reply')) {
                         promiseHandler = promisesHandler[msgObj.ID];
-                        msgObj.success ? promiseHandler.resolve(msgObj.replay) : promiseHandler.reject(msgObj.replay);
+                        msgObj.success ? promiseHandler.resolve(msgObj.reply) : promiseHandler.reject(msgObj.reply);
                     } else {
                         msgObj.function = toCamelCase(msgObj.function);
                         var executor = thisApi[msgObj.hub].client[msgObj.function];
                         if (executor !== undefined) {
                             var replayMessage = {ID: msgObj.ID};
                             try {
-                                replayMessage.replay = executor.apply(executor, msgObj.args);
+                                replayMessage.reply = executor.apply(executor, msgObj.args);
                                 replayMessage.success = true;
                             } catch (e) {
                                 replayMessage.success = false;
-                                replayMessage.replay = e.toString();
+                                replayMessage.reply = e.toString();
                             } finally {
-                                if (replayMessage.replay instanceof PromiseClass) {
-                                    replayMessage.replay.then(function (result) {
+                                if (replayMessage.reply instanceof PromiseClass) {
+                                    replayMessage.reply.then(function (result) {
                                         replayMessage.success = true;
-                                        replayMessage.replay = result;
+                                        replayMessage.reply = result;
                                         thisApi.wsClient.send(JSON.stringify(replayMessage));
                                     }, function (error) {
                                         replayMessage.success = false;
-                                        replayMessage.replay = error;
+                                        replayMessage.reply = error;
                                         thisApi.wsClient.send(JSON.stringify(replayMessage));
                                     });
                                 } else {
-                                    replayMessage.replay = replayMessage.replay === undefined ? null : replayMessage.replay;
+                                    replayMessage.reply = replayMessage.reply === undefined ? null : replayMessage.reply;
                                     thisApi.wsClient.send(JSON.stringify(replayMessage));
                                 }
                             }
                         } else {
-                            thisApi.onClientFunctionNotFound(msgObj.hub, msgObj.function);
+                            thisApi.callbacks.onClientFunctionNotFound(msgObj.hub, msgObj.function);
                         }
                     }
                 } catch (err) {
@@ -201,9 +201,9 @@ function HubsAPI(serverTimeout, wsClientClass, PromiseClass) {
             return constructMessage('ChatHub', 'static_func', arguments);
         },
 
-        getSubscribedClientsToHub : function (){
+        getSubscribedClientsIds : function (){
             
-            return constructMessage('ChatHub', 'get_subscribed_clients_to_hub', arguments);
+            return constructMessage('ChatHub', 'get_subscribed_clients_ids', arguments);
         },
 
         subscribeToHub : function (){
@@ -212,7 +212,7 @@ function HubsAPI(serverTimeout, wsClientClass, PromiseClass) {
         },
 
         sendToAll : function (name, message){
-            arguments[0] = name === undefined ? "hello" : name;
+            arguments[1] = message === undefined ? "hello" : message;
             return constructMessage('ChatHub', 'send_to_all', arguments);
         },
 
@@ -241,14 +241,14 @@ function HubsAPI(serverTimeout, wsClientClass, PromiseClass) {
             return constructMessage('UtilsAPIHub', 'get_id', arguments);
         },
 
-        getSubscribedClientsToHub : function (){
-            
-            return constructMessage('UtilsAPIHub', 'get_subscribed_clients_to_hub', arguments);
-        },
-
         unsubscribeFromHub : function (){
             
             return constructMessage('UtilsAPIHub', 'unsubscribe_from_hub', arguments);
+        },
+
+        getSubscribedClientsIds : function (){
+            
+            return constructMessage('UtilsAPIHub', 'get_subscribed_clients_ids', arguments);
         },
 
         subscribeToHub : function (){

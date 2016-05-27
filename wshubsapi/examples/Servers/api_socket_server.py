@@ -1,4 +1,4 @@
-import importlib
+
 import json
 import logging.config
 
@@ -9,7 +9,7 @@ logging.config.dictConfig(json.load(open('logging.json')))
 log = logging.getLogger(__name__)
 
 if __name__ == '__main__':
-    importlib.import_module("ChatHub")  # necessary to add this import for code inspection
+    HubsInspector.include_hubs_in("*_hub.py")  # use glob path patterns
     # construct the necessary client files in the specified path
     HubsInspector.inspect_implemented_hubs()
     HubsInspector.construct_python_file("../Clients/_static/hubs_api.py")
