@@ -6,6 +6,7 @@ from wshubsapi.client_file_generator.java_file_generator import JAVAFileGenerato
 from wshubsapi.client_file_generator.js_file_generator import JSClientFileGenerator
 from wshubsapi.client_file_generator.python_file_generator import PythonClientFileGenerator
 from wshubsapi.utils import is_function_for_ws_client, get_args, get_defaults
+from wshubsapi.hub import Hub
 
 
 class HubsInspectorError(Exception):
@@ -19,6 +20,8 @@ class HubError(Exception):
 class HubsInspector:
     __hubs_constructed = False
     HUBS_DICT = {}
+    DEFAULT_JS_API_FILE_NAME = "hubsApi.js"
+    DEFAULT_PY_API_FILE_NAME = "hubs_api.py"
 
     def __init__(self):
         raise HubsInspectorError("Static class, do not create an instance of HubsInspector")
@@ -70,26 +73,28 @@ class HubsInspector:
             cls.__hubs_constructed = True
 
     @classmethod
-    def construct_js_file(cls, path="."):
+    def construct_js_file(cls, path=DEFAULT_JS_API_FILE_NAME):
         cls.inspect_implemented_hubs()
-        JSClientFileGenerator.create_file(path, cls.get_hubs_information())
+        JSClientFileGenerator.create_file(cls.get_hubs_information(), path)
 
     @classmethod
     def construct_java_file(cls, package, path="."):
-        cls.inspect_implemented_hubs()
-        hubs = cls.HUBS_DICT.values()
-        JAVAFileGenerator.create_file(path, package, hubs)
-        JAVAFileGenerator.create_client_template(path, package, hubs)
+        raise NotImplementedError("coming in new versions")
+        # cls.inspect_implemented_hubs()
+        # hubs = cls.HUBS_DICT.values()
+        # JAVAFileGenerator.create_file(path, package, hubs)
+        # JAVAFileGenerator.create_client_template(path, package, hubs)
 
     @classmethod
-    def construct_python_file(cls, path="."):
+    def construct_python_file(cls, path=DEFAULT_PY_API_FILE_NAME):
         cls.inspect_implemented_hubs()
-        PythonClientFileGenerator.create_file(path, cls.HUBS_DICT.values())
+        PythonClientFileGenerator.create_file(cls.HUBS_DICT.values(), path)
 
     @classmethod
     def construct_cpp_file(cls, path="."):
-        cls.inspect_implemented_hubs()
-        CppFileGenerator.create_file(path, cls.get_hubs_information())
+        raise NotImplementedError("coming in new versions")
+        # cls.inspect_implemented_hubs()
+        # CppFileGenerator.create_file(path, cls.get_hubs_information())
 
     @classmethod
     def get_hub_instance(cls, hub):
@@ -117,6 +122,3 @@ class HubsInspector:
 
             info_report[hub.__HubName__] = dict(serverMethods=server_methods, clientMethods=client_methods)
         return info_report
-
-
-from wshubsapi.hub import Hub

@@ -1,12 +1,11 @@
 import glob
 import inspect
 import os
+import sys
 import threading
+import time
 import unittest
 
-import sys
-
-import time
 import xmlrunner
 
 

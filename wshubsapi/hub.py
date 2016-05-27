@@ -1,5 +1,4 @@
 from wshubsapi import utils
-from wshubsapi.connected_clients_group import ConnectedClientsGroup
 from wshubsapi.connected_clients_holder import ConnectedClientsHolder
 
 __author__ = 'Jorge'

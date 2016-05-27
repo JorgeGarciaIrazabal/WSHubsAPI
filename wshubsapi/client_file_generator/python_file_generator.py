@@ -1,16 +1,14 @@
 import inspect
 import os
+
+from wshubsapi.client_file_generator.client_file_generator import ClientFileGenerator
 from wshubsapi.utils import is_function_for_ws_client, get_defaults, get_args
 
 __author__ = 'jgarc'
 
 
-class PythonClientFileGenerator:
-    FILE_NAME = "hubs_api.py"
+class PythonClientFileGenerator(ClientFileGenerator):
     TAB = "    "
-
-    def __init__(self):
-        raise Exception("static class, do not create an instance of it")
 
     @classmethod
     def __get_hub_class_str(cls, class_):
@@ -40,22 +38,21 @@ class PythonClientFileGenerator:
         return [cls.ATTRIBUTE_HUB_TEMPLATE.format(name=h.__HubName__) for h in hubs]
 
     @classmethod
-    def create_file(cls, path, hubs):
-        if not os.path.exists(path):
-            os.makedirs(path)
-        with open(os.path.join(path, "__init__.py"), 'w'):  # creating __init__.py if not exist
-            pass
-        with open(os.path.join(path, cls.FILE_NAME), "w") as f:
-            class_strings = "".join(cls.__get_class_strings(hubs))
-            attributes_hubs = "\n".join(cls.__get_attributes_hub(hubs))
-            f.write(cls.WRAPPER.format(Hubs=class_strings, attributesHubs=attributes_hubs))
-
-    @classmethod
     def __get_class_strings(cls, hubs):
         class_strings = []
         for h in hubs:
             class_strings.append(cls.__get_hub_class_str(h))
         return class_strings
+
+    @classmethod
+    def create_file(cls, hubs, path):
+        parent_dir = cls._construct_api_path(path)
+        with open(os.path.join(parent_dir, "__init__.py"), 'w'):  # creating __init__.py if not exist
+            pass
+        with open(path, "w") as f:
+            class_strings = "".join(cls.__get_class_strings(hubs))
+            attributes_hubs = "\n".join(cls.__get_attributes_hub(hubs))
+            f.write(cls.WRAPPER.format(Hubs=class_strings, attributesHubs=attributes_hubs))
 
     WRAPPER = '''import logging
 import jsonpickle

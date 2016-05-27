@@ -1,20 +1,14 @@
-import os
-
 import inflection
 import jsonpickle
 from jsonpickle.pickler import Pickler
 
 from wshubsapi import utils
+from wshubsapi.client_file_generator.client_file_generator import ClientFileGenerator
 
 __author__ = 'jgarc'
 
 
-class JSClientFileGenerator:
-    FILE_NAME = "hubsApi.js"
-
-    def __init__(self):
-        raise Exception("static class, do not create an instance of it")
-
+class JSClientFileGenerator(ClientFileGenerator):
     @classmethod
     def __get_class_strs(cls, hubs_info):
         class_strings = []
@@ -49,10 +43,9 @@ class JSClientFileGenerator:
         return func_strings
 
     @classmethod
-    def create_file(cls, path, hubs_info):
-        if not os.path.exists(path):
-            os.makedirs(path)
-        with open(os.path.join(path, cls.FILE_NAME), "w") as f:
+    def create_file(cls, hubs_info, path):
+        cls._construct_api_path(path)
+        with open(path, "w") as f:
             class_strings = "".join(cls.__get_class_strs(hubs_info))
             f.write(cls.WRAPPER.format(main=class_strings))
 

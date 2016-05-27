@@ -18,8 +18,8 @@ app = web.Application([
 if __name__ == '__main__':
     importlib.import_module("chat_hub")
     HubsInspector.inspect_implemented_hubs()
-    HubsInspector.construct_js_file(settings["static_path"])
-    HubsInspector.construct_python_file(settings["static_path"])
+    HubsInspector.construct_js_file(settings["static_path"] + os.sep + "hubsApi.js")
+    HubsInspector.construct_python_file(settings["static_path"] + os.sep + "hubs_api.py")
     app.listen(8888)
     log.debug("listening...")
 

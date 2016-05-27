@@ -10,8 +10,8 @@ if __name__ == '__main__':
     importlib.import_module("ChatHub")  # necessary to add this import for code inspection
 
     HubsInspector.inspect_implemented_hubs()  # setup api
-    HubsInspector.construct_python_file("../Clients/_static")  # only if you will use a python client
-    HubsInspector.construct_js_file("../Clients/_static")  # only if you will use a js client
+    HubsInspector.construct_python_file("../Clients/_static/hubs_api.py")  # only if you will use a python client
+    HubsInspector.construct_js_file("../Clients/_static/hubsApi.js")  # only if you will use a js client
     server = make_server('127.0.0.1', 8888, server_class=WSGIServer,
                          handler_class=WebSocketWSGIRequestHandler,
                          app=WebSocketWSGIApplication(handler_cls=ConnectionHandler))
