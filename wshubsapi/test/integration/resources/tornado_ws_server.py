@@ -32,8 +32,8 @@ if __name__ == '__main__':
     importlib.import_module("wshubsapi.test.integration.resources.hubs.chat_hub")
     importlib.import_module("wshubsapi.test.integration.resources.hubs.echo_hub")
     HubsInspector.inspect_implemented_hubs(force_reconstruction=True)
-    HubsInspector.construct_js_file(settings["static_path"])
-    HubsInspector.construct_python_file(settings["static_path"])
+    HubsInspector.construct_js_file(settings["static_path"] + os.sep + "hubsApi.js")
+    HubsInspector.construct_python_file(settings["static_path"] + os.sep + "hubs_api.py")
     log.debug("starting...")
     app.listen(11111)
 
