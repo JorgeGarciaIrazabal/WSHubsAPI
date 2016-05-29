@@ -27,7 +27,7 @@ setup(
     # https://packaging.python.org/en/latest/single_source_version.html
     version='0.7.8',
 
-    description='message handler to communicate frontend -> backend and backend -> frontend in a intuitive way like signalR in C#',
+    description='make complex web-socket communication in a simple way',
     long_description=long_description,
 
     # The project's main homepage.
