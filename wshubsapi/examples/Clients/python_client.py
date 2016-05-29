@@ -23,8 +23,8 @@ if __name__ == '__main__':
 
 
     ws.ChatHub.client = ChatHubClient()
-
-    ws.ChatHub.server.subscribe_to_hub().result()
+    ids = ws.ChatHub.server.get_subscribed_clients_ids().result()
+    result = ws.ChatHub.get_clients("jsClient").print_message("test1", "test2").result()
     name = input("Enter your name:")
     # ws.ChatHub.server.get_subscribed_clients_to_hub() \
     #     .done(lambda x: sys.stdout.write(x[1] + "\n"), lambda x: sys.stdout.write("Error:%s\n" % x))

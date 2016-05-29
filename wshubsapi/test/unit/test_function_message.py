@@ -1,6 +1,8 @@
 # coding=utf-8
 import unittest
 
+from flexmock import flexmock, flexmock_teardown
+
 from wshubsapi.client_in_hub import ClientInHub
 from wshubsapi.connected_client import ConnectedClient
 from wshubsapi.function_message import FunctionMessage
@@ -12,18 +14,19 @@ from wshubsapi.test.utils.hubs_utils import remove_hubs_subclasses
 class TestFunctionMessage(unittest.TestCase):
     def setUp(self):
         class TestHub(Hub):
-            def testMethod(self, x, _sender, y=1):
+            def test_method(self, x, _sender, y=1):
                 return x, _sender, y
 
-            def testException(self):
+            def test_exception(self):
                 raise Exception("MyException")
 
-            def testNoSender(self, x):
+            def test_no_sender(self, x):
                 return x
 
-            def testReplayUnsuccessful(self, x):
+            def test_replay_unsuccessful(self, x):
                 return self._construct_unsuccessful_replay(x)
 
+        self.env_mock = flexmock(debug_mode=True)
         self.testHubClass = TestHub
         HubsInspector.inspect_implemented_hubs(force_reconstruction=True)
         self.testHubInstance = HubsInspector.get_hub_instance(self.testHubClass)
@@ -32,8 +35,9 @@ class TestFunctionMessage(unittest.TestCase):
         del self.testHubClass
         del self.testHubInstance
         remove_hubs_subclasses()
+        flexmock_teardown()
 
-    def __constructMessageStr(self, hub="TestHub", function="testMethod", ID=1, args=list()):
+    def __constructMessageStr(self, hub="TestHub", function="test_method", ID=1, args=list()):
         message = {
             "hub": hub,
             "function": function,
@@ -43,71 +47,73 @@ class TestFunctionMessage(unittest.TestCase):
         return message
 
     def test_FunctionMessageConstruction_InitializeNecessaryAttributes(self):
-        fn = FunctionMessage(self.__constructMessageStr(), "connectedClient")
+        fn = FunctionMessage(self.__constructMessageStr(), "connectedClient", self.env_mock)
 
         self.assertEqual(fn.hub_instance, self.testHubInstance)
         self.assertEqual(fn.hub_name, self.testHubClass.__HubName__)
         self.assertEqual(fn.args, [])
-        self.assertEqual(fn.method, self.testHubInstance.testMethod)
+        self.assertEqual(fn.method, self.testHubInstance.test_method)
         self.assertEqual(fn.connected_client, "connectedClient")
 
     def test_FunctionMessageConstruction_WithUnrealMethodNameRaisesAnError(self):
         message = self.__constructMessageStr(function="notExists")
-        self.assertRaises(AttributeError, FunctionMessage, message, "connectedClient")
+        self.assertRaises(AttributeError, FunctionMessage, message, "connectedClient", self.env_mock)
 
     def test_CallFunction_ReturnsAnExpectedReplayMessageIfSuccess(self):
-        fn = FunctionMessage(self.__constructMessageStr(args=["x"], ID=15, function="testNoSender"), "_sender")
+        fn = FunctionMessage(self.__constructMessageStr(args=["x"], ID=15, function="test_no_sender"), "_sender",
+                             self.env_mock)
 
-        functionResult = fn.call_function()
+        function_result = fn.call_function()
 
-        self.assertEqual(functionResult["reply"], "x")
-        self.assertEqual(functionResult["success"], True)
-        self.assertEqual(functionResult["hub"], self.testHubClass.__HubName__)
-        self.assertEqual(functionResult["function"], "testNoSender")
-        self.assertEqual(functionResult["ID"], 15)
+        self.assertEqual(function_result["reply"], "x")
+        self.assertEqual(function_result["success"], True)
+        self.assertEqual(function_result["hub"], self.testHubClass.__HubName__)
+        self.assertEqual(function_result["function"], "test_no_sender")
+        self.assertEqual(function_result["ID"], 15)
 
     def test_CallFunction_ReturnsAnExpectedReplayMessageIfNoSuccess(self):
-        fn = FunctionMessage(self.__constructMessageStr(ID=15, function="testException"), "_sender")
+        fn = FunctionMessage(self.__constructMessageStr(ID=15, function="test_exception"), "_sender", self.env_mock)
 
-        functionResult = fn.call_function()
+        function_result = fn.call_function()
 
-        self.assertEqual(functionResult["success"], False)
-        self.assertEqual(functionResult["hub"], self.testHubClass.__HubName__)
-        self.assertEqual(functionResult["function"], "testException")
-        self.assertEqual(functionResult["ID"], 15)
+        self.assertEqual(function_result["success"], False)
+        self.assertEqual(function_result["hub"], self.testHubClass.__HubName__)
+        self.assertEqual(function_result["function"], "test_exception")
+        self.assertEqual(function_result["ID"], 15)
 
     def test_CallFunction_IncludesSender(self):
         cc = ConnectedClient(None, None)
-        fn = FunctionMessage(self.__constructMessageStr(args=["x"]), cc)
+        fn = FunctionMessage(self.__constructMessageStr(args=["x"]), cc, self.env_mock)
 
-        functionResult = fn.call_function()
+        function_result = fn.call_function()
 
-        self.assertEqual(functionResult["reply"][0], "x")
-        self.assertIsInstance(functionResult["reply"][1], ClientInHub)
-        self.assertEqual(functionResult["reply"][1].api_get_real_connected_client(), cc)
-        self.assertEqual(functionResult["reply"][2], 1)
-        self.assertEqual(functionResult["success"], True)
+        self.assertEqual(function_result["reply"][0], "x")
+        self.assertIsInstance(function_result["reply"][1], ClientInHub)
+        self.assertEqual(function_result["reply"][1].api_get_real_connected_client(), cc)
+        self.assertEqual(function_result["reply"][2], 1)
+        self.assertEqual(function_result["success"], True)
 
     def test_CallFunction_DoesNotIncludesSenderIfNotRequested(self):
-        fn = FunctionMessage(self.__constructMessageStr(args=["x"], function="testNoSender"), "_sender")
+        fn = FunctionMessage(self.__constructMessageStr(args=["x"], function="test_no_sender"), "_sender", self.env_mock)
 
-        functionResult = fn.call_function()
+        function_result = fn.call_function()
 
-        self.assertEqual(functionResult["reply"], "x")
-        self.assertEqual(functionResult["success"], True)
+        self.assertEqual(function_result["reply"], "x")
+        self.assertEqual(function_result["success"], True)
 
     def test_CallFunction_SuccessFalseIfMethodRaisesException(self):
-        fn = FunctionMessage(self.__constructMessageStr(function="testException"), "_sender")
+        fn = FunctionMessage(self.__constructMessageStr(function="test_exception"), "_sender", self.env_mock)
 
-        functionResult = fn.call_function()
+        function_result = fn.call_function()
 
-        self.assertEqual(functionResult["success"], False)
-        self.assertEqual(functionResult["reply"]["error"], "MyException")
+        self.assertEqual(function_result["success"], False)
+        self.assertEqual(function_result["reply"]["error"], "MyException")
 
     def test_CallFunction_ReplaysSuccessFalseIfReturnsUnsuccessfulReplayObject(self):
-        fn = FunctionMessage(self.__constructMessageStr(function="testReplayUnsuccessful", args=["x"]), "_sender")
+        fn = FunctionMessage(self.__constructMessageStr(function="test_replay_unsuccessful", args=["x"]), "_sender",
+                             self.env_mock)
 
-        functionResult = fn.call_function()
+        function_result = fn.call_function()
 
-        self.assertEqual(functionResult["success"], False)
-        self.assertEqual(functionResult["reply"], "x")
+        self.assertEqual(function_result["success"], False)
+        self.assertEqual(function_result["reply"], "x")

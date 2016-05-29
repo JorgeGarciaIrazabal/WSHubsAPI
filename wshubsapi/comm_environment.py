@@ -35,7 +35,8 @@ class CommEnvironment(object):
     def __init__(self, message_received_queue_class=None,
                  unprovided_id_template="UNPROVIDED__{}",
                  serialization_max_depth=5,
-                 serialization_max_iter=80):
+                 serialization_max_iter=80,
+                 debug_mode=True):
         """
         :type message_received_queue_class: MessagesReceivedQueue
         """
@@ -43,6 +44,7 @@ class CommEnvironment(object):
         self.available_unprovided_ids = list()
         self.unprovided_id_template = unprovided_id_template
         self.last_provided_id = 0
+        self.debug_mode = debug_mode
 
         if message_received_queue_class is None:
             self.message_received_queue = MessagesReceivedQueue()
@@ -135,7 +137,7 @@ class CommEnvironment(object):
                 future.set_exception(HubsApiException("Timeout exception"))
 
     def __on_replay(self, client, msg_str, msg_obj):
-        hub_function = FunctionMessage(msg_obj, client)
+        hub_function = FunctionMessage(msg_obj, client, self)
         reply = hub_function.call_function()
         if reply is not None:
             self.reply(client, reply, msg_str)

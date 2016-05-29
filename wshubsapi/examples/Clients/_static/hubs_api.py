@@ -5,6 +5,8 @@ from wshubsapi import utils
 from concurrent.futures import Future
 
 utils.set_serializer_date_handler()
+_message_id = 0
+_message_lock = threading.RLock()
 
 
 class GenericClient(object):
@@ -13,25 +15,39 @@ class GenericClient(object):
 
 
 class GenericServer(object):
-    __message_id = 0
-    __message_lock = threading.RLock()
-
-    def __init__(self, ws_client, hub_name, serialization_args):
-        """
-        :type ws_client: WSHubsAPIClient
-        """
-        self.ws_client = ws_client
-        self.hub_name = hub_name
-        self.serialization_args = serialization_args
+    def __init__(self, hub):
+        self.hub = hub
 
     @classmethod
     def _get_next_message_id(cls):
-        with cls.__message_lock:
-            cls.__message_id += 1
-            return cls.__message_id
+        global _message_id
+        with _message_lock:
+            _message_id += 1
+            return _message_id
 
     def _serialize_object(self, obj2ser):
-        return jsonpickle.encode(obj2ser, **self.serialization_args)
+        return jsonpickle.encode(obj2ser, **self.hub.serialization_args)
+
+
+class GenericBridge(GenericServer):
+    def __getattr__(self, function_name):
+        def function_wrapper(*args_array):
+            """
+            :rtype : Future
+            """
+            args = list()
+            args.append(self.clients_ids)
+            args.append(function_name)
+            args.append(args_array)
+            id_ = self._get_next_message_id()
+            body = {"hub": self.hub.name, "function": "_client_to_clients_bridge", "args": args, "ID": id_}
+            future = self.hub.ws_client.get_future(id_)
+            send_return_obj = self.hub.ws_client.send(self._serialize_object(body))
+            if isinstance(send_return_obj, Future):
+                return send_return_obj
+            return future
+
+        return function_wrapper
 
 
 def construct_api_client_class(client_class):
@@ -88,7 +104,7 @@ def construct_api_client_class(client_class):
                 except:
                     self.log.exception("unable to call client function")
 
-            self.log.debug("Received message: %s" % m.data.decode('utf-8'))
+            self.log.debug("Message received: %s" % m.data.decode('utf-8'))
 
         def get_future(self, id_):
             """
@@ -132,9 +148,14 @@ class HubsAPI(object):
 
     class ChatHubClass(object):
         def __init__(self, ws_client, serialization_args):
-            hub_name = "ChatHub"
-            self.server = self.ServerClass(ws_client, hub_name, serialization_args)
+            self.name = "ChatHub"
+            self.ws_client = ws_client
+            self.serialization_args = serialization_args
+            self.server = self.ServerClass(self)
             self.client = self.ClientClass()
+
+        def get_clients(self, client_ids):
+            return HubsAPI.ChatHubClass.ClientsInServer(client_ids, self)
 
         class ServerClass(GenericServer):
             
@@ -145,9 +166,9 @@ class HubsAPI(object):
                 args = list()
                 
                 id_ = self._get_next_message_id()
-                body = {"hub": self.hub_name, "function": "subscribe_to_hub", "args": args, "ID": id_}
-                future = self.ws_client.get_future(id_)
-                send_return_obj = self.ws_client.send(self._serialize_object(body))
+                body = {"hub": self.hub.name, "function": "subscribe_to_hub", "args": args, "ID": id_}
+                future = self.hub.ws_client.get_future(id_)
+                send_return_obj = self.hub.ws_client.send(self._serialize_object(body))
                 if isinstance(send_return_obj, Future):
                     return send_return_obj
                 return future
@@ -160,9 +181,9 @@ class HubsAPI(object):
                 args.append(name)
                 args.append(message)
                 id_ = self._get_next_message_id()
-                body = {"hub": self.hub_name, "function": "send_to_all", "args": args, "ID": id_}
-                future = self.ws_client.get_future(id_)
-                send_return_obj = self.ws_client.send(self._serialize_object(body))
+                body = {"hub": self.hub.name, "function": "send_to_all", "args": args, "ID": id_}
+                future = self.hub.ws_client.get_future(id_)
+                send_return_obj = self.hub.ws_client.send(self._serialize_object(body))
                 if isinstance(send_return_obj, Future):
                     return send_return_obj
                 return future
@@ -174,9 +195,9 @@ class HubsAPI(object):
                 args = list()
                 
                 id_ = self._get_next_message_id()
-                body = {"hub": self.hub_name, "function": "unsubscribe_from_hub", "args": args, "ID": id_}
-                future = self.ws_client.get_future(id_)
-                send_return_obj = self.ws_client.send(self._serialize_object(body))
+                body = {"hub": self.hub.name, "function": "unsubscribe_from_hub", "args": args, "ID": id_}
+                future = self.hub.ws_client.get_future(id_)
+                send_return_obj = self.hub.ws_client.send(self._serialize_object(body))
                 if isinstance(send_return_obj, Future):
                     return send_return_obj
                 return future
@@ -188,9 +209,9 @@ class HubsAPI(object):
                 args = list()
                 
                 id_ = self._get_next_message_id()
-                body = {"hub": self.hub_name, "function": "get_subscribed_clients_ids", "args": args, "ID": id_}
-                future = self.ws_client.get_future(id_)
-                send_return_obj = self.ws_client.send(self._serialize_object(body))
+                body = {"hub": self.hub.name, "function": "get_subscribed_clients_ids", "args": args, "ID": id_}
+                future = self.hub.ws_client.get_future(id_)
+                send_return_obj = self.hub.ws_client.send(self._serialize_object(body))
                 if isinstance(send_return_obj, Future):
                     return send_return_obj
                 return future
@@ -202,11 +223,37 @@ class HubsAPI(object):
             def print_message(self, sender_name, msg):
                 pass
 
+        class ClientsInServer(GenericBridge):
+            def __init__(self, client_ids, hub):
+                super(self.__class__, self).__init__(hub)
+                self.clients_ids = client_ids
+            
+            def print_message(self, sender_name, msg):
+                """
+                :rtype : Future
+                """
+                args = list()
+                args.append(self.clients_ids)
+                args.append("print_message")
+                args.append([sender_name, msg])
+                id_ = self._get_next_message_id()
+                body = {"hub": self.hub.name, "function": "_client_to_clients_bridge", "args": args, "ID": id_}
+                future = self.hub.ws_client.get_future(id_)
+                send_return_obj = self.hub.ws_client.send(self._serialize_object(body))
+                if isinstance(send_return_obj, Future):
+                    return send_return_obj
+                return future
+
     class UtilsAPIHubClass(object):
         def __init__(self, ws_client, serialization_args):
-            hub_name = "UtilsAPIHub"
-            self.server = self.ServerClass(ws_client, hub_name, serialization_args)
+            self.name = "UtilsAPIHub"
+            self.ws_client = ws_client
+            self.serialization_args = serialization_args
+            self.server = self.ServerClass(self)
             self.client = self.ClientClass()
+
+        def get_clients(self, client_ids):
+            return HubsAPI.ChatHubClass.ClientsInServer(client_ids, self)
 
         class ServerClass(GenericServer):
             
@@ -217,9 +264,9 @@ class HubsAPI(object):
                 args = list()
                 
                 id_ = self._get_next_message_id()
-                body = {"hub": self.hub_name, "function": "get_hubs_structure", "args": args, "ID": id_}
-                future = self.ws_client.get_future(id_)
-                send_return_obj = self.ws_client.send(self._serialize_object(body))
+                body = {"hub": self.hub.name, "function": "get_hubs_structure", "args": args, "ID": id_}
+                future = self.hub.ws_client.get_future(id_)
+                send_return_obj = self.hub.ws_client.send(self._serialize_object(body))
                 if isinstance(send_return_obj, Future):
                     return send_return_obj
                 return future
@@ -231,9 +278,9 @@ class HubsAPI(object):
                 args = list()
                 args.append(client_id)
                 id_ = self._get_next_message_id()
-                body = {"hub": self.hub_name, "function": "is_client_connected", "args": args, "ID": id_}
-                future = self.ws_client.get_future(id_)
-                send_return_obj = self.ws_client.send(self._serialize_object(body))
+                body = {"hub": self.hub.name, "function": "is_client_connected", "args": args, "ID": id_}
+                future = self.hub.ws_client.get_future(id_)
+                send_return_obj = self.hub.ws_client.send(self._serialize_object(body))
                 if isinstance(send_return_obj, Future):
                     return send_return_obj
                 return future
@@ -245,9 +292,9 @@ class HubsAPI(object):
                 args = list()
                 
                 id_ = self._get_next_message_id()
-                body = {"hub": self.hub_name, "function": "get_id", "args": args, "ID": id_}
-                future = self.ws_client.get_future(id_)
-                send_return_obj = self.ws_client.send(self._serialize_object(body))
+                body = {"hub": self.hub.name, "function": "get_id", "args": args, "ID": id_}
+                future = self.hub.ws_client.get_future(id_)
+                send_return_obj = self.hub.ws_client.send(self._serialize_object(body))
                 if isinstance(send_return_obj, Future):
                     return send_return_obj
                 return future
@@ -259,9 +306,9 @@ class HubsAPI(object):
                 args = list()
                 
                 id_ = self._get_next_message_id()
-                body = {"hub": self.hub_name, "function": "unsubscribe_from_hub", "args": args, "ID": id_}
-                future = self.ws_client.get_future(id_)
-                send_return_obj = self.ws_client.send(self._serialize_object(body))
+                body = {"hub": self.hub.name, "function": "unsubscribe_from_hub", "args": args, "ID": id_}
+                future = self.hub.ws_client.get_future(id_)
+                send_return_obj = self.hub.ws_client.send(self._serialize_object(body))
                 if isinstance(send_return_obj, Future):
                     return send_return_obj
                 return future
@@ -273,9 +320,9 @@ class HubsAPI(object):
                 args = list()
                 
                 id_ = self._get_next_message_id()
-                body = {"hub": self.hub_name, "function": "get_subscribed_clients_ids", "args": args, "ID": id_}
-                future = self.ws_client.get_future(id_)
-                send_return_obj = self.ws_client.send(self._serialize_object(body))
+                body = {"hub": self.hub.name, "function": "get_subscribed_clients_ids", "args": args, "ID": id_}
+                future = self.hub.ws_client.get_future(id_)
+                send_return_obj = self.hub.ws_client.send(self._serialize_object(body))
                 if isinstance(send_return_obj, Future):
                     return send_return_obj
                 return future
@@ -287,9 +334,9 @@ class HubsAPI(object):
                 args = list()
                 
                 id_ = self._get_next_message_id()
-                body = {"hub": self.hub_name, "function": "subscribe_to_hub", "args": args, "ID": id_}
-                future = self.ws_client.get_future(id_)
-                send_return_obj = self.ws_client.send(self._serialize_object(body))
+                body = {"hub": self.hub.name, "function": "subscribe_to_hub", "args": args, "ID": id_}
+                future = self.hub.ws_client.get_future(id_)
+                send_return_obj = self.hub.ws_client.send(self._serialize_object(body))
                 if isinstance(send_return_obj, Future):
                     return send_return_obj
                 return future
@@ -301,9 +348,9 @@ class HubsAPI(object):
                 args = list()
                 args.append(client_id)
                 id_ = self._get_next_message_id()
-                body = {"hub": self.hub_name, "function": "set_id", "args": args, "ID": id_}
-                future = self.ws_client.get_future(id_)
-                send_return_obj = self.ws_client.send(self._serialize_object(body))
+                body = {"hub": self.hub.name, "function": "set_id", "args": args, "ID": id_}
+                future = self.hub.ws_client.get_future(id_)
+                send_return_obj = self.hub.ws_client.send(self._serialize_object(body))
                 if isinstance(send_return_obj, Future):
                     return send_return_obj
                 return future
@@ -311,4 +358,10 @@ class HubsAPI(object):
         class ClientClass(GenericClient):
             def __init__(self):
                 pass
+            
+
+        class ClientsInServer(GenericBridge):
+            def __init__(self, client_ids, hub):
+                super(self.__class__, self).__init__(hub)
+                self.clients_ids = client_ids
             

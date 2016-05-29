@@ -10,10 +10,12 @@ log = logging.getLogger(__name__)
 
 
 class FunctionMessage:
-    def __init__(self, msg_obj, connected_client):
+    def __init__(self, msg_obj, connected_client, comm_environment):
         """
-        :type messageStr: bytes|str
+        :type msg_obj: dict
+        :type comm_environment: wshubsapi.comm_environment.CommEnvironment
         """
+        self.comm_environment = comm_environment
         self.hub_instance = HubsInspector.HUBS_DICT[msg_obj["hub"]]
         self.hub_name = msg_obj["hub"]
         self.args = msg_obj["args"]
@@ -29,7 +31,10 @@ class FunctionMessage:
             return True, self.method(*self.args)
         except Exception as e:
             log.exception("Error calling hub function with: {}".format(str(self)))
-            return False, dict(error=str(e), type=str(type(e)), trace=traceback.format_exc())
+            error_info = dict(error=str(e), type=e.__class__.__name__, trace=traceback.format_exc())
+            if not self.comm_environment.debug_mode:
+                error_info.pop("trace")
+            return False, error_info
 
     def call_function(self):
         success, reply = self.__execute_function()

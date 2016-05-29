@@ -13,8 +13,9 @@ class PythonClientFileGenerator(ClientFileGenerator):
     @classmethod
     def __get_hub_class_str(cls, hub_name, hub_info):
         func_sep = ("\n" + cls.TAB * 2)
-        functions_str = dict(serverFunctions=cls.__get_js_server_functions_str(hub_info),
-                             clientFunctions=cls.__get_js_client_functions_str(hub_info))
+        functions_str = dict(serverFunctions=cls.__get_server_functions_str(hub_info),
+                             clientFunctions=cls.__get_client_functions_str(hub_info),
+                             bridgeFunctions=cls.__get_bridge_functions_str(hub_info))
         return cls.CLASS_TEMPLATE.format(name=hub_name, **functions_str)
 
     @classmethod
@@ -31,20 +32,26 @@ class PythonClientFileGenerator(ClientFileGenerator):
                 else:
                     formatted_args.insert(0, arg + "=" + str(defaults[-i - 1]))
             append_in_args = ("\n" + cls.TAB * 4).join([cls.ARGS_COOK_TEMPLATE.format(name=arg) for arg in args])
-            func_parameters = dict(name=method_name, args=", ".join(formatted_args), cook=append_in_args)
+            func_parameters = dict(name=method_name, args=", ".join(formatted_args),
+                                   cook=append_in_args, rawArgs=", ".join(args))
             all_parameters.append(func_parameters)
 
         return all_parameters
 
     @classmethod
-    def __get_js_server_functions_str(cls, hub_info):
+    def __get_server_functions_str(cls, hub_info):
         all_parameters = cls.__get_functions_parameters(hub_info["serverMethods"])
         return "\n".join([cls.SERVER_FUNCTION_TEMPLATE.format(**params) for params in all_parameters])
 
     @classmethod
-    def __get_js_client_functions_str(cls, hub_info):
+    def __get_client_functions_str(cls, hub_info):
         all_parameters = cls.__get_functions_parameters(hub_info["clientMethods"])
         return "\n".join([cls.CLIENT_FUNCTION_TEMPLATE.format(**params) for params in all_parameters])
+
+    @classmethod
+    def __get_bridge_functions_str(cls, hub_info):
+        all_parameters = cls.__get_functions_parameters(hub_info["clientMethods"])
+        return "\n".join([cls.BRIDGE_FUNCTION_TEMPLATE.format(**params) for params in all_parameters])
 
 
     @classmethod
@@ -80,6 +87,8 @@ from wshubsapi import utils
 from concurrent.futures import Future
 
 utils.set_serializer_date_handler()
+_message_id = 0
+_message_lock = threading.RLock()
 
 
 class GenericClient(object):
@@ -88,25 +97,39 @@ class GenericClient(object):
 
 
 class GenericServer(object):
-    __message_id = 0
-    __message_lock = threading.RLock()
-
-    def __init__(self, ws_client, hub_name, serialization_args):
-        """
-        :type ws_client: WSHubsAPIClient
-        """
-        self.ws_client = ws_client
-        self.hub_name = hub_name
-        self.serialization_args = serialization_args
+    def __init__(self, hub):
+        self.hub = hub
 
     @classmethod
     def _get_next_message_id(cls):
-        with cls.__message_lock:
-            cls.__message_id += 1
-            return cls.__message_id
+        global _message_id
+        with _message_lock:
+            _message_id += 1
+            return _message_id
 
     def _serialize_object(self, obj2ser):
-        return jsonpickle.encode(obj2ser, **self.serialization_args)
+        return jsonpickle.encode(obj2ser, **self.hub.serialization_args)
+
+
+class GenericBridge(GenericServer):
+    def __getattr__(self, function_name):
+        def function_wrapper(*args_array):
+            """
+            :rtype : Future
+            """
+            args = list()
+            args.append(self.clients_ids)
+            args.append(function_name)
+            args.append(args_array)
+            id_ = self._get_next_message_id()
+            body = {{"hub": self.hub.name, "function": "_client_to_clients_bridge", "args": args, "ID": id_}}
+            future = self.hub.ws_client.get_future(id_)
+            send_return_obj = self.hub.ws_client.send(self._serialize_object(body))
+            if isinstance(send_return_obj, Future):
+                return send_return_obj
+            return future
+
+        return function_wrapper
 
 
 def construct_api_client_class(client_class):
@@ -163,7 +186,7 @@ def construct_api_client_class(client_class):
                 except:
                     self.log.exception("unable to call client function")
 
-            self.log.debug("Received message: %s" % m.data.decode('utf-8'))
+            self.log.debug("Message received: %s" % m.data.decode('utf-8'))
 
         def get_future(self, id_):
             """
@@ -208,9 +231,14 @@ class HubsAPI(object):
     CLASS_TEMPLATE = '''
     class {name}Class(object):
         def __init__(self, ws_client, serialization_args):
-            hub_name = "{name}"
-            self.server = self.ServerClass(ws_client, hub_name, serialization_args)
+            self.name = "{name}"
+            self.ws_client = ws_client
+            self.serialization_args = serialization_args
+            self.server = self.ServerClass(self)
             self.client = self.ClientClass()
+
+        def get_clients(self, client_ids):
+            return HubsAPI.ChatHubClass.ClientsInServer(client_ids, self)
 
         class ServerClass(GenericServer):
             {serverFunctions}
@@ -219,6 +247,12 @@ class HubsAPI(object):
             def __init__(self):
                 pass
             {clientFunctions}
+
+        class ClientsInServer(GenericBridge):
+            def __init__(self, client_ids, hub):
+                super(self.__class__, self).__init__(hub)
+                self.clients_ids = client_ids
+            {bridgeFunctions}
 '''
 
     SERVER_FUNCTION_TEMPLATE = '''
@@ -229,9 +263,9 @@ class HubsAPI(object):
                 args = list()
                 {cook}
                 id_ = self._get_next_message_id()
-                body = {{"hub": self.hub_name, "function": "{name}", "args": args, "ID": id_}}
-                future = self.ws_client.get_future(id_)
-                send_return_obj = self.ws_client.send(self._serialize_object(body))
+                body = {{"hub": self.hub.name, "function": "{name}", "args": args, "ID": id_}}
+                future = self.hub.ws_client.get_future(id_)
+                send_return_obj = self.hub.ws_client.send(self._serialize_object(body))
                 if isinstance(send_return_obj, Future):
                     return send_return_obj
                 return future'''
@@ -239,6 +273,23 @@ class HubsAPI(object):
     CLIENT_FUNCTION_TEMPLATE = '''
             def {name}(self, {args}):
                 pass'''
+
+    BRIDGE_FUNCTION_TEMPLATE = '''
+            def {name}(self, {args}):
+                """
+                :rtype : Future
+                """
+                args = list()
+                args.append(self.clients_ids)
+                args.append("print_message")
+                args.append([{rawArgs}])
+                id_ = self._get_next_message_id()
+                body = {{"hub": self.hub.name, "function": "_client_to_clients_bridge", "args": args, "ID": id_}}
+                future = self.hub.ws_client.get_future(id_)
+                send_return_obj = self.hub.ws_client.send(self._serialize_object(body))
+                if isinstance(send_return_obj, Future):
+                    return send_return_obj
+                return future'''
 
     ARGS_COOK_TEMPLATE = "args.append({name})"
 

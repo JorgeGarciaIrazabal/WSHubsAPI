@@ -1,3 +1,5 @@
+from concurrent.futures import Future
+
 from wshubsapi import utils
 from wshubsapi.connected_clients_holder import ConnectedClientsHolder
 
@@ -79,3 +81,18 @@ class Hub(object):
         HUBS_API_IGNORE
         """
         return cls.__instance__
+
+    def _client_to_clients_bridge(self, clients_ids, function, args):
+        clients = self.clients.get(clients_ids)
+        futures = getattr(clients, function)(*args)
+        if isinstance(futures, Future):
+            # only one future (ex: if only one client id is provided)
+            return futures.result()
+
+        results = dict()
+        for future, client in zip(futures, clients.connected_clients):
+            try:
+                results[client.ID] = future.result(timeout=3)
+            except Exception as e:
+                results[client.ID] = dict(error_type=e.__class__.__name__, error=str(e))
+        return results

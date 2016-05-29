@@ -40,7 +40,7 @@
         $('#message').val('').focus();
     }
 
-    hubsApi.connect('ws://127.0.0.1:8888/').then(function () {
+    hubsApi.connect('ws://127.0.0.1:8888/jsClient').then(function () {
         $('#status').text("Connected")
 
         //sending message
@@ -52,6 +52,8 @@
     }, function (error) {
         console.error(error);
     });
+
+    hubsApi.ChatHub.server.subscribeToHub();
 
     //function to be called from server
     hubsApi.ChatHub.client.printMessage = function (from, message) {
