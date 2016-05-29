@@ -76,7 +76,7 @@ setup(
     # your project is installed. For an analysis of "install_requires" vs pip's
     # requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
-    install_requires=['jsonpickle', 'futures', 'inflection==0.3.1'],
+    install_requires=['jsonpickle', 'futures', 'inflection==0.3.1', 'ws4py'],
 
     # List additional groups of dependencies here (e.g. development
     # dependencies). You can install these using the following syntax,

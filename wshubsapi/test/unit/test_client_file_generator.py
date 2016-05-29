@@ -64,9 +64,10 @@ class TestClientFileGenerator(unittest.TestCase):
                 pass
 
             def _define_client_functions(self):
-                self.client_functions = dict(client1=lambda x, y: None,
-                                             client2=lambda x, y=1: None,
-                                             client3=lambda x=0, y=1: None)
+                return dict(client1=lambda x, y: None,
+                            client2=lambda x, y=1: None,
+                            client3=lambda x=0, y=1: None)
+
         HubsInspector.inspect_implemented_hubs(force_reconstruction=True)
         HubsInspector.construct_js_file()
 
@@ -96,9 +97,10 @@ class TestClientFileGenerator(unittest.TestCase):
                 pass
 
             def _define_client_functions(self):
-                self.client_functions = dict(client1=lambda x, y: None,
-                                             client2=lambda x, y=1: None,
-                                             client3=lambda x=0, y=1: None)
+                return dict(client1=lambda x, y: None,
+                            client2=lambda x, y=1: None,
+                            client3=lambda x=0, y=1: None)
+
         HubsInspector.inspect_implemented_hubs(force_reconstruction=True)
         HubsInspector.construct_python_file()
 

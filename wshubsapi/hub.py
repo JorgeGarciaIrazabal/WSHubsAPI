@@ -11,13 +11,12 @@ class UnsuccessfulReplay:
 
 class Hub(object):
     __HubName__ = None
-    
+
     def __init__(self):
         hub_name = self.__class__.__dict__.get("__HubName__", self.__class__.__name__)
         setattr(self.__class__, "__HubName__", hub_name)
 
-        self._client_functions = dict()
-        self._define_client_functions()
+        self._client_functions = self._define_client_functions()
         self._clients_holder = ConnectedClientsHolder(self)
         setattr(self.__class__, "__instance__", self)
 
@@ -61,8 +60,19 @@ class Hub(object):
         return UnsuccessfulReplay(reply)
 
     def _define_client_functions(self):
-        pass
-    
+        """
+        This function will tell the client possible client functions to be called from sever
+        It is just to inform, it is not mandatory but recommended
+
+        :return: It has to return a dict with:
+            key: function name,
+            value: lambda with the function structure (args and default values)
+            example:
+            return dict(post_message=lambda message, thread="MAIN": None,
+                        change_picture=lambda picture_url: None)
+        """
+        return dict()
+
     @classmethod
     def get_instance(cls):
         """

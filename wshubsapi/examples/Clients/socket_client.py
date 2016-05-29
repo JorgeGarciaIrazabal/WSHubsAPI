@@ -19,10 +19,10 @@ if __name__ == '__main__':
     ws.defaultOnError = lambda m: sys.stdout.write("message could not be sent!!!!! {}\n".format(m))
     ws.UtilsAPIHub.server.set_id("testing")
 
-    def printMessage(senderName, message):
-        print(u"From {0}: {1}".format(senderName, message))
+    def print_message(sender_name, message):
+        print(u"From {0}: {1}".format(sender_name, message))
 
-    ws.ChatHub.client.on_message = printMessage
+    ws.ChatHub.client.print_message = print_message
     ws.ChatHub.server.subscribe_to_hub().done(lambda x: ws.ChatHub.server.get_subscribed_clients_to_hub())
     name = input("Enter your name:")
     #ws.server.ChatHub.getNumOfClientsConnected().done(lambda x: sys.stdout.write(x[1]+"\n"), lambda x: sys.stdout.write("Error:%s\n"%x))

@@ -119,9 +119,9 @@ class TestHubInspector(unittest.TestCase):
                 pass
 
             def _define_client_functions(self):
-                self.client_functions = dict(client1=lambda x, y: None,
-                                             client2=lambda x, y=1: None,
-                                             client3=lambda x=0, y=1: None)
+                return dict(client1=lambda x, y: None,
+                            client2=lambda x, y=1: None,
+                            client3=lambda x=0, y=1: None)
 
         HubsInspector.inspect_implemented_hubs(force_reconstruction=True)
 
@@ -155,6 +155,3 @@ class TestHubInspector(unittest.TestCase):
         hubs_info = HubsInspector.get_hubs_information()
         self.assertIn("SubHub2", hubs_info)
         self.assertIn("SubHub3", hubs_info)
-
-
-

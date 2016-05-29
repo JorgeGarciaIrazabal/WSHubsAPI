@@ -189,21 +189,6 @@ function HubsAPI(serverTimeout, wsClientClass, PromiseClass) {
     this.ChatHub.server = {
         __HUB_NAME : 'ChatHub',
         
-        classMethod : function (){
-            
-            return constructMessage('ChatHub', 'class_method', arguments);
-        },
-
-        staticFunc : function (){
-            
-            return constructMessage('ChatHub', 'static_func', arguments);
-        },
-
-        getSubscribedClientsIds : function (){
-            
-            return constructMessage('ChatHub', 'get_subscribed_clients_ids', arguments);
-        },
-
         subscribeToHub : function (){
             
             return constructMessage('ChatHub', 'subscribe_to_hub', arguments);
@@ -217,11 +202,17 @@ function HubsAPI(serverTimeout, wsClientClass, PromiseClass) {
         unsubscribeFromHub : function (){
             
             return constructMessage('ChatHub', 'unsubscribe_from_hub', arguments);
+        },
+
+        getSubscribedClientsIds : function (){
+            
+            return constructMessage('ChatHub', 'get_subscribed_clients_ids', arguments);
         }
     };
     this.ChatHub.client = {
         __HUB_NAME : 'ChatHub',
         
+        printMessage : emptyFunction()
     };
     this.UtilsAPIHub = {};
     this.UtilsAPIHub.server = {

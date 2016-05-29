@@ -54,7 +54,7 @@
     });
 
     //function to be called from server
-    hubsApi.ChatHub.client.onMessage = function (from, message) {
+    hubsApi.ChatHub.client.printMessage = function (from, message) {
         $('#discussion').append('<li><strong>' + from
             + '</strong>: ' + message + '</li>');
         return "received"
