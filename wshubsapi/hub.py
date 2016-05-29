@@ -10,6 +10,8 @@ class UnsuccessfulReplay:
 
 
 class Hub(object):
+    __HubName__ = None
+    
     def __init__(self):
         hub_name = self.__class__.__dict__.get("__HubName__", self.__class__.__name__)
         setattr(self.__class__, "__HubName__", hub_name)
@@ -17,6 +19,7 @@ class Hub(object):
         self._client_functions = dict()
         self._define_client_functions()
         self._clients_holder = ConnectedClientsHolder(self)
+        setattr(self.__class__, "__instance__", self)
 
     def subscribe_to_hub(self, _sender):
         if _sender.api_get_real_connected_client() in self._clients_holder.hub_subscribers:
@@ -59,3 +62,10 @@ class Hub(object):
 
     def _define_client_functions(self):
         pass
+    
+    @classmethod
+    def get_instance(cls):
+        """
+        HUBS_API_IGNORE
+        """
+        return cls.__instance__

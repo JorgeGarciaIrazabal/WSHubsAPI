@@ -25,7 +25,7 @@ setup(
     name='wshubsapi',
     # the version across setup.py and the project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
-    version='0.7.8',
+    version='0.8.0',
 
     description='make complex web-socket communication in a simple way',
     long_description=long_description,
@@ -46,7 +46,7 @@ setup(
         #   3 - Alpha
         #   4 - Beta
         #   5 - Production/Stable
-        'Development Status :: 5 - Production/Stable',
+        'Development Status :: 4 - Beta',
 
         # Indicate who your project is intended for
         'Intended Audience :: Developers',

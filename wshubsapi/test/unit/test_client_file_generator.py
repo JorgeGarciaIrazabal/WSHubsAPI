@@ -9,14 +9,14 @@ from wshubsapi.hubs_inspector import HubsInspector
 from wshubsapi.test.utils.hubs_utils import remove_hubs_subclasses
 
 
-class TestClientFileConstructor(unittest.TestCase):
+class TestClientFileGenerator(unittest.TestCase):
     def setUp(self):
         class TestHub(Hub):
-            def getData(self):
+            def get_data(self):
                 pass
 
         class TestHub2(Hub):
-            def getData(self):
+            def get_data(self):
                 pass
 
         HubsInspector.inspect_implemented_hubs(force_reconstruction=True)
@@ -58,6 +58,20 @@ class TestClientFileConstructor(unittest.TestCase):
 
         self.assertTrue(os.path.exists(full_path))
 
+    def test_JSCreation_withClientFunctions(self):
+        class TestHubWithClient(Hub):
+            def get_data(self):
+                pass
+
+            def _define_client_functions(self):
+                self.client_functions = dict(client1=lambda x, y: None,
+                                             client2=lambda x, y=1: None,
+                                             client3=lambda x=0, y=1: None)
+        HubsInspector.inspect_implemented_hubs(force_reconstruction=True)
+        HubsInspector.construct_js_file()
+
+        self.assertTrue(os.path.exists(HubsInspector.DEFAULT_JS_API_FILE_NAME))
+
     @unittest.skip("no Java client ready")
     def test_JAVACreation(self):
         path = "onTest"
@@ -72,9 +86,23 @@ class TestClientFileConstructor(unittest.TestCase):
 
     def test_PythonCreation_default_values(self):
         HubsInspector.construct_python_file()
+
         self.assertTrue(os.path.exists(HubsInspector.DEFAULT_PY_API_FILE_NAME))
         self.assertTrue(os.path.exists("__init__.py"), "Check if python package is created")
-        os.remove(HubsInspector.DEFAULT_PY_API_FILE_NAME)
+
+    def test_PythonCreation_withClientFunctions(self):
+        class TestHubWithClient(Hub):
+            def get_data(self):
+                pass
+
+            def _define_client_functions(self):
+                self.client_functions = dict(client1=lambda x, y: None,
+                                             client2=lambda x, y=1: None,
+                                             client3=lambda x=0, y=1: None)
+        HubsInspector.inspect_implemented_hubs(force_reconstruction=True)
+        HubsInspector.construct_python_file()
+
+        self.assertTrue(os.path.exists(HubsInspector.DEFAULT_PY_API_FILE_NAME))
 
     def test_PythonCreation_new_path(self):
         full_path = os.path.join(self.other_folder, self.other_name)

@@ -8,7 +8,7 @@ function HubsAPI(serverTimeout, wsClientClass, PromiseClass) {
         defaultRespondTimeout = serverTimeout || 5000,
         thisApi = this,
         messagesBeforeOpen = [],
-        emptyFunction = function () {},
+        emptyFunction = function () {return function () {}}, //redefine any empty function as required
         onOpenTriggers = [];
 
     PromiseClass = PromiseClass || Promise;
@@ -59,7 +59,7 @@ function HubsAPI(serverTimeout, wsClientClass, PromiseClass) {
                 if (reconnectTimeout !== -1) {
                     window.setTimeout(function () {
                         thisApi.connect(url, reconnectTimeout);
-                        thisApi.callbacks.onReconnecting(error);
+                        thisApi.onReconnecting(error);
                     }, reconnectTimeout * 1000);
                 }
             }
@@ -73,7 +73,7 @@ function HubsAPI(serverTimeout, wsClientClass, PromiseClass) {
 
             thisApi.wsClient.onopen = function () {
                 resolve();
-                thisApi.callbacks.onOpen(thisApi);
+                thisApi.onOpen(thisApi);
                 onOpenTriggers.forEach(function (trigger) {
                     trigger();
                 });
@@ -84,7 +84,7 @@ function HubsAPI(serverTimeout, wsClientClass, PromiseClass) {
 
             thisApi.wsClient.onclose = function (error) {
                 reject(error);
-                thisApi.callbacks.onClose(error);
+                thisApi.onClose(error);
                 reconnect(error);
             };
 
@@ -133,7 +133,7 @@ function HubsAPI(serverTimeout, wsClientClass, PromiseClass) {
                                 }
                             }
                         } else {
-                            thisApi.callbacks.onClientFunctionNotFound(msgObj.hub, msgObj.function);
+                            thisApi.onClientFunctionNotFound(msgObj.hub, msgObj.function);
                         }
                     }
                 } catch (err) {
@@ -142,18 +142,16 @@ function HubsAPI(serverTimeout, wsClientClass, PromiseClass) {
             };
 
             thisApi.wsClient.onMessageError = function (error) {
-                thisApi.callbacks.onMessageError(error);
+                thisApi.onMessageError(error);
             };
         });
     };
 
-    this.callbacks = {
-        onClose: emptyFunction,
-        onOpen: emptyFunction,
-        onReconnecting: emptyFunction,
-        onMessageError: emptyFunction,
-        onClientFunctionNotFound: emptyFunction
-    };
+    this.onClose = emptyFunction();
+    this.onOpen = emptyFunction();
+    this.onReconnecting = emptyFunction();
+    this.onMessageError = emptyFunction();
+    this.onClientFunctionNotFound = emptyFunction();
 
     this.defaultErrorHandler = null;
 
@@ -221,7 +219,10 @@ function HubsAPI(serverTimeout, wsClientClass, PromiseClass) {
             return constructMessage('ChatHub', 'unsubscribe_from_hub', arguments);
         }
     };
-    this.ChatHub.client = {};
+    this.ChatHub.client = {
+        __HUB_NAME : 'ChatHub',
+        
+    };
     this.SubHub2 = {};
     this.SubHub2.server = {
         __HUB_NAME : 'SubHub2',
@@ -241,7 +242,10 @@ function HubsAPI(serverTimeout, wsClientClass, PromiseClass) {
             return constructMessage('SubHub2', 'get_subscribed_clients_ids', arguments);
         }
     };
-    this.SubHub2.client = {};
+    this.SubHub2.client = {
+        __HUB_NAME : 'SubHub2',
+        
+    };
     this.SubHub3 = {};
     this.SubHub3.server = {
         __HUB_NAME : 'SubHub3',
@@ -261,7 +265,10 @@ function HubsAPI(serverTimeout, wsClientClass, PromiseClass) {
             return constructMessage('SubHub3', 'get_subscribed_clients_ids', arguments);
         }
     };
-    this.SubHub3.client = {};
+    this.SubHub3.client = {
+        __HUB_NAME : 'SubHub3',
+        
+    };
     this.EchoHub = {};
     this.EchoHub.server = {
         __HUB_NAME : 'EchoHub',
@@ -291,7 +298,10 @@ function HubsAPI(serverTimeout, wsClientClass, PromiseClass) {
             return constructMessage('EchoHub', 'echo', arguments);
         }
     };
-    this.EchoHub.client = {};
+    this.EchoHub.client = {
+        __HUB_NAME : 'EchoHub',
+        
+    };
     this.SubHub = {};
     this.SubHub.server = {
         __HUB_NAME : 'SubHub',
@@ -311,7 +321,10 @@ function HubsAPI(serverTimeout, wsClientClass, PromiseClass) {
             return constructMessage('SubHub', 'get_subscribed_clients_ids', arguments);
         }
     };
-    this.SubHub.client = {};
+    this.SubHub.client = {
+        __HUB_NAME : 'SubHub',
+        
+    };
     this.UtilsAPIHub = {};
     this.UtilsAPIHub.server = {
         __HUB_NAME : 'UtilsAPIHub',
@@ -351,7 +364,10 @@ function HubsAPI(serverTimeout, wsClientClass, PromiseClass) {
             return constructMessage('UtilsAPIHub', 'set_id', arguments);
         }
     };
-    this.UtilsAPIHub.client = {};
+    this.UtilsAPIHub.client = {
+        __HUB_NAME : 'UtilsAPIHub',
+        
+    };
     this.SubHub1 = {};
     this.SubHub1.server = {
         __HUB_NAME : 'SubHub1',
@@ -371,7 +387,10 @@ function HubsAPI(serverTimeout, wsClientClass, PromiseClass) {
             return constructMessage('SubHub1', 'get_subscribed_clients_ids', arguments);
         }
     };
-    this.SubHub1.client = {};
+    this.SubHub1.client = {
+        __HUB_NAME : 'SubHub1',
+        
+    };
 }
 /* jshint ignore:end */
 /* ignore jslint end */

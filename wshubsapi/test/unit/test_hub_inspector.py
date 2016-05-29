@@ -15,7 +15,7 @@ class TestHubInspector(unittest.TestCase):
     def setUp(self):
         # Building hubs for testing
         class TestHub(Hub):
-            def getData(self):
+            def get_data(self):
                 pass
 
         class TestHub2(Hub):
@@ -41,7 +41,7 @@ class TestHubInspector(unittest.TestCase):
         self.assertEqual(len(HubsInspector.HUBS_DICT), 3, 'Detects all Hubs')
         self.assertTrue(issubclass(HubsInspector.HUBS_DICT['TestHub'].__class__, Hub), 'Hubs subclass is class')
         self.assertTrue(issubclass(HubsInspector.HUBS_DICT['TestHub2'].__class__, Hub), 'Hubs subclass is class')
-        self.assertTrue(getattr(HubsInspector.HUBS_DICT['TestHub'], "getData"), 'Detects function')
+        self.assertTrue(getattr(HubsInspector.HUBS_DICT['TestHub'], "get_data"), 'Detects function')
 
     def test_hubs_limitations(self):
         class TestHubLimitation(Hub):
@@ -111,11 +111,11 @@ class TestHubInspector(unittest.TestCase):
         hubs_info = HubsInspector.get_hubs_information()
 
         self.assertIn("TestHub2", hubs_info)
-        self.assertIn("getData", hubs_info["TestHub"]["serverMethods"])
+        self.assertIn("get_data", hubs_info["TestHub"]["serverMethods"])
 
     def test_getHubsInformation_ReturnsDictionaryWithClientFunctions(self):
         class TestHubWithClient(Hub):
-            def getData(self):
+            def get_data(self):
                 pass
 
             def _define_client_functions(self):
@@ -125,15 +125,15 @@ class TestHubInspector(unittest.TestCase):
 
         HubsInspector.inspect_implemented_hubs(force_reconstruction=True)
 
-        infoReport = HubsInspector.get_hubs_information()
+        info_report = HubsInspector.get_hubs_information()
 
-        self.assertIn("TestHubWithClient", infoReport)
-        client1Method = infoReport["TestHubWithClient"]["clientMethods"]["client1"]
-        client2Method = infoReport["TestHubWithClient"]["clientMethods"]["client2"]
-        client3Method = infoReport["TestHubWithClient"]["clientMethods"]["client3"]
-        self.assertEqual(client1Method["args"], ["x", "y"])
-        self.assertEqual(client2Method["defaults"], [1])
-        self.assertEqual(client3Method["defaults"], [0, 1])
+        self.assertIn("TestHubWithClient", info_report)
+        client1method = info_report["TestHubWithClient"]["clientMethods"]["client1"]
+        client2method = info_report["TestHubWithClient"]["clientMethods"]["client2"]
+        client3method = info_report["TestHubWithClient"]["clientMethods"]["client3"]
+        self.assertEqual(client1method["args"], ["x", "y"])
+        self.assertEqual(client2method["defaults"], [1])
+        self.assertEqual(client3method["defaults"], [0, 1])
 
     def test_include_hubs_in_withOneModule(self):
         hubs_info = HubsInspector.get_hubs_information()

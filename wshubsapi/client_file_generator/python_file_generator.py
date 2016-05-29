@@ -11,17 +11,17 @@ class PythonClientFileGenerator(ClientFileGenerator):
     TAB = "    "
 
     @classmethod
-    def __get_hub_class_str(cls, class_):
-        func_strings = ("\n" + cls.TAB * 2).join(cls.__get_function_str(class_))
-        return cls.CLASS_TEMPLATE.format(name=class_.__HubName__, functions=func_strings)
+    def __get_hub_class_str(cls, hub_name, hub_info):
+        func_sep = ("\n" + cls.TAB * 2)
+        func_strings = func_sep.join(cls.__get_function_str(hub_name, hub_info))
+        return cls.CLASS_TEMPLATE.format(name=hub_name, functions=func_strings)
 
     @classmethod
-    def __get_function_str(cls, class_):
+    def __get_function_str(cls, hub_name, hub_info):
         func_strings = []
-        functions = inspect.getmembers(class_, predicate=is_function_for_ws_client)
-        for name, method in functions:
-            args = get_args(method)
-            defaults = get_defaults(method)
+        for method_name, method_info in hub_info["serverMethods"].items():
+            args = method_info["args"]
+            defaults = method_info["defaults"]
             formatted_args = []
             for i, arg in enumerate(reversed(args)):
                 if i >= len(defaults):
@@ -30,28 +30,33 @@ class PythonClientFileGenerator(ClientFileGenerator):
                     formatted_args.insert(0, arg + "=" + str(defaults[-i - 1]))
             append_in_args = ("\n" + cls.TAB * 4).join([cls.ARGS_COOK_TEMPLATE.format(name=arg) for arg in args])
             func_strings.append(
-                cls.FUNCTION_TEMPLATE.format(name=name, args=", ".join(formatted_args), cook=append_in_args))
+                cls.FUNCTION_TEMPLATE.format(name=method_name, args=", ".join(formatted_args), cook=append_in_args))
         return func_strings
 
     @classmethod
-    def __get_attributes_hub(cls, hubs):
-        return [cls.ATTRIBUTE_HUB_TEMPLATE.format(name=h.__HubName__) for h in hubs]
+    def __get_attributes_hub(cls, hubs_info):
+        return [cls.ATTRIBUTE_HUB_TEMPLATE.format(name=name) for name in hubs_info]
 
     @classmethod
-    def __get_class_strings(cls, hubs):
+    def __get_class_strs(cls, hubs_info):
         class_strings = []
-        for h in hubs:
-            class_strings.append(cls.__get_hub_class_str(h))
+        for hub_name, hub_info in hubs_info.items():
+            class_strings.append(cls.__get_hub_class_str(hub_name, hub_info))
         return class_strings
 
     @classmethod
-    def create_file(cls, hubs, path):
+    def create_file(cls, hubs_info, path):
         parent_dir = cls._construct_api_path(path)
-        with open(os.path.join(parent_dir, "__init__.py"), 'w'):  # creating __init__.py if not exist
-            pass
+
+        # creating __init__.py if not exist
+        __init__file = os.path.join(parent_dir, "__init__.py")
+        if not os.path.exists(__init__file):
+            with open(os.path.join(parent_dir, "__init__.py"), 'w'):
+                pass
+
         with open(path, "w") as f:
-            class_strings = "".join(cls.__get_class_strings(hubs))
-            attributes_hubs = "\n".join(cls.__get_attributes_hub(hubs))
+            class_strings = "".join(cls.__get_class_strs(hubs_info))
+            attributes_hubs = "\n".join(cls.__get_attributes_hub(hubs_info))
             f.write(cls.WRAPPER.format(Hubs=class_strings, attributesHubs=attributes_hubs))
 
     WRAPPER = '''import logging

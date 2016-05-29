@@ -18,15 +18,16 @@ class JSClientFileGenerator(ClientFileGenerator):
 
     @classmethod
     def __get_hub_class_str(cls, hub_name, hub_info):
-        func_strings = ",\n".join(cls.__get_js_functions_str(hub_name, hub_info))
-        return cls.CLASS_TEMPLATE.format(name=hub_name, functions=func_strings)
+        functions_str = dict(serverFunctions=cls.__get_js_server_functions_str(hub_name, hub_info),
+                             clientFunctions=cls.__get_js_client_functions_str(hub_name, hub_info))
+        return cls.CLASS_TEMPLATE.format(name=hub_name, **functions_str)
 
     @classmethod
-    def __get_js_functions_str(cls, hub_name, hub_info):
+    def __get_functions_parameters(cls, hub_name, methods_info):
         pickler = Pickler(max_depth=4, max_iter=50, make_refs=False)
-        func_strings = []
+        all_parameters = []
 
-        for method_name, method_info in hub_info["serverMethods"].items():
+        for method_name, method_info in methods_info.items():
             defaults = method_info["defaults"]
             for i, default in enumerate(defaults):
                 if not isinstance(default, utils.string_class) or not default.startswith("\""):
@@ -37,10 +38,21 @@ class JSClientFileGenerator(ClientFileGenerator):
                 arg_pos = len(args) - len(defaults) + i  # argument with the default value
                 defaults_array.append(cls.ARGS_COOK_TEMPLATE.format(iter=arg_pos, name=args[arg_pos], default=d))
             defaults_str = "\n\t\t\t".join(defaults_array)
-            func_strings.append(cls.FUNCTION_TEMPLATE.format(name=method_name, args=", ".join(args),
-                                                             cook=defaults_str, hubName=hub_name,
-                                                             camelCaseName=inflection.camelize(method_name, False)))
-        return func_strings
+            func_parameters = dict(name=method_name, args=", ".join(args),
+                                   cook=defaults_str, hubName=hub_name,
+                                   camelCaseName=inflection.camelize(method_name, False))
+            all_parameters.append(func_parameters)
+        return all_parameters
+
+    @classmethod
+    def __get_js_server_functions_str(cls, hub_name, hub_info):
+        all_parameters = cls.__get_functions_parameters(hub_name, hub_info["serverMethods"])
+        return ",\n".join([cls.SERVER_FUNCTION_TEMPLATE.format(**params) for params in all_parameters])
+
+    @classmethod
+    def __get_js_client_functions_str(cls, hub_name, hub_info):
+        all_parameters = cls.__get_functions_parameters(hub_name, hub_info["clientMethods"])
+        return ",\n".join([cls.CLIENT_FUNCTION_TEMPLATE.format(**params) for params in all_parameters])
 
     @classmethod
     def create_file(cls, hubs_info, path):
@@ -59,7 +71,7 @@ function HubsAPI(serverTimeout, wsClientClass, PromiseClass) {{
         defaultRespondTimeout = serverTimeout || 5000,
         thisApi = this,
         messagesBeforeOpen = [],
-        emptyFunction = function () {{}},
+        emptyFunction = function () {{return function () {{}}}}, //redefine any empty function as required
         onOpenTriggers = [];
 
     PromiseClass = PromiseClass || Promise;
@@ -110,7 +122,7 @@ function HubsAPI(serverTimeout, wsClientClass, PromiseClass) {{
                 if (reconnectTimeout !== -1) {{
                     window.setTimeout(function () {{
                         thisApi.connect(url, reconnectTimeout);
-                        thisApi.callbacks.onReconnecting(error);
+                        thisApi.onReconnecting(error);
                     }}, reconnectTimeout * 1000);
                 }}
             }}
@@ -124,7 +136,7 @@ function HubsAPI(serverTimeout, wsClientClass, PromiseClass) {{
 
             thisApi.wsClient.onopen = function () {{
                 resolve();
-                thisApi.callbacks.onOpen(thisApi);
+                thisApi.onOpen(thisApi);
                 onOpenTriggers.forEach(function (trigger) {{
                     trigger();
                 }});
@@ -135,7 +147,7 @@ function HubsAPI(serverTimeout, wsClientClass, PromiseClass) {{
 
             thisApi.wsClient.onclose = function (error) {{
                 reject(error);
-                thisApi.callbacks.onClose(error);
+                thisApi.onClose(error);
                 reconnect(error);
             }};
 
@@ -184,7 +196,7 @@ function HubsAPI(serverTimeout, wsClientClass, PromiseClass) {{
                                 }}
                             }}
                         }} else {{
-                            thisApi.callbacks.onClientFunctionNotFound(msgObj.hub, msgObj.function);
+                            thisApi.onClientFunctionNotFound(msgObj.hub, msgObj.function);
                         }}
                     }}
                 }} catch (err) {{
@@ -193,18 +205,16 @@ function HubsAPI(serverTimeout, wsClientClass, PromiseClass) {{
             }};
 
             thisApi.wsClient.onMessageError = function (error) {{
-                thisApi.callbacks.onMessageError(error);
+                thisApi.onMessageError(error);
             }};
         }});
     }};
 
-    this.callbacks = {{
-        onClose: emptyFunction,
-        onOpen: emptyFunction,
-        onReconnecting: emptyFunction,
-        onMessageError: emptyFunction,
-        onClientFunctionNotFound: emptyFunction
-    }};
+    this.onClose = emptyFunction();
+    this.onOpen = emptyFunction();
+    this.onReconnecting = emptyFunction();
+    this.onMessageError = emptyFunction();
+    this.onClientFunctionNotFound = emptyFunction();
 
     this.defaultErrorHandler = null;
 
@@ -246,14 +256,20 @@ function HubsAPI(serverTimeout, wsClientClass, PromiseClass) {{
     this.{name} = {{}};
     this.{name}.server = {{
         __HUB_NAME : '{name}',
-        {functions}
+        {serverFunctions}
     }};
-    this.{name}.client = {{}};"""
+    this.{name}.client = {{
+        __HUB_NAME : '{name}',
+        {clientFunctions}
+    }};"""
 
-    FUNCTION_TEMPLATE = """
+    SERVER_FUNCTION_TEMPLATE = """
         {camelCaseName} : function ({args}){{
             {cook}
             return constructMessage('{hubName}', '{name}', arguments);
         }}"""
+
+    CLIENT_FUNCTION_TEMPLATE = """
+        {camelCaseName} : emptyFunction()"""
 
     ARGS_COOK_TEMPLATE = "arguments[{iter}] = {name} === undefined ? {default} : {name};"
