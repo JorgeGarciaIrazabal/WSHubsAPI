@@ -60,7 +60,7 @@ function HubsAPI(serverTimeout, wsClientClass, PromiseClass) {
                     window.setTimeout(function () {
                         thisApi.connect(url, reconnectTimeout);
                         thisApi.onReconnecting(error);
-                    }, reconnectTimeout * 1000);
+                    }, reconnectTimeout);
                 }
             }
 
@@ -223,6 +223,15 @@ function HubsAPI(serverTimeout, wsClientClass, PromiseClass) {
         __HUB_NAME : 'ChatHub',
         
     };
+    this.ChatHub.getClients = function(clientsIds){
+        return {
+            clientsIds: clientsIds,
+            call: function (functionName, functionArgs) {
+                var bodyArgs = [this.clientsIds, functionName, functionArgs];
+                return constructMessage('ChatHub', '_client_to_clients_bridge', bodyArgs);
+            },
+        }
+    };
     this.SubHub2 = {};
     this.SubHub2.server = {
         __HUB_NAME : 'SubHub2',
@@ -246,6 +255,15 @@ function HubsAPI(serverTimeout, wsClientClass, PromiseClass) {
         __HUB_NAME : 'SubHub2',
         
     };
+    this.SubHub2.getClients = function(clientsIds){
+        return {
+            clientsIds: clientsIds,
+            call: function (functionName, functionArgs) {
+                var bodyArgs = [this.clientsIds, functionName, functionArgs];
+                return constructMessage('SubHub2', '_client_to_clients_bridge', bodyArgs);
+            },
+        }
+    };
     this.SubHub3 = {};
     this.SubHub3.server = {
         __HUB_NAME : 'SubHub3',
@@ -268,6 +286,15 @@ function HubsAPI(serverTimeout, wsClientClass, PromiseClass) {
     this.SubHub3.client = {
         __HUB_NAME : 'SubHub3',
         
+    };
+    this.SubHub3.getClients = function(clientsIds){
+        return {
+            clientsIds: clientsIds,
+            call: function (functionName, functionArgs) {
+                var bodyArgs = [this.clientsIds, functionName, functionArgs];
+                return constructMessage('SubHub3', '_client_to_clients_bridge', bodyArgs);
+            },
+        }
     };
     this.EchoHub = {};
     this.EchoHub.server = {
@@ -302,6 +329,15 @@ function HubsAPI(serverTimeout, wsClientClass, PromiseClass) {
         __HUB_NAME : 'EchoHub',
         
     };
+    this.EchoHub.getClients = function(clientsIds){
+        return {
+            clientsIds: clientsIds,
+            call: function (functionName, functionArgs) {
+                var bodyArgs = [this.clientsIds, functionName, functionArgs];
+                return constructMessage('EchoHub', '_client_to_clients_bridge', bodyArgs);
+            },
+        }
+    };
     this.SubHub = {};
     this.SubHub.server = {
         __HUB_NAME : 'SubHub',
@@ -324,6 +360,15 @@ function HubsAPI(serverTimeout, wsClientClass, PromiseClass) {
     this.SubHub.client = {
         __HUB_NAME : 'SubHub',
         
+    };
+    this.SubHub.getClients = function(clientsIds){
+        return {
+            clientsIds: clientsIds,
+            call: function (functionName, functionArgs) {
+                var bodyArgs = [this.clientsIds, functionName, functionArgs];
+                return constructMessage('SubHub', '_client_to_clients_bridge', bodyArgs);
+            },
+        }
     };
     this.UtilsAPIHub = {};
     this.UtilsAPIHub.server = {
@@ -368,6 +413,15 @@ function HubsAPI(serverTimeout, wsClientClass, PromiseClass) {
         __HUB_NAME : 'UtilsAPIHub',
         
     };
+    this.UtilsAPIHub.getClients = function(clientsIds){
+        return {
+            clientsIds: clientsIds,
+            call: function (functionName, functionArgs) {
+                var bodyArgs = [this.clientsIds, functionName, functionArgs];
+                return constructMessage('UtilsAPIHub', '_client_to_clients_bridge', bodyArgs);
+            },
+        }
+    };
     this.SubHub1 = {};
     this.SubHub1.server = {
         __HUB_NAME : 'SubHub1',
@@ -390,6 +444,15 @@ function HubsAPI(serverTimeout, wsClientClass, PromiseClass) {
     this.SubHub1.client = {
         __HUB_NAME : 'SubHub1',
         
+    };
+    this.SubHub1.getClients = function(clientsIds){
+        return {
+            clientsIds: clientsIds,
+            call: function (functionName, functionArgs) {
+                var bodyArgs = [this.clientsIds, functionName, functionArgs];
+                return constructMessage('SubHub1', '_client_to_clients_bridge', bodyArgs);
+            },
+        }
     };
 }
 /* jshint ignore:end */

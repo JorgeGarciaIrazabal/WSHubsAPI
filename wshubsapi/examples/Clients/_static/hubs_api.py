@@ -234,7 +234,7 @@ class HubsAPI(object):
                 """
                 args = list()
                 args.append(self.clients_ids)
-                args.append("print_message")
+                args.append(print_message)
                 args.append([sender_name, msg])
                 id_ = self._get_next_message_id()
                 body = {"hub": self.hub.name, "function": "_client_to_clients_bridge", "args": args, "ID": id_}

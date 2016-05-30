@@ -18,8 +18,9 @@ class JSClientFileGenerator(ClientFileGenerator):
 
     @classmethod
     def __get_hub_class_str(cls, hub_name, hub_info):
-        functions_str = dict(serverFunctions=cls.__get_js_server_functions_str(hub_name, hub_info),
-                             clientFunctions=cls.__get_js_client_functions_str(hub_name, hub_info))
+        functions_str = dict(serverFunctions=cls.__get_server_functions_str(hub_name, hub_info),
+                             clientFunctions=cls.__get_client_functions_str(hub_name, hub_info),
+                             bridgeFunctions=cls.__get_bridge_functions_str(hub_name, hub_info))
         return cls.CLASS_TEMPLATE.format(name=hub_name, **functions_str)
 
     @classmethod
@@ -45,14 +46,19 @@ class JSClientFileGenerator(ClientFileGenerator):
         return all_parameters
 
     @classmethod
-    def __get_js_server_functions_str(cls, hub_name, hub_info):
+    def __get_server_functions_str(cls, hub_name, hub_info):
         all_parameters = cls.__get_functions_parameters(hub_name, hub_info["serverMethods"])
         return ",\n".join([cls.SERVER_FUNCTION_TEMPLATE.format(**params) for params in all_parameters])
 
     @classmethod
-    def __get_js_client_functions_str(cls, hub_name, hub_info):
+    def __get_client_functions_str(cls, hub_name, hub_info):
         all_parameters = cls.__get_functions_parameters(hub_name, hub_info["clientMethods"])
         return ",\n".join([cls.CLIENT_FUNCTION_TEMPLATE.format(**params) for params in all_parameters])
+
+    @classmethod
+    def __get_bridge_functions_str(cls, hub_name, hub_info):
+        all_parameters = cls.__get_functions_parameters(hub_name, hub_info["clientMethods"])
+        return ",\n".join([cls.BRIDGE_FUNCTIONS_TEMPLATE.format(**params) for params in all_parameters])
 
     @classmethod
     def create_file(cls, hubs_info, path):
@@ -123,7 +129,7 @@ function HubsAPI(serverTimeout, wsClientClass, PromiseClass) {{
                     window.setTimeout(function () {{
                         thisApi.connect(url, reconnectTimeout);
                         thisApi.onReconnecting(error);
-                    }}, reconnectTimeout * 1000);
+                    }}, reconnectTimeout);
                 }}
             }}
 
@@ -261,6 +267,15 @@ function HubsAPI(serverTimeout, wsClientClass, PromiseClass) {{
     this.{name}.client = {{
         __HUB_NAME : '{name}',
         {clientFunctions}
+    }};
+    this.{name}.getClients = function(clientsIds){{
+        return {{
+            clientsIds: clientsIds,
+            call: function (functionName, functionArgs) {{
+                var bodyArgs = [this.clientsIds, functionName, functionArgs];
+                return constructMessage('{name}', '_client_to_clients_bridge', bodyArgs);
+            }},{bridgeFunctions}
+        }}
     }};"""
 
     SERVER_FUNCTION_TEMPLATE = """
@@ -268,6 +283,14 @@ function HubsAPI(serverTimeout, wsClientClass, PromiseClass) {{
             {cook}
             return constructMessage('{hubName}', '{name}', arguments);
         }}"""
+
+    BRIDGE_FUNCTIONS_TEMPLATE = """
+            {camelCaseName} : function ({args}){{
+                {cook}
+                var funcArgs = Array.prototype.slice.call(arguments)
+                var bodyArgs = [this.clientsIds, '{name}', funcArgs];
+                return constructMessage('{hubName}', '_client_to_clients_bridge', bodyArgs);
+            }}"""
 
     CLIENT_FUNCTION_TEMPLATE = """
         {camelCaseName} : emptyFunction()"""

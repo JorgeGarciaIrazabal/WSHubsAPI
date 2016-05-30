@@ -60,7 +60,7 @@ function HubsAPI(serverTimeout, wsClientClass, PromiseClass) {
                     window.setTimeout(function () {
                         thisApi.connect(url, reconnectTimeout);
                         thisApi.onReconnecting(error);
-                    }, reconnectTimeout * 1000);
+                    }, reconnectTimeout);
                 }
             }
 
@@ -214,6 +214,21 @@ function HubsAPI(serverTimeout, wsClientClass, PromiseClass) {
         
         printMessage : emptyFunction()
     };
+    this.ChatHub.getClients = function(clientsIds){
+        return {
+            clientsIds: clientsIds,
+            call: function (functionName, functionArgs) {
+                var bodyArgs = [this.clientsIds, functionName, functionArgs];
+                return constructMessage('ChatHub', '_client_to_clients_bridge', bodyArgs);
+            },
+            printMessage : function (senderName, msg){
+                
+                var funcArgs = Array.prototype.slice.call(arguments)
+                var bodyArgs = [this.clientsIds, 'print_message', funcArgs];
+                return constructMessage('ChatHub', '_client_to_clients_bridge', bodyArgs);
+            }
+        }
+    };
     this.UtilsAPIHub = {};
     this.UtilsAPIHub.server = {
         __HUB_NAME : 'UtilsAPIHub',
@@ -256,6 +271,15 @@ function HubsAPI(serverTimeout, wsClientClass, PromiseClass) {
     this.UtilsAPIHub.client = {
         __HUB_NAME : 'UtilsAPIHub',
         
+    };
+    this.UtilsAPIHub.getClients = function(clientsIds){
+        return {
+            clientsIds: clientsIds,
+            call: function (functionName, functionArgs) {
+                var bodyArgs = [this.clientsIds, functionName, functionArgs];
+                return constructMessage('UtilsAPIHub', '_client_to_clients_bridge', bodyArgs);
+            },
+        }
     };
 }
 /* jshint ignore:end */

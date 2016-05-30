@@ -29,7 +29,7 @@
             + '</strong>: ' + message + '</li>');
 
 
-        hubsApi.ChatHub.server.sendToAll(name, message)
+        hubsApi.ChatHub.getClients('javascript client').call("printMessage", [name, message])
             .then(function (numOfMessagesSent) {
                 console.log("message sent to " + numOfMessagesSent + " client(s)");
             }, function (err) {
@@ -40,7 +40,7 @@
         $('#message').val('').focus();
     }
 
-    hubsApi.connect('ws://127.0.0.1:8888/jsClient').then(function () {
+    hubsApi.connect('ws://127.0.0.1:8888/javascript client').then(function () {
         $('#status').text("Connected")
 
         //sending message
