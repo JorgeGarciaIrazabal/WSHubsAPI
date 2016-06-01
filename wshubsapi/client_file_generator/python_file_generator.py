@@ -110,6 +110,16 @@ class GenericServer(object):
     def _serialize_object(self, obj2ser):
         return jsonpickle.encode(obj2ser, **self.hub.serialization_args)
 
+    def construct_message(self, args, function_name):
+        id_ = self._get_next_message_id()
+        body = {{"hub": self.hub.name, "function": function_name, "args": args, "ID": id_}}
+        future = self.hub.ws_client.get_future(id_)
+        send_return_obj = self.hub.ws_client.send(self._serialize_object(body))
+        if isinstance(send_return_obj, Future):
+            return send_return_obj
+        else:
+            return future
+
 
 class GenericBridge(GenericServer):
     def __getattr__(self, function_name):
@@ -262,13 +272,7 @@ class HubsAPI(object):
                 """
                 args = list()
                 {cook}
-                id_ = self._get_next_message_id()
-                body = {{"hub": self.hub.name, "function": "{name}", "args": args, "ID": id_}}
-                future = self.hub.ws_client.get_future(id_)
-                send_return_obj = self.hub.ws_client.send(self._serialize_object(body))
-                if isinstance(send_return_obj, Future):
-                    return send_return_obj
-                return future'''
+                return self.construct_message(args, "{name}")'''
 
     CLIENT_FUNCTION_TEMPLATE = '''
             def {name}(self, {args}):
@@ -283,13 +287,7 @@ class HubsAPI(object):
                 args.append(self.clients_ids)
                 args.append("{name}")
                 args.append([{rawArgs}])
-                id_ = self._get_next_message_id()
-                body = {{"hub": self.hub.name, "function": "_client_to_clients_bridge", "args": args, "ID": id_}}
-                future = self.hub.ws_client.get_future(id_)
-                send_return_obj = self.hub.ws_client.send(self._serialize_object(body))
-                if isinstance(send_return_obj, Future):
-                    return send_return_obj
-                return future'''
+                return self.construct_message(args, "_client_to_clients_bridge") '''
 
     ARGS_COOK_TEMPLATE = "args.append({name})"
 
