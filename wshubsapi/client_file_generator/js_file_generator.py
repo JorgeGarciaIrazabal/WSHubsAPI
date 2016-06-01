@@ -287,7 +287,7 @@ function HubsAPI(serverTimeout, wsClientClass, PromiseClass) {{
     BRIDGE_FUNCTIONS_TEMPLATE = """
             {camelCaseName} : function ({args}){{
                 {cook}
-                var funcArgs = Array.prototype.slice.call(arguments)
+                var funcArgs = Array.prototype.slice.call(arguments);
                 var bodyArgs = [this.clientsIds, '{name}', funcArgs];
                 return constructMessage('{hubName}', '_client_to_clients_bridge', bodyArgs);
             }}"""

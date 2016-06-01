@@ -238,7 +238,7 @@ class HubsAPI(object):
             self.client = self.ClientClass()
 
         def get_clients(self, client_ids):
-            return HubsAPI.ChatHubClass.ClientsInServer(client_ids, self)
+            return HubsAPI.{name}Class.ClientsInServer(client_ids, self)
 
         class ServerClass(GenericServer):
             {serverFunctions}
@@ -281,7 +281,7 @@ class HubsAPI(object):
                 """
                 args = list()
                 args.append(self.clients_ids)
-                args.append({name})
+                args.append("{name}")
                 args.append([{rawArgs}])
                 id_ = self._get_next_message_id()
                 body = {{"hub": self.hub.name, "function": "_client_to_clients_bridge", "args": args, "ID": id_}}

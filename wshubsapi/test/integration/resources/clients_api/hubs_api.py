@@ -270,7 +270,7 @@ class HubsAPI(object):
             self.client = self.ClientClass()
 
         def get_clients(self, client_ids):
-            return HubsAPI.ChatHubClass.ClientsInServer(client_ids, self)
+            return HubsAPI.SubHub2Class.ClientsInServer(client_ids, self)
 
         class ServerClass(GenericServer):
             
@@ -336,7 +336,7 @@ class HubsAPI(object):
             self.client = self.ClientClass()
 
         def get_clients(self, client_ids):
-            return HubsAPI.ChatHubClass.ClientsInServer(client_ids, self)
+            return HubsAPI.SubHub3Class.ClientsInServer(client_ids, self)
 
         class ServerClass(GenericServer):
             
@@ -402,7 +402,7 @@ class HubsAPI(object):
             self.client = self.ClientClass()
 
         def get_clients(self, client_ids):
-            return HubsAPI.ChatHubClass.ClientsInServer(client_ids, self)
+            return HubsAPI.EchoHubClass.ClientsInServer(client_ids, self)
 
         class ServerClass(GenericServer):
             
@@ -496,7 +496,7 @@ class HubsAPI(object):
             self.client = self.ClientClass()
 
         def get_clients(self, client_ids):
-            return HubsAPI.ChatHubClass.ClientsInServer(client_ids, self)
+            return HubsAPI.SubHubClass.ClientsInServer(client_ids, self)
 
         class ServerClass(GenericServer):
             
@@ -562,7 +562,7 @@ class HubsAPI(object):
             self.client = self.ClientClass()
 
         def get_clients(self, client_ids):
-            return HubsAPI.ChatHubClass.ClientsInServer(client_ids, self)
+            return HubsAPI.UtilsAPIHubClass.ClientsInServer(client_ids, self)
 
         class ServerClass(GenericServer):
             
@@ -684,7 +684,7 @@ class HubsAPI(object):
             self.client = self.ClientClass()
 
         def get_clients(self, client_ids):
-            return HubsAPI.ChatHubClass.ClientsInServer(client_ids, self)
+            return HubsAPI.SubHub1Class.ClientsInServer(client_ids, self)
 
         class ServerClass(GenericServer):
             
