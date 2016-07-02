@@ -137,7 +137,7 @@ function HubsAPI(serverTimeout, wsClientClass, PromiseClass) {{
                 thisApi.wsClient = wsClientClass === undefined ? new WebSocket(url) : new wsClientClass(url);
             }} catch (error) {{
                 reconnect(error);
-                reject(error);
+                return reject(error);
             }}
 
             thisApi.wsClient.onopen = function () {{
@@ -202,7 +202,7 @@ function HubsAPI(serverTimeout, wsClientClass, PromiseClass) {{
                                 }}
                             }}
                         }} else {{
-                            thisApi.onClientFunctionNotFound(msgObj.hub, msgObj.function);
+                            thisApi.onClientFunctionNotFound(msgObj.hub, msgObj.function, msgObj.args);
                         }}
                     }}
                 }} catch (err) {{
