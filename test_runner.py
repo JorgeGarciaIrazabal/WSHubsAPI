@@ -22,14 +22,14 @@ def __get_suites(tests_path):
     test_files = glob.glob(tests_path)
     relative_test_files = [test_file.split(os.sep)[-4:] for test_file in test_files]
     module_strings = [".".join(test_file)[:-3] for test_file in relative_test_files]
-    print "this is a test", path, tests_path, test_files
-    print module_strings
+    print("this is a test", path, tests_path, test_files)
+    print(module_strings)
     for t in module_strings:
         try:
             unittest.defaultTestLoader.loadTestsFromName(t)
-            print t, 'good'
+            print(t, 'good')
         except Exception as e:
-            print t, str(e)
+            print(t, str(e))
     return [unittest.defaultTestLoader.loadTestsFromName(test_file) for test_file in module_strings]
 
 
@@ -41,6 +41,12 @@ def __run_test(suite):
 def run_unit_test():
     suite = unittest.TestSuite(__get_suites('wshubsapi/test/unit/test*.py'))
     __run_test(suite)
+
+
+def execfile(file_path):
+    with open(file_path) as f:
+        code = compile(f.read(), file_path, 'exec')
+        exec(code, globals(), locals())
 
 
 def run_integration_test():

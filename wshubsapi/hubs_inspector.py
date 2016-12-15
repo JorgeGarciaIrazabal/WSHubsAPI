@@ -94,7 +94,7 @@ class HubsInspector:
         PythonClientFileGenerator.create_file(cls.get_hubs_information(), path)
 
     @classmethod
-    def construct_dart_file(cls, path=DEFAULT_PY_API_FILE_NAME):
+    def construct_dart_file(cls, path=DEFAULT_DART_API_FILE_NAME):
         cls.inspect_implemented_hubs()
         DartClientFileGenerator.create_file(cls.get_hubs_information(), path)
 

@@ -2,26 +2,20 @@ import json
 import logging
 import threading
 
-try:
-    from Queue import Queue
-except:
-    from queue import Queue
 from jsonpickle.pickler import Pickler
 from concurrent.futures import Future
 
 from wshubsapi.connected_clients_holder import ConnectedClientsHolder
 from wshubsapi.function_message import FunctionMessage
-from wshubsapi.utils import set_serializer_date_handler, serialize_message
-from wshubsapi.messages_received_queue import MessagesReceivedQueue
-# do not remove this line (hubs inspector needs to find it)
-from wshubsapi import utils_api_hub, asynchronous
+from wshubsapi.serializer import Serializer
 
-log = logging.getLogger(__name__)
+# do not remove this line (hubs inspector needs to find it)
+from wshubsapi import utils_api_hub
+
 __author__ = 'Jorge Garcia Irazabal'
 
 _DEFAULT_PICKER = Pickler(max_depth=5, max_iter=80, make_refs=False)
 
-set_serializer_date_handler()  # todo move this
 
 
 class HubsApiException(Exception):
@@ -32,34 +26,20 @@ class CommEnvironment(object):
     _comm_environments = dict()
     get_instance_lock = threading.Lock()
 
-    def __init__(self, message_received_queue_class=None,
-                 unprovided_id_template="UNPROVIDED__{}",
-                 serialization_max_depth=5,
-                 serialization_max_iter=80,
-                 debug_mode=True):
-        """
-        :type message_received_queue_class: MessagesReceivedQueue
-        """
+    def __init__(self, unprovided_id_template="UNPROVIDED__{}", debug_mode=True):
         self.lock = threading.Lock()
         self.available_unprovided_ids = list()
         self.unprovided_id_template = unprovided_id_template
         self.last_provided_id = 0
         self.debug_mode = debug_mode
 
-        if message_received_queue_class is None:
-            self.message_received_queue = MessagesReceivedQueue()
-        else:
-            self.message_received_queue = message_received_queue_class
-        self.message_received_queue.on_message = self.on_message
-        self.message_received_queue.on_error = self.on_error
-
-        self.message_received_queue.start_threads()
         self.all_connected_clients = ConnectedClientsHolder.all_connected_clients
-        self.serialization_args = dict(max_depth=serialization_max_depth, max_iter=serialization_max_iter)
         self.__last_client_message_id = 0
         self.__new_client_message_id_lock = threading.Lock()
         self.__futures_buffer = {}
         """:type : dict[int, Future, datetime]"""
+        self._log = logging.getLogger(__name__)
+        self.serializer = Serializer()
 
     def get_unprovided_id(self):
         if len(self.available_unprovided_ids) > 0:
@@ -80,7 +60,7 @@ class CommEnvironment(object):
     def on_message(self, client, msg_str):
         try:
             msg_str = msg_str if isinstance(msg_str, str) else msg_str.encode("utf-8")
-            msg_obj = json.loads(msg_str)
+            msg_obj = self.serializer.unserialize(msg_str)
             if "reply" not in msg_obj:
                 self.__on_replay(client, msg_str, msg_obj)
             else:
@@ -89,16 +69,13 @@ class CommEnvironment(object):
         except Exception as e:
             self.on_error(client, e)
 
-    def on_async_message(self, client, message):
-        self.message_received_queue.put((message, client))
-
     def on_closed(self, client):
         """:type client: wshubsapi.connected_client.ConnectedClient"""
         ConnectedClientsHolder.pop_client(client.ID)
         client.api_is_closed = True
 
     def on_error(self, client, exception):
-        log.exception("Error parsing message")
+        self._log.exception("Error parsing message")
 
     def reply(self, client, reply, origin_message):
         """
@@ -106,7 +83,7 @@ class CommEnvironment(object):
         :param reply: serialized object to be sent as a reply of a message received
         :param origin_message: Message received (provided for overridden functions)
         """
-        client.api_write_message(serialize_message(self.serialization_args, reply))
+        client.api_write_message(self.serialize_message(reply))
 
     def get_new_clients_future(self):
         with self.__new_client_message_id_lock:
@@ -118,17 +95,8 @@ class CommEnvironment(object):
     def close(self, **kwargs):
         self.message_received_queue.executor.shutdown(**kwargs)
 
-    @classmethod
-    def get_instance(cls, key="generic", **kwargs):
-        """
-        :key: include a key to use multiple communication environments
-        :rtype: CommEnvironment
-        """
-        with cls.get_instance_lock:
-            cls._comm_environments[key] = cls._comm_environments.get(key, None)
-            if cls._comm_environments[key] is None:
-                cls._comm_environments[key] = CommEnvironment(**kwargs)
-            return cls._comm_environments[key]
+    def serialize_message(self, message):
+        return self.serializer.serialize(message)
 
     def __on_time_out(self, id_):
         with self.__new_client_message_id_lock:
@@ -149,3 +117,15 @@ class CommEnvironment(object):
                 future.set_result(msg_obj["reply"])
             else:
                 future.set_exception(Exception(msg_obj["reply"]))
+
+    @classmethod
+    def get_instance(cls, key="generic", **kwargs):
+        """
+        :key: include a key to use multiple communication environments
+        :rtype: CommEnvironment
+        """
+        with cls.get_instance_lock:
+            cls._comm_environments[key] = cls._comm_environments.get(key, None)
+            if cls._comm_environments[key] is None:
+                cls._comm_environments[key] = CommEnvironment(**kwargs)
+            return cls._comm_environments[key]

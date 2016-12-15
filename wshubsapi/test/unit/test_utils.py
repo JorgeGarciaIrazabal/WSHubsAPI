@@ -4,22 +4,15 @@ import unittest
 from flexmock import flexmock, flexmock_teardown
 
 from wshubsapi.hubs_inspector import HubsInspector
-from wshubsapi.messages_received_queue import MessagesReceivedQueue
 from wshubsapi.utils import *
 
 
 class TestUtils(unittest.TestCase):
     def setUp(self):
-        flexmock(MessagesReceivedQueue, DEFAULT_MAX_WORKERS=0)
-        self.queue = None
+        pass
 
     def tearDown(self):
         flexmock_teardown()
-        if isinstance(self.queue, MessagesReceivedQueue):
-            self.queue.keepAlive = False
-            for i in range(self.queue.maxWorkers):
-                self.queue.put(None, None)
-            self.queue.executor.shutdown()
 
     def test_ascii__upper_case_is_initialized(self):
         random_letters = ["A", "Q", "P"]

@@ -23,7 +23,8 @@ class ConnectedClientsHolder:
         return ConnectedClientsGroup(connected_clients, self.hub_name)
 
     def get_clients(self, filter_function):
-        return ConnectedClientsGroup(filter(filter_function, self.all_connected_clients.values()), self.hub_name)
+        clients = filter(filter_function, self.all_connected_clients.values())
+        return ConnectedClientsGroup(list(clients), self.hub_name)
 
     def get_client(self, client_id):
         """

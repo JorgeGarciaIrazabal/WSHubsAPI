@@ -26,7 +26,7 @@ class ConnectionHandler(WebSocket):
 
     def received_message(self, message):
         log.debug("Message received from ID: %s\n%s " % (str(self._connected_client.ID), str(message)))
-        self.comm_environment.on_async_message(self._connected_client, message.data)
+        self.comm_environment.on_message(self._connected_client, message.data)
 
     def closed(self, code, reason=None):
         log.debug("client closed %s" % self._connected_client.__dict__.get("ID", "None"))

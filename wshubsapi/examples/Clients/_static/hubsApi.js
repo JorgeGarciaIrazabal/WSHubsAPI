@@ -68,7 +68,7 @@ function HubsAPI(serverTimeout, wsClientClass, PromiseClass) {
                 thisApi.wsClient = wsClientClass === undefined ? new WebSocket(url) : new wsClientClass(url);
             } catch (error) {
                 reconnect(error);
-                reject(error);
+                return reject(error);
             }
 
             thisApi.wsClient.onopen = function () {
@@ -133,7 +133,7 @@ function HubsAPI(serverTimeout, wsClientClass, PromiseClass) {
                                 }
                             }
                         } else {
-                            thisApi.onClientFunctionNotFound(msgObj.hub, msgObj.function);
+                            thisApi.onClientFunctionNotFound(msgObj.hub, msgObj.function, msgObj.args);
                         }
                     }
                 } catch (err) {
@@ -189,11 +189,6 @@ function HubsAPI(serverTimeout, wsClientClass, PromiseClass) {
     this.ChatHub.server = {
         __HUB_NAME : 'ChatHub',
         
-        subscribeToHub : function (){
-            
-            return constructMessage('ChatHub', 'subscribe_to_hub', arguments);
-        },
-
         sendToAll : function (name, message){
             arguments[1] = message === undefined ? "hello" : message;
             return constructMessage('ChatHub', 'send_to_all', arguments);
@@ -202,6 +197,11 @@ function HubsAPI(serverTimeout, wsClientClass, PromiseClass) {
         getSubscribedClientsIds : function (){
             
             return constructMessage('ChatHub', 'get_subscribed_clients_ids', arguments);
+        },
+
+        subscribeToHub : function (){
+            
+            return constructMessage('ChatHub', 'subscribe_to_hub', arguments);
         },
 
         unsubscribeFromHub : function (){
@@ -223,7 +223,7 @@ function HubsAPI(serverTimeout, wsClientClass, PromiseClass) {
             },
             printMessage : function (senderName, msg){
                 
-                var funcArgs = Array.prototype.slice.call(arguments)
+                var funcArgs = Array.prototype.slice.call(arguments);
                 var bodyArgs = [this.clientsIds, 'print_message', funcArgs];
                 return constructMessage('ChatHub', '_client_to_clients_bridge', bodyArgs);
             }
@@ -233,14 +233,9 @@ function HubsAPI(serverTimeout, wsClientClass, PromiseClass) {
     this.UtilsAPIHub.server = {
         __HUB_NAME : 'UtilsAPIHub',
         
-        setId : function (clientId){
+        getHubsStructure : function (){
             
-            return constructMessage('UtilsAPIHub', 'set_id', arguments);
-        },
-
-        getSubscribedClientsIds : function (){
-            
-            return constructMessage('UtilsAPIHub', 'get_subscribed_clients_ids', arguments);
+            return constructMessage('UtilsAPIHub', 'get_hubs_structure', arguments);
         },
 
         isClientConnected : function (clientId){
@@ -248,9 +243,9 @@ function HubsAPI(serverTimeout, wsClientClass, PromiseClass) {
             return constructMessage('UtilsAPIHub', 'is_client_connected', arguments);
         },
 
-        unsubscribeFromHub : function (){
+        getSubscribedClientsIds : function (){
             
-            return constructMessage('UtilsAPIHub', 'unsubscribe_from_hub', arguments);
+            return constructMessage('UtilsAPIHub', 'get_subscribed_clients_ids', arguments);
         },
 
         subscribeToHub : function (){
@@ -258,14 +253,19 @@ function HubsAPI(serverTimeout, wsClientClass, PromiseClass) {
             return constructMessage('UtilsAPIHub', 'subscribe_to_hub', arguments);
         },
 
+        unsubscribeFromHub : function (){
+            
+            return constructMessage('UtilsAPIHub', 'unsubscribe_from_hub', arguments);
+        },
+
+        setId : function (clientId){
+            
+            return constructMessage('UtilsAPIHub', 'set_id', arguments);
+        },
+
         getId : function (){
             
             return constructMessage('UtilsAPIHub', 'get_id', arguments);
-        },
-
-        getHubsStructure : function (){
-            
-            return constructMessage('UtilsAPIHub', 'get_hubs_structure', arguments);
         }
     };
     this.UtilsAPIHub.client = {

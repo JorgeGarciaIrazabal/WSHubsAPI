@@ -85,6 +85,7 @@ class DartClientFileGenerator(ClientFileGenerator):
 
     @classmethod
     def create_file(cls, hubs_info, path):
+        parent_dir = cls._construct_api_path(path)
         with open(path, "w") as f:
             class_strings = "".join(cls.__get_class_strs(hubs_info))
             attributes_hubs_declaration = "\n".join(cls.__get_attributes_hub_declaration(hubs_info))
