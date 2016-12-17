@@ -1,9 +1,8 @@
 import inflection
-import jsonpickle
-from jsonpickle.pickler import Pickler
 
 from wshubsapi import utils
 from wshubsapi.client_file_generator.client_file_generator import ClientFileGenerator
+from wshubsapi.serializer import Serializer
 
 __author__ = 'jgarc'
 
@@ -25,14 +24,14 @@ class JSClientFileGenerator(ClientFileGenerator):
 
     @classmethod
     def __get_functions_parameters(cls, hub_name, methods_info):
-        pickler = Pickler(max_depth=4, max_iter=50, make_refs=False)
         all_parameters = []
+        serializer = Serializer()
 
         for method_name, method_info in methods_info.items():
             defaults = method_info["defaults"]
             for i, default in enumerate(defaults):
                 if not isinstance(default, utils.string_class) or not default.startswith("\""):
-                    defaults[i] = jsonpickle.encode(pickler.flatten(default))
+                    defaults[i] = serializer.serialize(default)
             args = [inflection.camelize(arg, False) for arg in method_info["args"]]
             defaults_array = []
             for i, d in list(enumerate(defaults)):
@@ -137,7 +136,7 @@ function HubsAPI(serverTimeout, wsClientClass, PromiseClass) {{
                 thisApi.wsClient = wsClientClass === undefined ? new WebSocket(url) : new wsClientClass(url);
             }} catch (error) {{
                 reconnect(error);
-                reject(error);
+                return reject(error);
             }}
 
             thisApi.wsClient.onopen = function () {{
@@ -202,7 +201,7 @@ function HubsAPI(serverTimeout, wsClientClass, PromiseClass) {{
                                 }}
                             }}
                         }} else {{
-                            thisApi.onClientFunctionNotFound(msgObj.hub, msgObj.function);
+                            thisApi.onClientFunctionNotFound(msgObj.hub, msgObj.function, msgObj.args);
                         }}
                     }}
                 }} catch (err) {{
@@ -287,7 +286,7 @@ function HubsAPI(serverTimeout, wsClientClass, PromiseClass) {{
     BRIDGE_FUNCTIONS_TEMPLATE = """
             {camelCaseName} : function ({args}){{
                 {cook}
-                var funcArgs = Array.prototype.slice.call(arguments)
+                var funcArgs = Array.prototype.slice.call(arguments);
                 var bodyArgs = [this.clientsIds, '{name}', funcArgs];
                 return constructMessage('{hubName}', '_client_to_clients_bridge', bodyArgs);
             }}"""

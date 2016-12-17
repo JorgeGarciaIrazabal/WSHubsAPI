@@ -4,6 +4,7 @@ import inspect
 import os
 
 from wshubsapi import utils
+from wshubsapi.client_file_generator.dart_file_generator import DartClientFileGenerator
 from wshubsapi.client_file_generator.js_file_generator import JSClientFileGenerator
 from wshubsapi.client_file_generator.python_file_generator import PythonClientFileGenerator
 from wshubsapi.hub import Hub
@@ -23,6 +24,7 @@ class HubsInspector:
     HUBS_DICT = {}
     DEFAULT_JS_API_FILE_NAME = "hubsApi.js"
     DEFAULT_PY_API_FILE_NAME = "hubs_api.py"
+    DEFAULT_DART_API_FILE_NAME = "hubs_api.dart"
 
     def __init__(self):
         raise HubsInspectorError("Static class, do not create an instance of HubsInspector")
@@ -90,6 +92,11 @@ class HubsInspector:
     def construct_python_file(cls, path=DEFAULT_PY_API_FILE_NAME):
         cls.inspect_implemented_hubs()
         PythonClientFileGenerator.create_file(cls.get_hubs_information(), path)
+
+    @classmethod
+    def construct_dart_file(cls, path=DEFAULT_DART_API_FILE_NAME):
+        cls.inspect_implemented_hubs()
+        DartClientFileGenerator.create_file(cls.get_hubs_information(), path)
 
     @classmethod
     def construct_cpp_file(cls, path="."):

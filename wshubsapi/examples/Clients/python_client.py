@@ -4,9 +4,6 @@ import logging.config
 import sys
 
 logging.config.dictConfig(json.load(open('logging.json')))
-if sys.version_info[0] == 2:
-    input = raw_input
-
 # file created by the server
 from _static.hubs_api import HubsAPI
 
@@ -33,4 +30,4 @@ if __name__ == '__main__':
         if sys.version_info[0] == 2:
             message = message.decode(sys.stdin.encoding)
         message_from_server = ws.ChatHub.server.send_to_all(name, message).result()
-        print "message sent to {} client(s)\n".format(message_from_server)
+        print("message sent to {} client(s)\n".format(message_from_server))

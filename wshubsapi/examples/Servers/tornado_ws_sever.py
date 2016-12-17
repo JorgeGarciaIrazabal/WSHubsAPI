@@ -20,6 +20,7 @@ if __name__ == '__main__':
     HubsInspector.inspect_implemented_hubs()
     HubsInspector.construct_js_file(settings["static_path"] + os.sep + "hubsApi.js")
     HubsInspector.construct_python_file(settings["static_path"] + os.sep + "hubs_api.py")
+    HubsInspector.construct_dart_file(settings["static_path"] + os.sep + "hubs_api.dart")
     log.debug("starting...")
     app.listen(8888)
 

@@ -1,11 +1,7 @@
-from wshubsapi import utils
-
-"""
-Class that wraps a client but includes de hubName to be able to construct the message to call client function
-"""
-
-
 class ClientInHub(object):
+    """ Class that wraps a client but includes de hubName
+     to be able to construct the message to call client function """
+
     def __init__(self, client, hub_name):
         """
         :type client: wshubsapi.connected_client.ConnectedClient
@@ -32,7 +28,7 @@ class ClientInHub(object):
         def connection_function(*args):
             future, id_ = self.__com_environment.get_new_clients_future()
             message = dict(function=function_name, args=list(args), hub=self.__hub_name, ID=id_)
-            msg_str = utils.serialize_message(self.__com_environment.serialization_args, message)
+            msg_str = self.__com_environment.serialize_message(message)
 
             self.__client.api_write_message(msg_str)
             return future

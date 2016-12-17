@@ -1,11 +1,10 @@
 import datetime
-
-import jsonpickle
-
-import wshubsapi.comm_environment
-from wshubsapi import utils
+from datetime import timedelta
 import json
 import unittest
+
+from wshubsapi.comm_environment import CommEnvironment
+from wshubsapi.serializer import Serializer
 
 
 class ComplexObject(object):
@@ -15,13 +14,13 @@ class ComplexObject(object):
 
 class TestSerialization(unittest.TestCase):
     def setUp(self):
-        self.serialization_args = dict()
-        utils.set_serializer_date_handler()
+        self.serializer = Serializer()
+        self.comm_env = CommEnvironment()
 
     def test_basicObjectSerialization(self):
-        serialization = utils.serialize_message(self.serialization_args, 5)
+        serialization = self.comm_env.serialize_message(5)
         self.assertTrue(serialization == '5', 'number serialization')
-        serialization = utils.serialize_message(self.serialization_args, "hi")
+        serialization = self.comm_env.serialize_message("hi")
         self.assertTrue(serialization == '"hi"', 'str serialization')
 
     def test_simpleObjects(self):
@@ -30,7 +29,7 @@ class TestSerialization(unittest.TestCase):
                 self.a = 1
                 self.b = "hi"
 
-        serialization = utils.serialize_message(self.serialization_args, SimpleObject())
+        serialization = self.comm_env.serialize_message(SimpleObject())
         self.assertTrue(json.loads(serialization)["a"] == 1)
         self.assertTrue(json.loads(serialization)["b"] == "hi")
 
@@ -38,33 +37,30 @@ class TestSerialization(unittest.TestCase):
         class ComplexObject(object):
             def __init__(self):
                 self.a = {"a": 10, 1: 15}
-                self.b = [1, 2, "hola"]
+                self.b = [1, 2, "hello"]
 
-        serialization = utils.serialize_message(self.serialization_args, ComplexObject())
-        serObject = json.loads(serialization)
-        self.assertTrue(isinstance(serObject["a"], dict))
-        self.assertTrue(serObject["a"]["a"] == 10)
-        self.assertTrue(serObject["a"]["1"] == 15)
-        self.assertTrue(len(serObject["b"]) == 3)
+        serialization = self.comm_env.serialize_message(ComplexObject())
+        ser_obj = json.loads(serialization)
+        self.assertTrue(isinstance(ser_obj["a"], dict))
+        self.assertTrue(ser_obj["a"]["a"] == 10)
+        self.assertTrue(ser_obj["a"]["1"] == 15)
+        self.assertTrue(len(ser_obj["b"]) == 3)
 
     def test_cycleRef(self):
-        serialization = jsonpickle.encode(ComplexObject())
-        serObject = jsonpickle.decode(serialization)
-        self.assertEqual(serObject.a, serObject)
+        serialization = self.comm_env.serialize_message(ComplexObject())
+        ser_obj = json.loads(serialization)
+        checking_obj = ser_obj
+        for i in range(self.comm_env.serializer.max_depth):
+            self.assertIn('a', checking_obj)
+            checking_obj = checking_obj['a']
+        self.assertNotIn('a', checking_obj)
 
     def test_dateTimeObjects(self):
         date = datetime.datetime.now()
-        serialization = utils.serialize_message(self.serialization_args, {"datetime": date})
-        self.assertTrue(json.loads(serialization)["datetime"] == date.strftime(utils.DATE_TIME_FORMAT),
-                        'datetime serialization')
-
-        date = datetime.date(2001, 1, 1)
-        serialization = utils.serialize_message(self.serialization_args, {"datetime": date})
-        self.assertTrue(json.loads(serialization)["datetime"] == date.strftime(utils.DATE_TIME_FORMAT),
-                        'datetime serialization')
-
-        date = datetime.time()
-        serialization = utils.serialize_message(self.serialization_args, {"datetime": date})
-        self.assertTrue(json.loads(serialization)["datetime"] == date.strftime(utils.DATE_TIME_FORMAT),
-                        'datetime serialization')
+        serialization = self.comm_env.serialize_message({"datetime": date})
+        self.assertIn(Serializer.DATE_TAME_KEY, serialization)
+        datetime_obj = self.serializer.unserialize(serialization)
+        self.assertIsInstance(datetime_obj['datetime'], datetime.datetime)
+        print(datetime.datetime.now() - datetime_obj['datetime'])
+        self.assertTrue(datetime.datetime.now() - datetime_obj['datetime'] < timedelta(milliseconds=25))
 

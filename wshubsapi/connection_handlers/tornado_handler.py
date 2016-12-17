@@ -30,7 +30,7 @@ class ConnectionHandler(tornado.websocket.WebSocketHandler):
 
     def on_message(self, message):
         log.debug(u"Message received from ID: {}\n{} ".format(self._connected_client.ID, message))
-        self.comm_environment.on_async_message(self._connected_client, message)
+        self.comm_environment.on_message(self._connected_client, message)
 
     def on_close(self):
         log.debug("client closed %s" % self._connected_client.__dict__.get("ID", "None"))

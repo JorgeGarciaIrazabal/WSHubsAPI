@@ -1,5 +1,5 @@
 import logging
-import SocketServer
+import socketserver
 import threading
 from _socket import error
 import socket
@@ -12,9 +12,9 @@ log = logging.getLogger(__name__)
 log.addHandler(logging.NullHandler())
 
 
-class SocketHandler(SocketServer.BaseRequestHandler):
+class SocketHandler(socketserver.BaseRequestHandler):
     def __init__(self, request, client_address, server):
-        SocketServer.BaseRequestHandler.__init__(self, request, client_address, server)
+        socketserver.BaseRequestHandler.__init__(self, request, client_address, server)
         # never enter here :O
         self.comm_environment = None
         """:type : CommEnvironment"""
@@ -45,14 +45,14 @@ class SocketHandler(SocketServer.BaseRequestHandler):
             else:
                 for m in self.__message_separator.add_data(data):
                     log.debug("Message received from ID: %s\n%s " % (str(self.__connected_client.ID), str(m)))
-                    self.comm_environment.on_async_message(self.__connected_client, m)
+                    self.comm_environment.on_message(self.__connected_client, m)
 
     def finish(self):
         log.debug("client closed %s" % self.__connected_client.__dict__.get("ID", "None"))
         self.comm_environment.on_closed(self.__connected_client)
 
 
-class ThreadedTCPServer(SocketServer.ThreadingMixIn, SocketServer.TCPServer):
+class ThreadedTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
     pass
 
 
