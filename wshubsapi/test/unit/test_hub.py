@@ -8,7 +8,6 @@ from wshubsapi.comm_environment import CommEnvironment
 from wshubsapi.client_in_hub import ClientInHub
 from wshubsapi.connected_client import ConnectedClient
 from wshubsapi.hub import Hub, UnsuccessfulReplay
-from wshubsapi.messages_received_queue import MessagesReceivedQueue
 from wshubsapi.test.utils.hubs_utils import remove_hubs_subclasses
 
 
@@ -17,8 +16,7 @@ class TestHub(unittest.TestCase):
         class TestHub1(Hub):
             pass
         self.hub = TestHub1()
-        message_received_queue = flexmock(MessagesReceivedQueue(), start_threads=lambda: None)
-        connected_client_sender = flexmock(ConnectedClient(CommEnvironment(message_received_queue), None), ID="myId")
+        connected_client_sender = flexmock(ConnectedClient(CommEnvironment(), None), ID="myId")
         self.sender = ClientInHub(connected_client_sender, TestHub1.__HubName__)
 
     def tearDown(self):
@@ -64,9 +62,8 @@ class TestHub(unittest.TestCase):
         self.assertEqual(len(self.hub.get_subscribed_clients_ids()), 1)
 
     def test_get_subscribed_clients_returns_the_right_clients(self):
-        def construct_sender(id):
-            message_received_queue = flexmock(MessagesReceivedQueue(), start_threads=lambda: None)
-            connected_client_sender = flexmock(ConnectedClient(CommEnvironment(message_received_queue), None), ID=id)
+        def construct_sender(id_):
+            connected_client_sender = flexmock(ConnectedClient(CommEnvironment(), None), ID=id_)
             return ClientInHub(connected_client_sender, self.hub.__HubName__)
 
         client_a = construct_sender("a")

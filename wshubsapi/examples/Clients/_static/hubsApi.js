@@ -68,7 +68,7 @@ function HubsAPI(serverTimeout, wsClientClass, PromiseClass) {
                 thisApi.wsClient = wsClientClass === undefined ? new WebSocket(url) : new wsClientClass(url);
             } catch (error) {
                 reconnect(error);
-                reject(error);
+                return reject(error);
             }
 
             thisApi.wsClient.onopen = function () {
@@ -133,7 +133,7 @@ function HubsAPI(serverTimeout, wsClientClass, PromiseClass) {
                                 }
                             }
                         } else {
-                            thisApi.onClientFunctionNotFound(msgObj.hub, msgObj.function);
+                            thisApi.onClientFunctionNotFound(msgObj.hub, msgObj.function, msgObj.args);
                         }
                     }
                 } catch (err) {
@@ -185,13 +185,65 @@ function HubsAPI(serverTimeout, wsClientClass, PromiseClass) {
         return promise;
     };
     
+    this.UtilsAPIHub = {};
+    this.UtilsAPIHub.server = {
+        __HUB_NAME : 'UtilsAPIHub',
+        
+        getHubsStructure : function (){
+            
+            return constructMessage('UtilsAPIHub', 'get_hubs_structure', arguments);
+        },
+
+        subscribeToHub : function (){
+            
+            return constructMessage('UtilsAPIHub', 'subscribe_to_hub', arguments);
+        },
+
+        unsubscribeFromHub : function (){
+            
+            return constructMessage('UtilsAPIHub', 'unsubscribe_from_hub', arguments);
+        },
+
+        setId : function (clientId){
+            
+            return constructMessage('UtilsAPIHub', 'set_id', arguments);
+        },
+
+        getId : function (){
+            
+            return constructMessage('UtilsAPIHub', 'get_id', arguments);
+        },
+
+        getSubscribedClientsIds : function (){
+            
+            return constructMessage('UtilsAPIHub', 'get_subscribed_clients_ids', arguments);
+        },
+
+        isClientConnected : function (clientId){
+            
+            return constructMessage('UtilsAPIHub', 'is_client_connected', arguments);
+        }
+    };
+    this.UtilsAPIHub.client = {
+        __HUB_NAME : 'UtilsAPIHub',
+        
+    };
+    this.UtilsAPIHub.getClients = function(clientsIds){
+        return {
+            clientsIds: clientsIds,
+            call: function (functionName, functionArgs) {
+                var bodyArgs = [this.clientsIds, functionName, functionArgs];
+                return constructMessage('UtilsAPIHub', '_client_to_clients_bridge', bodyArgs);
+            },
+        }
+    };
     this.ChatHub = {};
     this.ChatHub.server = {
         __HUB_NAME : 'ChatHub',
         
-        subscribeToHub : function (){
+        unsubscribeFromHub : function (){
             
-            return constructMessage('ChatHub', 'subscribe_to_hub', arguments);
+            return constructMessage('ChatHub', 'unsubscribe_from_hub', arguments);
         },
 
         sendToAll : function (name, message){
@@ -204,9 +256,9 @@ function HubsAPI(serverTimeout, wsClientClass, PromiseClass) {
             return constructMessage('ChatHub', 'get_subscribed_clients_ids', arguments);
         },
 
-        unsubscribeFromHub : function (){
+        subscribeToHub : function (){
             
-            return constructMessage('ChatHub', 'unsubscribe_from_hub', arguments);
+            return constructMessage('ChatHub', 'subscribe_to_hub', arguments);
         }
     };
     this.ChatHub.client = {
@@ -223,62 +275,10 @@ function HubsAPI(serverTimeout, wsClientClass, PromiseClass) {
             },
             printMessage : function (senderName, msg){
                 
-                var funcArgs = Array.prototype.slice.call(arguments)
+                var funcArgs = Array.prototype.slice.call(arguments);
                 var bodyArgs = [this.clientsIds, 'print_message', funcArgs];
                 return constructMessage('ChatHub', '_client_to_clients_bridge', bodyArgs);
             }
-        }
-    };
-    this.UtilsAPIHub = {};
-    this.UtilsAPIHub.server = {
-        __HUB_NAME : 'UtilsAPIHub',
-        
-        setId : function (clientId){
-            
-            return constructMessage('UtilsAPIHub', 'set_id', arguments);
-        },
-
-        getSubscribedClientsIds : function (){
-            
-            return constructMessage('UtilsAPIHub', 'get_subscribed_clients_ids', arguments);
-        },
-
-        isClientConnected : function (clientId){
-            
-            return constructMessage('UtilsAPIHub', 'is_client_connected', arguments);
-        },
-
-        unsubscribeFromHub : function (){
-            
-            return constructMessage('UtilsAPIHub', 'unsubscribe_from_hub', arguments);
-        },
-
-        subscribeToHub : function (){
-            
-            return constructMessage('UtilsAPIHub', 'subscribe_to_hub', arguments);
-        },
-
-        getId : function (){
-            
-            return constructMessage('UtilsAPIHub', 'get_id', arguments);
-        },
-
-        getHubsStructure : function (){
-            
-            return constructMessage('UtilsAPIHub', 'get_hubs_structure', arguments);
-        }
-    };
-    this.UtilsAPIHub.client = {
-        __HUB_NAME : 'UtilsAPIHub',
-        
-    };
-    this.UtilsAPIHub.getClients = function(clientsIds){
-        return {
-            clientsIds: clientsIds,
-            call: function (functionName, functionArgs) {
-                var bodyArgs = [this.clientsIds, functionName, functionArgs];
-                return constructMessage('UtilsAPIHub', '_client_to_clients_bridge', bodyArgs);
-            },
         }
     };
 }

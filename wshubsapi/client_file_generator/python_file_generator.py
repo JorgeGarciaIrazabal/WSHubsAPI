@@ -81,12 +81,10 @@ class PythonClientFileGenerator(ClientFileGenerator):
             f.write(cls.WRAPPER.format(Hubs=class_strings, attributesHubs=attributes_hubs))
 
     WRAPPER = '''import logging
-import jsonpickle
 import threading
-from wshubsapi import utils
 from concurrent.futures import Future
+from wshubsapi.serializer import Serializer
 
-utils.set_serializer_date_handler()
 _message_id = 0
 _message_lock = threading.RLock()
 
@@ -99,6 +97,7 @@ class GenericClient(object):
 class GenericServer(object):
     def __init__(self, hub):
         self.hub = hub
+        self.serializer = Serializer()
 
     @classmethod
     def _get_next_message_id(cls):
@@ -108,7 +107,17 @@ class GenericServer(object):
             return _message_id
 
     def _serialize_object(self, obj2ser):
-        return jsonpickle.encode(obj2ser, **self.hub.serialization_args)
+        return self.serializer.serialize(obj2ser)
+
+    def construct_message(self, args, function_name):
+        id_ = self._get_next_message_id()
+        body = {{"hub": self.hub.name, "function": function_name, "args": args, "ID": id_}}
+        future = self.hub.ws_client.get_future(id_)
+        send_return_obj = self.hub.ws_client.send(self._serialize_object(body))
+        if isinstance(send_return_obj, Future):
+            return send_return_obj
+        else:
+            return future
 
     def construct_message(self, args, function_name):
         id_ = self._get_next_message_id()
@@ -158,6 +167,7 @@ def construct_api_client_class(client_class):
             self.api = api
             self.log = logging.getLogger(__name__)
             self.log.addHandler(logging.NullHandler())
+            self.serializer = Serializer()
 
         def opened(self):
             self.is_opened = True
@@ -168,7 +178,7 @@ def construct_api_client_class(client_class):
 
         def received_message(self, m):
             try:
-                msg_obj = jsonpickle.decode(m.data.decode('utf-8'))
+                msg_obj = self.serializer.unserialize(m.data.decode('utf-8'))
             except Exception as e:
                 self.on_error(e)
                 return
@@ -219,8 +229,7 @@ class HubsAPI(object):
         api_client_class = construct_api_client_class(client_class)
         self.ws_client = api_client_class(self, url)
         self.ws_client.default_on_error = lambda error: None
-        self.serialization_args = dict(max_depth=serialization_max_depth, max_iter=serialization_max_iter)
-        self.serialization_args['unpicklable'] = True
+        self.serializer = Serializer()
 {attributesHubs}
 
     @property
@@ -235,15 +244,14 @@ class HubsAPI(object):
         self.ws_client.connect()
 
     def serialize_object(self, obj2ser):
-        return jsonpickle.encode(obj2ser, self.serialization_args)
+        return self.serializer.serialize(obj2ser)
 {Hubs}'''
 
     CLASS_TEMPLATE = '''
     class {name}Class(object):
-        def __init__(self, ws_client, serialization_args):
+        def __init__(self, ws_client):
             self.name = "{name}"
             self.ws_client = ws_client
-            self.serialization_args = serialization_args
             self.server = self.ServerClass(self)
             self.client = self.ClientClass()
 
@@ -291,4 +299,4 @@ class HubsAPI(object):
 
     ARGS_COOK_TEMPLATE = "args.append({name})"
 
-    ATTRIBUTE_HUB_TEMPLATE = "        self.{name} = self.{name}Class(self.ws_client, self.serialization_args)"
+    ATTRIBUTE_HUB_TEMPLATE = "        self.{name} = self.{name}Class(self.ws_client)"

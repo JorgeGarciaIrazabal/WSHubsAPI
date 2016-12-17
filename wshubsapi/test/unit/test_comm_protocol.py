@@ -10,20 +10,17 @@ import unittest
 from wshubsapi.connected_client import ConnectedClient
 from wshubsapi.comm_environment import CommEnvironment
 from wshubsapi.connected_clients_holder import ConnectedClientsHolder
-from wshubsapi.messages_received_queue import MessagesReceivedQueue
 
 
 class TestCommProtocol(unittest.TestCase):
     def setUp(self):
-        message_received_queue = flexmock(MessagesReceivedQueue(), start_threads=lambda: None)
-        self.comm_environment = CommEnvironment(message_received_queue, unprovided_id_template="unprovided_{}")
+        self.comm_environment = CommEnvironment(unprovided_id_template="unprovided_{}")
 
     def tearDown(self):
         flexmock_teardown()
         super(TestCommProtocol, self).tearDown()
 
     def test_construct_initializeMandatoryAttributes(self):
-        self.assertIsInstance(self.comm_environment.message_received_queue, MessagesReceivedQueue)
         self.assertIsInstance(self.comm_environment.lock, thread.LockType)
         self.assertIs(self.comm_environment.all_connected_clients, ConnectedClientsHolder.all_connected_clients)
 

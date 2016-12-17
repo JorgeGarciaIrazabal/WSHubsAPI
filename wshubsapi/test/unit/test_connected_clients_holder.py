@@ -1,6 +1,5 @@
 # coding=utf-8
 import unittest
-import jsonpickle
 from flexmock import flexmock, flexmock_teardown
 
 from wshubsapi.client_in_hub import ClientInHub
@@ -8,7 +7,7 @@ from wshubsapi.comm_environment import CommEnvironment
 from wshubsapi.connected_client import ConnectedClient
 from wshubsapi.connected_clients_holder import ConnectedClientsHolder
 from wshubsapi.hub import Hub
-from wshubsapi.messages_received_queue import MessagesReceivedQueue
+from wshubsapi.serializer import Serializer
 from wshubsapi.test.utils.hubs_utils import remove_hubs_subclasses
 
 
@@ -23,8 +22,7 @@ class TestConnectedClientsHolder(unittest.TestCase):
         ConnectedClientsHolder.all_connected_clients = dict()
 
         for i in range(10):
-            message_received_queue = flexmock(MessagesReceivedQueue(), start_threads=lambda: None)
-            connected_client = flexmock(ConnectedClient(CommEnvironment(message_received_queue), None))
+            connected_client = flexmock(ConnectedClient(CommEnvironment(), None))
             connected_client.ID = i
             self.clients_holder.append_client(connected_client)
 
@@ -81,9 +79,10 @@ class TestConnectedClientsHolder(unittest.TestCase):
     def test_get_clients__is_well_constructed(self):
         client = self.clients_holder.get_client(1)
         self.message_checked = False
+        serializer = Serializer()
 
         def message_to_write(msg):
-            json_msg = jsonpickle.decode(msg)
+            json_msg = serializer.unserialize(msg)
             self.assertEqual(json_msg["function"], "test_call_function")
             self.assertEqual(json_msg["hub"], self.test_hub_name)
             self.message_checked = True

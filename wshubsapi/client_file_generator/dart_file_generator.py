@@ -85,6 +85,7 @@ class DartClientFileGenerator(ClientFileGenerator):
 
     @classmethod
     def create_file(cls, hubs_info, path):
+        parent_dir = cls._construct_api_path(path)
         with open(path, "w") as f:
             class_strings = "".join(cls.__get_class_strs(hubs_info))
             attributes_hubs_declaration = "\n".join(cls.__get_attributes_hub_declaration(hubs_info))
@@ -98,34 +99,79 @@ import 'dart:convert';
 import 'dart:html';
 import 'dart:mirrors';
 
+class _Serializer {{
+    String serialize(obj) {{
+        return JSON.encode(_jsonize(obj));
+    }}
+
+    _jsonize(var obj) {{
+        if (obj is String || obj is num || obj is bool) {{
+            return obj;
+        }}
+        else if (obj is DateTime) {{
+            return _jsonize({{"__date_time__": obj
+                .toUtc()
+                .millisecondsSinceEpoch}});
+        }}
+        else if (obj is List) {{
+            return obj.map((item) {{
+                return _jsonize(item);
+            }});
+        }}
+        else if (obj is Map) {{
+            obj.forEach((key, item) {{
+                obj[key] = _jsonize(item);
+            }});
+            return obj;
+        }}
+        else {{
+            Map map = new Map();
+            InstanceMirror im = reflect(obj);
+            ClassMirror cm = im.type;
+            var decls = cm.declarations.values.where((dm) => dm is VariableMirror);
+            decls.forEach((dm) {{
+                var key = MirrorSystem.getName(dm.simpleName);
+                var val = im
+                    .getField(dm.simpleName)
+                    .reflectee;
+                map[key] = _jsonize(val);
+            }});
+            return map;
+        }}
+    }}
+
+    Map unserialize(objStr) {{
+        Map objMap = JSON.decode(objStr);
+        return _unjsonize(objMap);
+    }}
+
+    _unjsonize(obj) {{
+        if (obj is String || obj is num || obj is bool) {{
+            return obj;
+        }}
+        else if (obj is List) {{
+            return obj.map((item) {{
+                return _unjsonize(item);
+            }});
+        }}
+        else if (obj is Map) {{
+            if (obj.containsKey("__date_time__")) {{
+                return new DateTime.fromMillisecondsSinceEpoch(obj["__date_time__"], isUtc: true);
+            }}
+            obj.forEach((key, item) {{
+                obj[key] = _unjsonize(item);
+            }});
+            return obj;
+        }}
+    }}
+}}
+
 String _camelCase(String string) =>
     string
         .toLowerCase()
         .replaceAllMapped(new RegExp(r'[_.\- ]+(\w|$)'), (Match m) {{
         return m[1].toUpperCase();
     }});
-
-_jsonize(var obj) {{
-    try {{
-        if(obj is String || obj is num || obj is List || obj is Map || obj is bool) {{
-            return obj;
-        }}
-        return JSON.encode(obj);
-    }} catch (exception) {{
-        Map map = new Map();
-        InstanceMirror im = reflect(obj);
-        ClassMirror cm = im.type;
-        var decls = cm.declarations.values.where((dm) => dm is VariableMirror);
-        decls.forEach((dm) {{
-            var key = MirrorSystem.getName(dm.simpleName);
-            var val = im
-                .getField(dm.simpleName)
-                .reflectee;
-            map[key] = val;
-        }});
-        return map;
-    }}
-}}
 
 class WsHandler {{
     int messageId = 0;
@@ -172,7 +218,7 @@ class WsHandler {{
         var completer = new Completer();
         var id = messageId++;
         var serializedArgs = args.map((arg) {{
-            return _jsonize(arg);
+            return api.serializer.serialize(arg);
         }}).toList();
         Map body = {{
             'hub': hubName,
@@ -195,7 +241,7 @@ class WsHandler {{
 
     onMessage(MessageEvent e) async {{
         print('message receiver ${{e.data}}');
-        Map<String, Object> msgMap = JSON.decode(e.data);
+        Map<String, Object> msgMap = api.serializer.unserialize(e.data);
         if (msgMap.containsKey('reply')) {{
             var completer = futuresHandler[msgMap['ID']];
             msgMap['success']
@@ -215,9 +261,10 @@ class WsHandler {{
                 if(reply is Future){{
                     reply = await reply;
                 }}
-                replyMessage['reply'] = _jsonize(reply);
+                replyMessage['reply'] = api.serializer.serialize(reply);;
                 replyMessage['success'] = true;
             }} catch (exception, stackTrace) {{
+                print(stackTrace);
                 replyMessage['reply'] = exception.toString();
                 replyMessage['success'] = false;
             }} finally {{
@@ -230,6 +277,7 @@ class WsHandler {{
 
 class HubsApi {{
     WsHandler wsHandler;
+    _Serializer serializer = new _Serializer();
 {attributesHubsDeclaration}
 
     HubsApi() {{

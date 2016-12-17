@@ -49,7 +49,8 @@ fabric.properties
 dist/
 wshubsapi.egg-info
 build
-POC/
+**/POC/
+*.log
 *.pyc
 **/test-reports/
 .sonar
