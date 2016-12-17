@@ -138,8 +138,8 @@ class HubsAPI(object):
         self.ws_client = api_client_class(self, url)
         self.ws_client.default_on_error = lambda error: None
         self.serializer = Serializer()
-        self.ChatHub = self.ChatHubClass(self.ws_client)
         self.UtilsAPIHub = self.UtilsAPIHubClass(self.ws_client)
+        self.ChatHub = self.ChatHubClass(self.ws_client)
 
     @property
     def default_on_error(self):
@@ -154,73 +154,6 @@ class HubsAPI(object):
 
     def serialize_object(self, obj2ser):
         return self.serializer.serialize(obj2ser)
-
-    class ChatHubClass(object):
-        def __init__(self, ws_client):
-            self.name = "ChatHub"
-            self.ws_client = ws_client
-            self.server = self.ServerClass(self)
-            self.client = self.ClientClass()
-
-        def get_clients(self, client_ids):
-            return HubsAPI.ChatHubClass.ClientsInServer(client_ids, self)
-
-        class ServerClass(GenericServer):
-            
-            def send_to_all(self, name, message="hello"):
-                """
-                :rtype : Future
-                """
-                args = list()
-                args.append(name)
-                args.append(message)
-                return self.construct_message(args, "send_to_all")
-
-            def get_subscribed_clients_ids(self, ):
-                """
-                :rtype : Future
-                """
-                args = list()
-                
-                return self.construct_message(args, "get_subscribed_clients_ids")
-
-            def subscribe_to_hub(self, ):
-                """
-                :rtype : Future
-                """
-                args = list()
-                
-                return self.construct_message(args, "subscribe_to_hub")
-
-            def unsubscribe_from_hub(self, ):
-                """
-                :rtype : Future
-                """
-                args = list()
-                
-                return self.construct_message(args, "unsubscribe_from_hub")
-
-        class ClientClass(GenericClient):
-            def __init__(self):
-                pass
-            
-            def print_message(self, sender_name, msg):
-                pass
-
-        class ClientsInServer(GenericBridge):
-            def __init__(self, client_ids, hub):
-                super(self.__class__, self).__init__(hub)
-                self.clients_ids = client_ids
-            
-            def print_message(self, sender_name, msg):
-                """
-                :rtype : Future
-                """
-                args = list()
-                args.append(self.clients_ids)
-                args.append("print_message")
-                args.append([sender_name, msg])
-                return self.construct_message(args, "_client_to_clients_bridge") 
 
     class UtilsAPIHubClass(object):
         def __init__(self, ws_client):
@@ -241,22 +174,6 @@ class HubsAPI(object):
                 args = list()
                 
                 return self.construct_message(args, "get_hubs_structure")
-
-            def is_client_connected(self, client_id):
-                """
-                :rtype : Future
-                """
-                args = list()
-                args.append(client_id)
-                return self.construct_message(args, "is_client_connected")
-
-            def get_subscribed_clients_ids(self, ):
-                """
-                :rtype : Future
-                """
-                args = list()
-                
-                return self.construct_message(args, "get_subscribed_clients_ids")
 
             def subscribe_to_hub(self, ):
                 """
@@ -290,6 +207,22 @@ class HubsAPI(object):
                 
                 return self.construct_message(args, "get_id")
 
+            def get_subscribed_clients_ids(self, ):
+                """
+                :rtype : Future
+                """
+                args = list()
+                
+                return self.construct_message(args, "get_subscribed_clients_ids")
+
+            def is_client_connected(self, client_id):
+                """
+                :rtype : Future
+                """
+                args = list()
+                args.append(client_id)
+                return self.construct_message(args, "is_client_connected")
+
         class ClientClass(GenericClient):
             def __init__(self):
                 pass
@@ -300,3 +233,70 @@ class HubsAPI(object):
                 super(self.__class__, self).__init__(hub)
                 self.clients_ids = client_ids
             
+
+    class ChatHubClass(object):
+        def __init__(self, ws_client):
+            self.name = "ChatHub"
+            self.ws_client = ws_client
+            self.server = self.ServerClass(self)
+            self.client = self.ClientClass()
+
+        def get_clients(self, client_ids):
+            return HubsAPI.ChatHubClass.ClientsInServer(client_ids, self)
+
+        class ServerClass(GenericServer):
+            
+            def unsubscribe_from_hub(self, ):
+                """
+                :rtype : Future
+                """
+                args = list()
+                
+                return self.construct_message(args, "unsubscribe_from_hub")
+
+            def send_to_all(self, name, message="hello"):
+                """
+                :rtype : Future
+                """
+                args = list()
+                args.append(name)
+                args.append(message)
+                return self.construct_message(args, "send_to_all")
+
+            def get_subscribed_clients_ids(self, ):
+                """
+                :rtype : Future
+                """
+                args = list()
+                
+                return self.construct_message(args, "get_subscribed_clients_ids")
+
+            def subscribe_to_hub(self, ):
+                """
+                :rtype : Future
+                """
+                args = list()
+                
+                return self.construct_message(args, "subscribe_to_hub")
+
+        class ClientClass(GenericClient):
+            def __init__(self):
+                pass
+            
+            def print_message(self, sender_name, msg):
+                pass
+
+        class ClientsInServer(GenericBridge):
+            def __init__(self, client_ids, hub):
+                super(self.__class__, self).__init__(hub)
+                self.clients_ids = client_ids
+            
+            def print_message(self, sender_name, msg):
+                """
+                :rtype : Future
+                """
+                args = list()
+                args.append(self.clients_ids)
+                args.append("print_message")
+                args.append([sender_name, msg])
+                return self.construct_message(args, "_client_to_clients_bridge") 

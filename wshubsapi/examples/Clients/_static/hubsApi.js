@@ -185,50 +185,6 @@ function HubsAPI(serverTimeout, wsClientClass, PromiseClass) {
         return promise;
     };
     
-    this.ChatHub = {};
-    this.ChatHub.server = {
-        __HUB_NAME : 'ChatHub',
-        
-        sendToAll : function (name, message){
-            arguments[1] = message === undefined ? "hello" : message;
-            return constructMessage('ChatHub', 'send_to_all', arguments);
-        },
-
-        getSubscribedClientsIds : function (){
-            
-            return constructMessage('ChatHub', 'get_subscribed_clients_ids', arguments);
-        },
-
-        subscribeToHub : function (){
-            
-            return constructMessage('ChatHub', 'subscribe_to_hub', arguments);
-        },
-
-        unsubscribeFromHub : function (){
-            
-            return constructMessage('ChatHub', 'unsubscribe_from_hub', arguments);
-        }
-    };
-    this.ChatHub.client = {
-        __HUB_NAME : 'ChatHub',
-        
-        printMessage : emptyFunction()
-    };
-    this.ChatHub.getClients = function(clientsIds){
-        return {
-            clientsIds: clientsIds,
-            call: function (functionName, functionArgs) {
-                var bodyArgs = [this.clientsIds, functionName, functionArgs];
-                return constructMessage('ChatHub', '_client_to_clients_bridge', bodyArgs);
-            },
-            printMessage : function (senderName, msg){
-                
-                var funcArgs = Array.prototype.slice.call(arguments);
-                var bodyArgs = [this.clientsIds, 'print_message', funcArgs];
-                return constructMessage('ChatHub', '_client_to_clients_bridge', bodyArgs);
-            }
-        }
-    };
     this.UtilsAPIHub = {};
     this.UtilsAPIHub.server = {
         __HUB_NAME : 'UtilsAPIHub',
@@ -236,16 +192,6 @@ function HubsAPI(serverTimeout, wsClientClass, PromiseClass) {
         getHubsStructure : function (){
             
             return constructMessage('UtilsAPIHub', 'get_hubs_structure', arguments);
-        },
-
-        isClientConnected : function (clientId){
-            
-            return constructMessage('UtilsAPIHub', 'is_client_connected', arguments);
-        },
-
-        getSubscribedClientsIds : function (){
-            
-            return constructMessage('UtilsAPIHub', 'get_subscribed_clients_ids', arguments);
         },
 
         subscribeToHub : function (){
@@ -266,6 +212,16 @@ function HubsAPI(serverTimeout, wsClientClass, PromiseClass) {
         getId : function (){
             
             return constructMessage('UtilsAPIHub', 'get_id', arguments);
+        },
+
+        getSubscribedClientsIds : function (){
+            
+            return constructMessage('UtilsAPIHub', 'get_subscribed_clients_ids', arguments);
+        },
+
+        isClientConnected : function (clientId){
+            
+            return constructMessage('UtilsAPIHub', 'is_client_connected', arguments);
         }
     };
     this.UtilsAPIHub.client = {
@@ -279,6 +235,50 @@ function HubsAPI(serverTimeout, wsClientClass, PromiseClass) {
                 var bodyArgs = [this.clientsIds, functionName, functionArgs];
                 return constructMessage('UtilsAPIHub', '_client_to_clients_bridge', bodyArgs);
             },
+        }
+    };
+    this.ChatHub = {};
+    this.ChatHub.server = {
+        __HUB_NAME : 'ChatHub',
+        
+        unsubscribeFromHub : function (){
+            
+            return constructMessage('ChatHub', 'unsubscribe_from_hub', arguments);
+        },
+
+        sendToAll : function (name, message){
+            arguments[1] = message === undefined ? "hello" : message;
+            return constructMessage('ChatHub', 'send_to_all', arguments);
+        },
+
+        getSubscribedClientsIds : function (){
+            
+            return constructMessage('ChatHub', 'get_subscribed_clients_ids', arguments);
+        },
+
+        subscribeToHub : function (){
+            
+            return constructMessage('ChatHub', 'subscribe_to_hub', arguments);
+        }
+    };
+    this.ChatHub.client = {
+        __HUB_NAME : 'ChatHub',
+        
+        printMessage : emptyFunction()
+    };
+    this.ChatHub.getClients = function(clientsIds){
+        return {
+            clientsIds: clientsIds,
+            call: function (functionName, functionArgs) {
+                var bodyArgs = [this.clientsIds, functionName, functionArgs];
+                return constructMessage('ChatHub', '_client_to_clients_bridge', bodyArgs);
+            },
+            printMessage : function (senderName, msg){
+                
+                var funcArgs = Array.prototype.slice.call(arguments);
+                var bodyArgs = [this.clientsIds, 'print_message', funcArgs];
+                return constructMessage('ChatHub', '_client_to_clients_bridge', bodyArgs);
+            }
         }
     };
 }
