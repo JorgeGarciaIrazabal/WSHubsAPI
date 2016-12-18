@@ -51,6 +51,8 @@ wshubsapi.egg-info
 build
 **/POC/
 *.log
+**/examples/Clients/_static/hubs*
+**/examples/Clients/_static/__init__.py*
 *.pyc
 **/test-reports/
 .sonar
