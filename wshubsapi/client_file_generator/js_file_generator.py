@@ -69,6 +69,54 @@ class JSClientFileGenerator(ClientFileGenerator):
     WRAPPER = """'use strict';
 /* jshint ignore:start */
 /* ignore jslint start */
+
+function __serialize(obj) {{
+    return JSON.stringify(__jsonize(obj));
+}}
+
+function __jsonize(obj){{
+    if(obj instanceof Date){{
+        return {{__date_time__: obj.getTime()}}
+    }}
+    else if(obj instanceof Array){{
+        obj.forEach(function (elem, i, list){{
+            list[i] = __jsonize(elem);
+        }});
+    }}
+    else if(obj instanceof Object){{
+        for(var key in obj) {{
+            if(obj.hasOwnProperty(key)){{
+                obj[key] = __jsonize(obj[key]);
+            }}
+        }}
+    }}
+    return obj;
+}}
+
+function __unserialize(objStr) {{
+    return __unjsonizer(JSON.parse(objStr));
+}}
+
+function __unjsonizer(obj) {{
+    if(obj instanceof Object && '__date_time__' in obj) {{
+        return new Date(obj.__date_time__);
+    }}
+    else if(obj instanceof Array){{
+        obj.forEach(function (elem, i, list){{
+            list[i] = __unjsonizer(elem);
+        }});
+    }}
+    else if(obj instanceof Object){{
+        for(var key in obj) {{
+            if(obj.hasOwnProperty(key)){{
+                obj[key] = __unjsonizer(obj[key]);
+            }}
+        }}
+    }}
+    return obj;
+}}
+
+
 function HubsAPI(serverTimeout, wsClientClass, PromiseClass) {{
 
     var messageID = 0,
@@ -169,7 +217,7 @@ function HubsAPI(serverTimeout, wsClientClass, PromiseClass) {{
             thisApi.wsClient.onmessage = function (ev) {{
                 try {{
                     var promiseHandler,
-                        msgObj = JSON.parse(ev.data);
+                        msgObj = __unserialize(ev.data);
                     if (msgObj.hasOwnProperty('reply')) {{
                         promiseHandler = promisesHandler[msgObj.ID];
                         msgObj.success ? promiseHandler.resolve(msgObj.reply) : promiseHandler.reject(msgObj.reply);
@@ -189,15 +237,15 @@ function HubsAPI(serverTimeout, wsClientClass, PromiseClass) {{
                                     replayMessage.reply.then(function (result) {{
                                         replayMessage.success = true;
                                         replayMessage.reply = result;
-                                        thisApi.wsClient.send(JSON.stringify(replayMessage));
+                                        thisApi.wsClient.send(__serialize(replayMessage));
                                     }}, function (error) {{
                                         replayMessage.success = false;
                                         replayMessage.reply = error;
-                                        thisApi.wsClient.send(JSON.stringify(replayMessage));
+                                        thisApi.wsClient.send(__serialize(replayMessage));
                                     }});
                                 }} else {{
                                     replayMessage.reply = replayMessage.reply === undefined ? null : replayMessage.reply;
-                                    thisApi.wsClient.send(JSON.stringify(replayMessage));
+                                    thisApi.wsClient.send(__serialize(replayMessage));
                                 }}
                             }}
                         }} else {{
@@ -241,11 +289,11 @@ function HubsAPI(serverTimeout, wsClientClass, PromiseClass) {{
             _reject = reject;
 
             if (thisApi.wsClient.readyState === WebSocket.CONNECTING) {{
-                messagesBeforeOpen.push(JSON.stringify(body));
+                messagesBeforeOpen.push(__serialize(body));
             }} else if (thisApi.wsClient.readyState !== WebSocket.OPEN) {{
                 reject('webSocket not connected');
             }} else {{
-                thisApi.wsClient.send(JSON.stringify(body));
+                thisApi.wsClient.send(__serialize(body));
             }}
         }});
         promise._timeoutID = timeoutID;

@@ -37,6 +37,16 @@ class GenericServer(object):
         else:
             return future
 
+    def construct_message(self, args, function_name):
+        id_ = self._get_next_message_id()
+        body = {"hub": self.hub.name, "function": function_name, "args": args, "ID": id_}
+        future = self.hub.ws_client.get_future(id_)
+        send_return_obj = self.hub.ws_client.send(self._serialize_object(body))
+        if isinstance(send_return_obj, Future):
+            return send_return_obj
+        else:
+            return future
+
 
 class GenericBridge(GenericServer):
     def __getattr__(self, function_name):
@@ -167,6 +177,14 @@ class HubsAPI(object):
 
         class ServerClass(GenericServer):
             
+            def is_client_connected(self, client_id):
+                """
+                :rtype : Future
+                """
+                args = list()
+                args.append(client_id)
+                return self.construct_message(args, "is_client_connected")
+
             def get_hubs_structure(self, ):
                 """
                 :rtype : Future
@@ -183,13 +201,13 @@ class HubsAPI(object):
                 
                 return self.construct_message(args, "subscribe_to_hub")
 
-            def unsubscribe_from_hub(self, ):
+            def get_id(self, ):
                 """
                 :rtype : Future
                 """
                 args = list()
                 
-                return self.construct_message(args, "unsubscribe_from_hub")
+                return self.construct_message(args, "get_id")
 
             def set_id(self, client_id):
                 """
@@ -199,13 +217,13 @@ class HubsAPI(object):
                 args.append(client_id)
                 return self.construct_message(args, "set_id")
 
-            def get_id(self, ):
+            def unsubscribe_from_hub(self, ):
                 """
                 :rtype : Future
                 """
                 args = list()
                 
-                return self.construct_message(args, "get_id")
+                return self.construct_message(args, "unsubscribe_from_hub")
 
             def get_subscribed_clients_ids(self, ):
                 """
@@ -214,14 +232,6 @@ class HubsAPI(object):
                 args = list()
                 
                 return self.construct_message(args, "get_subscribed_clients_ids")
-
-            def is_client_connected(self, client_id):
-                """
-                :rtype : Future
-                """
-                args = list()
-                args.append(client_id)
-                return self.construct_message(args, "is_client_connected")
 
         class ClientClass(GenericClient):
             def __init__(self):
@@ -246,6 +256,14 @@ class HubsAPI(object):
 
         class ServerClass(GenericServer):
             
+            def subscribe_to_hub(self, ):
+                """
+                :rtype : Future
+                """
+                args = list()
+                
+                return self.construct_message(args, "subscribe_to_hub")
+
             def unsubscribe_from_hub(self, ):
                 """
                 :rtype : Future
@@ -270,14 +288,6 @@ class HubsAPI(object):
                 args = list()
                 
                 return self.construct_message(args, "get_subscribed_clients_ids")
-
-            def subscribe_to_hub(self, ):
-                """
-                :rtype : Future
-                """
-                args = list()
-                
-                return self.construct_message(args, "subscribe_to_hub")
 
         class ClientClass(GenericClient):
             def __init__(self):
