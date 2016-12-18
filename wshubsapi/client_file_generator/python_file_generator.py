@@ -119,16 +119,6 @@ class GenericServer(object):
         else:
             return future
 
-    def construct_message(self, args, function_name):
-        id_ = self._get_next_message_id()
-        body = {{"hub": self.hub.name, "function": function_name, "args": args, "ID": id_}}
-        future = self.hub.ws_client.get_future(id_)
-        send_return_obj = self.hub.ws_client.send(self._serialize_object(body))
-        if isinstance(send_return_obj, Future):
-            return send_return_obj
-        else:
-            return future
-
 
 class GenericBridge(GenericServer):
     def __getattr__(self, function_name):
