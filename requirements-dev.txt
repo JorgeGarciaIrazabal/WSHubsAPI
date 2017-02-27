@@ -8,3 +8,5 @@ xmlrunner
 coverage
 requests
 django
+twine
+wheel
