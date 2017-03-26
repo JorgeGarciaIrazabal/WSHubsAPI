@@ -1,8 +1,6 @@
-import json
 import logging
 import threading
 
-from jsonpickle.pickler import Pickler
 from concurrent.futures import Future
 
 from wshubsapi.connected_clients_holder import ConnectedClientsHolder
@@ -13,9 +11,6 @@ from wshubsapi.serializer import Serializer
 from wshubsapi import utils_api_hub
 
 __author__ = 'Jorge Garcia Irazabal'
-
-_DEFAULT_PICKER = Pickler(max_depth=5, max_iter=80, make_refs=False)
-
 
 
 class HubsApiException(Exception):

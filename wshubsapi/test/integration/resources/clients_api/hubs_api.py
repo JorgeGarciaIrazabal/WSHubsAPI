@@ -1,10 +1,8 @@
 import logging
-import jsonpickle
 import threading
-from wshubsapi import utils
 from concurrent.futures import Future
+from wshubsapi.serializer import Serializer
 
-utils.set_serializer_date_handler()
 _message_id = 0
 _message_lock = threading.RLock()
 
@@ -17,6 +15,7 @@ class GenericClient(object):
 class GenericServer(object):
     def __init__(self, hub):
         self.hub = hub
+        self.serializer = Serializer()
 
     @classmethod
     def _get_next_message_id(cls):
@@ -26,7 +25,7 @@ class GenericServer(object):
             return _message_id
 
     def _serialize_object(self, obj2ser):
-        return jsonpickle.encode(obj2ser, **self.hub.serialization_args)
+        return self.serializer.serialize(obj2ser)
 
     def construct_message(self, args, function_name):
         id_ = self._get_next_message_id()
@@ -76,6 +75,7 @@ def construct_api_client_class(client_class):
             self.api = api
             self.log = logging.getLogger(__name__)
             self.log.addHandler(logging.NullHandler())
+            self.serializer = Serializer()
 
         def opened(self):
             self.is_opened = True
@@ -86,7 +86,7 @@ def construct_api_client_class(client_class):
 
         def received_message(self, m):
             try:
-                msg_obj = jsonpickle.decode(m.data.decode('utf-8'))
+                msg_obj = self.serializer.unserialize(m.data.decode('utf-8'))
             except Exception as e:
                 self.on_error(e)
                 return
@@ -137,15 +137,10 @@ class HubsAPI(object):
         api_client_class = construct_api_client_class(client_class)
         self.ws_client = api_client_class(self, url)
         self.ws_client.default_on_error = lambda error: None
-        self.serialization_args = dict(max_depth=serialization_max_depth, max_iter=serialization_max_iter)
-        self.serialization_args['unpicklable'] = True
-        self.SubHub = self.SubHubClass(self.ws_client, self.serialization_args)
-        self.UtilsAPIHub = self.UtilsAPIHubClass(self.ws_client, self.serialization_args)
-        self.SubHub3 = self.SubHub3Class(self.ws_client, self.serialization_args)
-        self.ChatHub = self.ChatHubClass(self.ws_client, self.serialization_args)
-        self.SubHub1 = self.SubHub1Class(self.ws_client, self.serialization_args)
-        self.EchoHub = self.EchoHubClass(self.ws_client, self.serialization_args)
-        self.SubHub2 = self.SubHub2Class(self.ws_client, self.serialization_args)
+        self.serializer = Serializer()
+        self.ChatHub = self.ChatHubClass(self.ws_client)
+        self.EchoHub = self.EchoHubClass(self.ws_client)
+        self.UtilsAPIHub = self.UtilsAPIHubClass(self.ws_client)
 
     @property
     def default_on_error(self):
@@ -159,21 +154,54 @@ class HubsAPI(object):
         self.ws_client.connect()
 
     def serialize_object(self, obj2ser):
-        return jsonpickle.encode(obj2ser, self.serialization_args)
+        return self.serializer.serialize(obj2ser)
 
-    class SubHubClass(object):
-        def __init__(self, ws_client, serialization_args):
-            self.name = "SubHub"
+    class ChatHubClass(object):
+        def __init__(self, ws_client):
+            self.name = "ChatHub"
             self.ws_client = ws_client
-            self.serialization_args = serialization_args
             self.server = self.ServerClass(self)
             self.client = self.ClientClass()
 
         def get_clients(self, client_ids):
-            return HubsAPI.SubHubClass.ClientsInServer(client_ids, self)
+            return HubsAPI.ChatHubClass.ClientsInServer(client_ids, self)
 
         class ServerClass(GenericServer):
             
+            def get_subscribed_clients_ids(self, ):
+                """
+                :rtype : Future
+                """
+                args = list()
+                
+                return self.construct_message(args, "get_subscribed_clients_ids")
+
+            def raise_exception(self, exception_message):
+                """
+                :rtype : Future
+                """
+                args = list()
+                args.append(exception_message)
+                return self.construct_message(args, "raise_exception")
+
+            def send_message_to_client(self, message, client_id):
+                """
+                :rtype : Future
+                """
+                args = list()
+                args.append(message)
+                args.append(client_id)
+                return self.construct_message(args, "send_message_to_client")
+
+            def send_to_all(self, name, message="hello"):
+                """
+                :rtype : Future
+                """
+                args = list()
+                args.append(name)
+                args.append(message)
+                return self.construct_message(args, "send_to_all")
+
             def subscribe_to_hub(self, ):
                 """
                 :rtype : Future
@@ -190,6 +218,45 @@ class HubsAPI(object):
                 
                 return self.construct_message(args, "unsubscribe_from_hub")
 
+        class ClientClass(GenericClient):
+            def __init__(self):
+                pass
+            
+
+        class ClientsInServer(GenericBridge):
+            def __init__(self, client_ids, hub):
+                super(self.__class__, self).__init__(hub)
+                self.clients_ids = client_ids
+            
+
+    class EchoHubClass(object):
+        def __init__(self, ws_client):
+            self.name = "EchoHub"
+            self.ws_client = ws_client
+            self.server = self.ServerClass(self)
+            self.client = self.ClientClass()
+
+        def get_clients(self, client_ids):
+            return HubsAPI.EchoHubClass.ClientsInServer(client_ids, self)
+
+        class ServerClass(GenericServer):
+            
+            def echo(self, message):
+                """
+                :rtype : Future
+                """
+                args = list()
+                args.append(message)
+                return self.construct_message(args, "echo")
+
+            def echo_to_sender(self, message):
+                """
+                :rtype : Future
+                """
+                args = list()
+                args.append(message)
+                return self.construct_message(args, "echo_to_sender")
+
             def get_subscribed_clients_ids(self, ):
                 """
                 :rtype : Future
@@ -197,6 +264,22 @@ class HubsAPI(object):
                 args = list()
                 
                 return self.construct_message(args, "get_subscribed_clients_ids")
+
+            def subscribe_to_hub(self, ):
+                """
+                :rtype : Future
+                """
+                args = list()
+                
+                return self.construct_message(args, "subscribe_to_hub")
+
+            def unsubscribe_from_hub(self, ):
+                """
+                :rtype : Future
+                """
+                args = list()
+                
+                return self.construct_message(args, "unsubscribe_from_hub")
 
         class ClientClass(GenericClient):
             def __init__(self):
@@ -210,10 +293,9 @@ class HubsAPI(object):
             
 
     class UtilsAPIHubClass(object):
-        def __init__(self, ws_client, serialization_args):
+        def __init__(self, ws_client):
             self.name = "UtilsAPIHub"
             self.ws_client = ws_client
-            self.serialization_args = serialization_args
             self.server = self.ServerClass(self)
             self.client = self.ClientClass()
 
@@ -222,22 +304,6 @@ class HubsAPI(object):
 
         class ServerClass(GenericServer):
             
-            def unsubscribe_from_hub(self, ):
-                """
-                :rtype : Future
-                """
-                args = list()
-                
-                return self.construct_message(args, "unsubscribe_from_hub")
-
-            def subscribe_to_hub(self, ):
-                """
-                :rtype : Future
-                """
-                args = list()
-                
-                return self.construct_message(args, "subscribe_to_hub")
-
             def get_hubs_structure(self, ):
                 """
                 :rtype : Future
@@ -262,14 +328,6 @@ class HubsAPI(object):
                 
                 return self.construct_message(args, "get_subscribed_clients_ids")
 
-            def set_id(self, client_id):
-                """
-                :rtype : Future
-                """
-                args = list()
-                args.append(client_id)
-                return self.construct_message(args, "set_id")
-
             def is_client_connected(self, client_id):
                 """
                 :rtype : Future
@@ -278,152 +336,14 @@ class HubsAPI(object):
                 args.append(client_id)
                 return self.construct_message(args, "is_client_connected")
 
-        class ClientClass(GenericClient):
-            def __init__(self):
-                pass
-            
-
-        class ClientsInServer(GenericBridge):
-            def __init__(self, client_ids, hub):
-                super(self.__class__, self).__init__(hub)
-                self.clients_ids = client_ids
-            
-
-    class SubHub3Class(object):
-        def __init__(self, ws_client, serialization_args):
-            self.name = "SubHub3"
-            self.ws_client = ws_client
-            self.serialization_args = serialization_args
-            self.server = self.ServerClass(self)
-            self.client = self.ClientClass()
-
-        def get_clients(self, client_ids):
-            return HubsAPI.SubHub3Class.ClientsInServer(client_ids, self)
-
-        class ServerClass(GenericServer):
-            
-            def subscribe_to_hub(self, ):
+            def set_id(self, client_id):
                 """
                 :rtype : Future
                 """
                 args = list()
-                
-                return self.construct_message(args, "subscribe_to_hub")
-
-            def unsubscribe_from_hub(self, ):
-                """
-                :rtype : Future
-                """
-                args = list()
-                
-                return self.construct_message(args, "unsubscribe_from_hub")
-
-            def get_subscribed_clients_ids(self, ):
-                """
-                :rtype : Future
-                """
-                args = list()
-                
-                return self.construct_message(args, "get_subscribed_clients_ids")
-
-        class ClientClass(GenericClient):
-            def __init__(self):
-                pass
-            
-
-        class ClientsInServer(GenericBridge):
-            def __init__(self, client_ids, hub):
-                super(self.__class__, self).__init__(hub)
-                self.clients_ids = client_ids
-            
-
-    class ChatHubClass(object):
-        def __init__(self, ws_client, serialization_args):
-            self.name = "ChatHub"
-            self.ws_client = ws_client
-            self.serialization_args = serialization_args
-            self.server = self.ServerClass(self)
-            self.client = self.ClientClass()
-
-        def get_clients(self, client_ids):
-            return HubsAPI.ChatHubClass.ClientsInServer(client_ids, self)
-
-        class ServerClass(GenericServer):
-            
-            def unsubscribe_from_hub(self, ):
-                """
-                :rtype : Future
-                """
-                args = list()
-                
-                return self.construct_message(args, "unsubscribe_from_hub")
-
-            def subscribe_to_hub(self, ):
-                """
-                :rtype : Future
-                """
-                args = list()
-                
-                return self.construct_message(args, "subscribe_to_hub")
-
-            def send_to_all(self, name, message="hello"):
-                """
-                :rtype : Future
-                """
-                args = list()
-                args.append(name)
-                args.append(message)
-                return self.construct_message(args, "send_to_all")
-
-            def get_subscribed_clients_ids(self, ):
-                """
-                :rtype : Future
-                """
-                args = list()
-                
-                return self.construct_message(args, "get_subscribed_clients_ids")
-
-            def send_message_to_client(self, message, client_id):
-                """
-                :rtype : Future
-                """
-                args = list()
-                args.append(message)
                 args.append(client_id)
-                return self.construct_message(args, "send_message_to_client")
+                return self.construct_message(args, "set_id")
 
-            def raise_exception(self, exception_message):
-                """
-                :rtype : Future
-                """
-                args = list()
-                args.append(exception_message)
-                return self.construct_message(args, "raise_exception")
-
-        class ClientClass(GenericClient):
-            def __init__(self):
-                pass
-            
-
-        class ClientsInServer(GenericBridge):
-            def __init__(self, client_ids, hub):
-                super(self.__class__, self).__init__(hub)
-                self.clients_ids = client_ids
-            
-
-    class SubHub1Class(object):
-        def __init__(self, ws_client, serialization_args):
-            self.name = "SubHub1"
-            self.ws_client = ws_client
-            self.serialization_args = serialization_args
-            self.server = self.ServerClass(self)
-            self.client = self.ClientClass()
-
-        def get_clients(self, client_ids):
-            return HubsAPI.SubHub1Class.ClientsInServer(client_ids, self)
-
-        class ServerClass(GenericServer):
-            
             def subscribe_to_hub(self, ):
                 """
                 :rtype : Future
@@ -439,126 +359,6 @@ class HubsAPI(object):
                 args = list()
                 
                 return self.construct_message(args, "unsubscribe_from_hub")
-
-            def get_subscribed_clients_ids(self, ):
-                """
-                :rtype : Future
-                """
-                args = list()
-                
-                return self.construct_message(args, "get_subscribed_clients_ids")
-
-        class ClientClass(GenericClient):
-            def __init__(self):
-                pass
-            
-
-        class ClientsInServer(GenericBridge):
-            def __init__(self, client_ids, hub):
-                super(self.__class__, self).__init__(hub)
-                self.clients_ids = client_ids
-            
-
-    class EchoHubClass(object):
-        def __init__(self, ws_client, serialization_args):
-            self.name = "EchoHub"
-            self.ws_client = ws_client
-            self.serialization_args = serialization_args
-            self.server = self.ServerClass(self)
-            self.client = self.ClientClass()
-
-        def get_clients(self, client_ids):
-            return HubsAPI.EchoHubClass.ClientsInServer(client_ids, self)
-
-        class ServerClass(GenericServer):
-            
-            def subscribe_to_hub(self, ):
-                """
-                :rtype : Future
-                """
-                args = list()
-                
-                return self.construct_message(args, "subscribe_to_hub")
-
-            def unsubscribe_from_hub(self, ):
-                """
-                :rtype : Future
-                """
-                args = list()
-                
-                return self.construct_message(args, "unsubscribe_from_hub")
-
-            def get_subscribed_clients_ids(self, ):
-                """
-                :rtype : Future
-                """
-                args = list()
-                
-                return self.construct_message(args, "get_subscribed_clients_ids")
-
-            def echo(self, message):
-                """
-                :rtype : Future
-                """
-                args = list()
-                args.append(message)
-                return self.construct_message(args, "echo")
-
-            def echo_to_sender(self, message):
-                """
-                :rtype : Future
-                """
-                args = list()
-                args.append(message)
-                return self.construct_message(args, "echo_to_sender")
-
-        class ClientClass(GenericClient):
-            def __init__(self):
-                pass
-            
-
-        class ClientsInServer(GenericBridge):
-            def __init__(self, client_ids, hub):
-                super(self.__class__, self).__init__(hub)
-                self.clients_ids = client_ids
-            
-
-    class SubHub2Class(object):
-        def __init__(self, ws_client, serialization_args):
-            self.name = "SubHub2"
-            self.ws_client = ws_client
-            self.serialization_args = serialization_args
-            self.server = self.ServerClass(self)
-            self.client = self.ClientClass()
-
-        def get_clients(self, client_ids):
-            return HubsAPI.SubHub2Class.ClientsInServer(client_ids, self)
-
-        class ServerClass(GenericServer):
-            
-            def subscribe_to_hub(self, ):
-                """
-                :rtype : Future
-                """
-                args = list()
-                
-                return self.construct_message(args, "subscribe_to_hub")
-
-            def unsubscribe_from_hub(self, ):
-                """
-                :rtype : Future
-                """
-                args = list()
-                
-                return self.construct_message(args, "unsubscribe_from_hub")
-
-            def get_subscribed_clients_ids(self, ):
-                """
-                :rtype : Future
-                """
-                args = list()
-                
-                return self.construct_message(args, "get_subscribed_clients_ids")
 
         class ClientClass(GenericClient):
             def __init__(self):

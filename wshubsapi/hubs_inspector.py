@@ -2,6 +2,7 @@ import glob
 import imp
 import inspect
 import os
+from collections import OrderedDict
 
 from wshubsapi import utils
 from wshubsapi.client_file_generator.dart_file_generator import DartClientFileGenerator
@@ -115,23 +116,27 @@ class HubsInspector:
 
     @classmethod
     def get_hubs_information(cls):
-        info_report = {}
+        info_report = OrderedDict()
         hubs = cls.HUBS_DICT.values()
         for hub in hubs:
             functions = inspect.getmembers(hub, predicate=is_function_for_ws_client)
-            server_methods = {}
+            server_methods = OrderedDict()
             for name, method in functions:
                 # filtering functions to ignore
                 if inspect.getdoc(method) is not None and "HUBS_API_IGNORE" in inspect.getdoc(method):
                     continue
                 args_dict = dict(args=get_args(method), defaults=get_defaults(method))
                 server_methods[name] = args_dict
-            client_methods = {}
+            client_methods = OrderedDict()
             for name, method in hub.client_functions.items():
                 args_dict = dict(args=get_args(method), defaults=get_defaults(method))
                 client_methods[name] = args_dict
-
-            info_report[hub.__HubName__] = dict(serverMethods=server_methods, clientMethods=client_methods)
+            # sorting methods
+            server_methods = OrderedDict(sorted(server_methods.items()))
+            client_methods = OrderedDict(sorted(client_methods.items()))
+            info_report[hub.__HubName__] = OrderedDict(serverMethods=server_methods, clientMethods=client_methods)
+        # sorting report so we have always the same hubsapi id nothing change
+        info_report = OrderedDict(sorted(info_report.items()))
         return info_report
 
     @classmethod

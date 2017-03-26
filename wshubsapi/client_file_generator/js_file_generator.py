@@ -303,8 +303,11 @@ function HubsAPI(serverTimeout, wsClientClass, PromiseClass) {{
     {main}
 }}
 
-if (module && module.exports) {{
-  module.exports = HubsAPI;
+try {{
+  if (module && module.exports) {{
+    module.exports = HubsAPI;
+  }}
+}} catch (e) {{
 }}
 
 /* jshint ignore:end */
