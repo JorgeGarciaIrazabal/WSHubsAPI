@@ -2,7 +2,7 @@ import logging
 import traceback
 
 from wshubsapi.client_in_hub import ClientInHub
-from wshubsapi.hub import UnsuccessfulReplay
+from wshubsapi.hub import UnsuccessfulReply
 from wshubsapi.hubs_inspector import HubsInspector
 from wshubsapi.utils import get_args, SENDER_KEY_PARAMETER
 
@@ -38,11 +38,11 @@ class FunctionMessage:
 
     def call_function(self):
         success, reply = self.__execute_function()
-        if isinstance(reply, UnsuccessfulReplay):
-            return self.construct_replay_dict(False, reply.reply)
-        return self.construct_replay_dict(success, reply)
+        if isinstance(reply, UnsuccessfulReply):
+            return self.construct_reply_dict(False, reply.reply)
+        return self.construct_reply_dict(success, reply)
 
-    def construct_replay_dict(self, success=None, reply=None):
+    def construct_reply_dict(self, success=None, reply=None):
         return {
             "success": success,
             "reply": reply,

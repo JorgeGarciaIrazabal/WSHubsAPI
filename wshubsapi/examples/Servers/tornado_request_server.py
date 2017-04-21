@@ -12,7 +12,7 @@ log = logging.getLogger("_serverMock_")
 settings = {"static_path": os.path.join(os.path.dirname(__file__), "../Clients/_static")}
 
 app = web.Application([
-    (r'/(.*)', TornadoRequestHandler),
+    (r'/api/', TornadoRequestHandler),
 ])
 
 if __name__ == '__main__':

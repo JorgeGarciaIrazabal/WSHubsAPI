@@ -2,13 +2,13 @@
 
 class MessageCreator:
     @classmethod
-    def create_replay_message(cls, **kwargs):
-        message = cls.__get_default_replay_message()
+    def create_reply_message(cls, **kwargs):
+        message = cls.__get_default_reply_message()
         message.update(kwargs)
         return message
 
     @classmethod
-    def __get_default_replay_message(cls):
+    def __get_default_reply_message(cls):
         return {
             "success": True,
             "reply": "successfully completed",

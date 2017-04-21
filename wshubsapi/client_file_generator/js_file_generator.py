@@ -225,27 +225,27 @@ function HubsAPI(serverTimeout, wsClientClass, PromiseClass) {{
                         msgObj.function = toCamelCase(msgObj.function);
                         var executor = thisApi[msgObj.hub].client[msgObj.function];
                         if (executor !== undefined) {{
-                            var replayMessage = {{ID: msgObj.ID}};
+                            var replyMessage = {{ID: msgObj.ID}};
                             try {{
-                                replayMessage.reply = executor.apply(executor, msgObj.args);
-                                replayMessage.success = true;
+                                replyMessage.reply = executor.apply(executor, msgObj.args);
+                                replyMessage.success = true;
                             }} catch (e) {{
-                                replayMessage.success = false;
-                                replayMessage.reply = e.toString();
+                                replyMessage.success = false;
+                                replyMessage.reply = e.toString();
                             }} finally {{
-                                if (replayMessage.reply instanceof PromiseClass) {{
-                                    replayMessage.reply.then(function (result) {{
-                                        replayMessage.success = true;
-                                        replayMessage.reply = result;
-                                        thisApi.wsClient.send(__serialize(replayMessage));
+                                if (replyMessage.reply instanceof PromiseClass) {{
+                                    replyMessage.reply.then(function (result) {{
+                                        replyMessage.success = true;
+                                        replyMessage.reply = result;
+                                        thisApi.wsClient.send(__serialize(replyMessage));
                                     }}, function (error) {{
-                                        replayMessage.success = false;
-                                        replayMessage.reply = error;
-                                        thisApi.wsClient.send(__serialize(replayMessage));
+                                        replyMessage.success = false;
+                                        replyMessage.reply = error;
+                                        thisApi.wsClient.send(__serialize(replyMessage));
                                     }});
                                 }} else {{
-                                    replayMessage.reply = replayMessage.reply === undefined ? null : replayMessage.reply;
-                                    thisApi.wsClient.send(__serialize(replayMessage));
+                                    replyMessage.reply = replyMessage.reply === undefined ? null : replyMessage.reply;
+                                    thisApi.wsClient.send(__serialize(replyMessage));
                                 }}
                             }}
                         }} else {{

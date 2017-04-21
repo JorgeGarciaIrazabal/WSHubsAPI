@@ -23,8 +23,8 @@ class TestFunctionMessage(unittest.TestCase):
             def test_no_sender(self, x):
                 return x
 
-            def test_replay_unsuccessful(self, x):
-                return self._construct_unsuccessful_replay(x)
+            def test_reply_unsuccessful(self, x):
+                return self._construct_unsuccessful_reply(x)
 
         self.env_mock = flexmock(debug_mode=True)
         self.testHubClass = TestHub
@@ -59,7 +59,7 @@ class TestFunctionMessage(unittest.TestCase):
         message = self.__constructMessageStr(function="notExists")
         self.assertRaises(AttributeError, FunctionMessage, message, "connectedClient", self.env_mock)
 
-    def test_CallFunction_ReturnsAnExpectedReplayMessageIfSuccess(self):
+    def test_CallFunction_ReturnsAnExpectedReplyMessageIfSuccess(self):
         fn = FunctionMessage(self.__constructMessageStr(args=["x"], ID=15, function="test_no_sender"), "_sender",
                              self.env_mock)
 
@@ -71,7 +71,7 @@ class TestFunctionMessage(unittest.TestCase):
         self.assertEqual(function_result["function"], "test_no_sender")
         self.assertEqual(function_result["ID"], 15)
 
-    def test_CallFunction_ReturnsAnExpectedReplayMessageIfNoSuccess(self):
+    def test_CallFunction_ReturnsAnExpectedReplyMessageIfNoSuccess(self):
         fn = FunctionMessage(self.__constructMessageStr(ID=15, function="test_exception"), "_sender", self.env_mock)
 
         function_result = fn.call_function()
@@ -109,8 +109,8 @@ class TestFunctionMessage(unittest.TestCase):
         self.assertEqual(function_result["success"], False)
         self.assertEqual(function_result["reply"]["error"], "MyException")
 
-    def test_CallFunction_ReplaysSuccessFalseIfReturnsUnsuccessfulReplayObject(self):
-        fn = FunctionMessage(self.__constructMessageStr(function="test_replay_unsuccessful", args=["x"]), "_sender",
+    def test_CallFunction_ReplysSuccessFalseIfReturnsUnsuccessfulReplyObject(self):
+        fn = FunctionMessage(self.__constructMessageStr(function="test_reply_unsuccessful", args=["x"]), "_sender",
                              self.env_mock)
 
         function_result = fn.call_function()

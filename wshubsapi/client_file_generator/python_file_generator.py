@@ -183,16 +183,16 @@ def construct_api_client_class(client_class):
             else:
                 try:
                     client_function = getattr(getattr(self.api, (msg_obj["hub"])).client, msg_obj["function"])
-                    replay_message = dict(ID=msg_obj["ID"])
+                    reply_message = dict(ID=msg_obj["ID"])
                     try:
                         reply = client_function(*msg_obj["args"])
-                        replay_message["reply"] = reply
-                        replay_message["success"] = True
+                        reply_message["reply"] = reply
+                        reply_message["success"] = True
                     except Exception as e:
-                        replay_message["reply"] = str(e)
-                        replay_message["success"] = False
+                        reply_message["reply"] = str(e)
+                        reply_message["success"] = False
                     finally:
-                        self.api.ws_client.send(self.api.serialize_object(replay_message))
+                        self.api.ws_client.send(self.api.serialize_object(reply_message))
                 except:
                     self.log.exception("unable to call client function")
 

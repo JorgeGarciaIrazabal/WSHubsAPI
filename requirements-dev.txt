@@ -8,5 +8,6 @@ xmlrunner
 coverage
 requests
 django
+Flask
 twine
 wheel

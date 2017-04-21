@@ -15,3 +15,4 @@ class ChatHub(Hub):
         It is just to inform, it is not mandatory but recommended
         """
         return dict(print_message=lambda sender_name, msg: None)
+

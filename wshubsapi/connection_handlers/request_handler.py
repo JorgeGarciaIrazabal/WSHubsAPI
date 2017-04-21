@@ -1,6 +1,7 @@
-from SimpleHTTPServer import SimpleHTTPRequestHandler
 import logging
 import threading
+from flask import request
+from http.server import SimpleHTTPRequestHandler
 
 import requests
 import tornado
@@ -47,14 +48,40 @@ class TornadoRequestHandler(tornado.web.RequestHandler):
 
     def __init__(self, application, request, **kwargs):
         super(TornadoRequestHandler, self).__init__(application, request, **kwargs)
-        self._connected_client_mock = ConnectedClient(self.comm_environment, self.write)
         if TornadoRequestHandler.comm_environment is None:
             TornadoRequestHandler.comm_environment = CommEnvironment()
+        self._connected_client_mock = ConnectedClient(self.comm_environment, self.write)
 
     def get(self, *args):
         message = self.request.body
         log.debug("Message received from:\n{} ".format(message))
         self.comm_environment.on_message(self._connected_client_mock, message)
+
+
+class FlaskRequestHandler:
+    comm_environment = None
+
+    def data_received(self, chunk):
+        pass
+
+    def __init__(self):
+        self.client_response = ""
+
+        if self.comm_environment is None:
+            self.comm_environment = CommEnvironment()
+        self._connected_client_mock = ConnectedClient(self.comm_environment, self.write)
+
+    def handle_message(self):
+        message = request.get_data()
+        log.debug("Message received from:\n{} ".format(message))
+        self.comm_environment.on_message(self._connected_client_mock, message)
+
+    def write(self, message):
+        self.client_response = message
+
+    def get_response(self):
+        log.debug("Message received to:\n{} ".format(self.client_response))
+        return self.client_response
 
 
 class DjangoRequestHandler:

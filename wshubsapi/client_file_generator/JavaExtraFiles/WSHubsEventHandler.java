@@ -23,14 +23,14 @@ public abstract class WSHubsEventHandler implements WebSocketEventHandler {
     public void onMessage(WebSocketMessage message) {
         try {
             JSONObject msgObj = new JSONObject(message.getText());
-            if (msgObj.has("replay")) {//critical point TODO:use mutex or conditions to prevent concurrent problems
+            if (msgObj.has("reply")) {//critical point TODO:use mutex or conditions to prevent concurrent problems
                 if (returnFunctions.containsKey(msgObj.getInt("ID"))) {
                     FunctionResult.Handler task = returnFunctions.get(msgObj.getInt("ID"));
                     if (!task.isDone()) {
                         if (msgObj.getBoolean("success"))
-                            task._onSuccess(msgObj.get("replay"));
+                            task._onSuccess(msgObj.get("reply"));
                         else
-                            task._onError(msgObj.get("replay"));
+                            task._onError(msgObj.get("reply"));
                     }
                 }
             } else {

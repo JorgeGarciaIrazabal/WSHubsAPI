@@ -7,7 +7,7 @@ from wshubsapi.connected_clients_holder import ConnectedClientsHolder
 from wshubsapi.comm_environment import CommEnvironment
 from wshubsapi.client_in_hub import ClientInHub
 from wshubsapi.connected_client import ConnectedClient
-from wshubsapi.hub import Hub, UnsuccessfulReplay
+from wshubsapi.hub import Hub, UnsuccessfulReply
 from wshubsapi.test.utils.hubs_utils import remove_hubs_subclasses
 
 
@@ -26,11 +26,11 @@ class TestHub(unittest.TestCase):
     def test_hub_creation__adds__HubName__attribute_to_sub_class(self):
         self.assertEqual("TestHub1", self.hub.__HubName__)
 
-    def test_construct_unnecessary_replay_returns_unsuccessful_replay_instance(self):
-        unsuccessful_replay = self.hub._construct_unsuccessful_replay("reply")
+    def test_construct_unnecessary_reply_returns_unsuccessful_reply_instance(self):
+        unsuccessful_reply = self.hub._construct_unsuccessful_reply("reply")
 
-        self.assertIsInstance(unsuccessful_replay, UnsuccessfulReplay)
-        self.assertEqual(unsuccessful_replay.reply, "reply")
+        self.assertIsInstance(unsuccessful_reply, UnsuccessfulReply)
+        self.assertEqual(unsuccessful_reply.reply, "reply")
 
     def test_hub_creation_starts_with_no_subscribed_clients(self):
 

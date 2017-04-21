@@ -20,8 +20,8 @@ class TestConnectedClient(unittest.TestCase):
         class TestHub(Hub):
             def __init__(self):
                 super(TestHub, self).__init__()
-                self.testFunctionReplayArg = lambda x: x
-                self.testFunctionReplayNone = lambda: None
+                self.testFunctionReplyArg = lambda x: x
+                self.testFunctionReplyNone = lambda: None
 
             def test_function_error(self):
                 raise Exception("Error")
@@ -75,35 +75,35 @@ class TestConnectedClient(unittest.TestCase):
         message = MessageCreator.create_on_message_message(hub=self.testHubClass.__HubName__,
                                                            function=function_str,
                                                            args=args)
-        replay_message = MessageCreator.create_replay_message(hub=self.testHubClass.__HubName__,
+        reply_message = MessageCreator.create_reply_message(hub=self.testHubClass.__HubName__,
                                                               function=function_str,
                                                               reply=reply,
                                                               success=success)
         message_str = json.dumps(message)
         self.commEnvironment = flexmock(self.commEnvironment)
 
-        return message_str, replay_message
+        return message_str, reply_message
 
-    def test_onMessage_callsReplayIfSuccess(self):
-        message_str, replay_message = self.__set_up_on_message("testFunctionReplayArg", [1], 1)
-        self.commEnvironment.should_receive("reply").with_args(self.connectedClient, replay_message, message_str).once()
+    def test_onMessage_callsReplyIfSuccess(self):
+        message_str, reply_message = self.__set_up_on_message("testFunctionReplyArg", [1], 1)
+        self.commEnvironment.should_receive("reply").with_args(self.connectedClient, reply_message, message_str).once()
 
         self.commEnvironment.on_message(self.connectedClient, message_str)
 
     def test_onMessage_callsOnErrorIfError(self):
-        message_str, replay_message = self.__set_up_on_message("testFunctionError", [], dict, success=False)
-        self.commEnvironment.should_receive("__on_replay").with_args(self.connectedClient, message_str, dict).once()
+        message_str, reply_message = self.__set_up_on_message("testFunctionError", [], dict, success=False)
+        self.commEnvironment.should_receive("__on_reply").with_args(self.connectedClient, message_str, dict).once()
 
         self.commEnvironment.on_message(self.connectedClient, message_str)
 
-    def test_onMessage_notCallsReplayIfFunctionReturnNone(self):
-        message_str, replay_message = self.__set_up_on_message("testFunctionReplayNone", [], None)
+    def test_onMessage_notCallsReplyIfFunctionReturnNone(self):
+        message_str, reply_message = self.__set_up_on_message("testFunctionReplyNone", [], None)
         self.commEnvironment.should_receive("reply").never()
 
         self.commEnvironment.on_message(self.connectedClient, message_str)
 
     def test_onMessage_onErrorIsCalledIfMessageCanNotBeParsed(self):
-        message_str, replay_message = self.__set_up_on_message("testFunctionReplayNone", [], None)
+        message_str, reply_message = self.__set_up_on_message("testFunctionReplyNone", [], None)
         self.commEnvironment.should_receive("reply").never()
         self.commEnvironment.should_receive("on_error").once()
 
@@ -118,9 +118,9 @@ class TestConnectedClient(unittest.TestCase):
         self.assertRaises(KeyError, self.connectedClientsHolder.get_client, id_)
         self.assertEqual(len(self.connectedClientsHolder.all_connected_clients), 0)
 
-    def test_replay_writeMessageWithAString(self):
-        replay_message = MessageCreator.create_replay_message()
+    def test_reply_writeMessageWithAString(self):
+        reply_message = MessageCreator.create_reply_message()
         self.connectedClient = flexmock(self.connectedClient)
         self.connectedClient.should_receive("api_write_message").with_args(str).once()
 
-        self.commEnvironment.reply(self.connectedClient, replay_message, "test")
+        self.commEnvironment.reply(self.connectedClient, reply_message, "test")

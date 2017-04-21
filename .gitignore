@@ -57,5 +57,6 @@ build
 **/test-reports/
 .sonar
 **/__pycache__/
+/env
 
 wshubsapi/test/integration/resources/clients_api/*

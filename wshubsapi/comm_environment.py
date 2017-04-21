@@ -10,8 +10,6 @@ from wshubsapi.serializer import Serializer
 # do not remove this line (hubs inspector needs to find it)
 from wshubsapi import utils_api_hub
 
-__author__ = 'Jorge Garcia Irazabal'
-
 
 class HubsApiException(Exception):
     pass
@@ -54,12 +52,13 @@ class CommEnvironment(object):
 
     def on_message(self, client, msg_str):
         try:
+            msg_str = msg_str if not isinstance(msg_str, bytes) else msg_str.decode("utf-8")
             msg_str = msg_str if isinstance(msg_str, str) else msg_str.encode("utf-8")
             msg_obj = self.serializer.unserialize(msg_str)
             if "reply" not in msg_obj:
-                self.__on_replay(client, msg_str, msg_obj)
+                self.__on_reply(client, msg_str, msg_obj)
             else:
-                self.__on_replayed(msg_obj)
+                self.__on_replied(msg_obj)
 
         except Exception as e:
             self.on_error(client, e)
@@ -87,9 +86,6 @@ class CommEnvironment(object):
             self.__futures_buffer[id_] = Future()
         return self.__futures_buffer[id_], id_
 
-    def close(self, **kwargs):
-        self.message_received_queue.executor.shutdown(**kwargs)
-
     def serialize_message(self, message):
         return self.serializer.serialize(message)
 
@@ -99,13 +95,13 @@ class CommEnvironment(object):
                 future = self.__futures_buffer.pop(id_)
                 future.set_exception(HubsApiException("Timeout exception"))
 
-    def __on_replay(self, client, msg_str, msg_obj):
+    def __on_reply(self, client, msg_str, msg_obj):
         hub_function = FunctionMessage(msg_obj, client, self)
         reply = hub_function.call_function()
         if reply is not None:
             self.reply(client, reply, msg_str)
 
-    def __on_replayed(self, msg_obj):
+    def __on_replied(self, msg_obj):
         future = self.__futures_buffer.pop(msg_obj["ID"], None)
         if future is not None:
             if msg_obj["success"]:
